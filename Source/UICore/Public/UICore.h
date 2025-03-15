@@ -4,7 +4,7 @@
 
 #include "Modules/ModuleManager.h"
 
-class FUIModule : public IModuleInterface
+class FUICoreModule : public IModuleInterface
 {
 public:
 

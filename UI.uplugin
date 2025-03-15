@@ -16,9 +16,15 @@
 	"Installed": false,
 	"Modules": [
 		{
-			"Name": "UI",
+			"Name": "UICore",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ECS",
+			"Enabled": true
 		}
 	]
 }
