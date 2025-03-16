@@ -7,7 +7,6 @@
 namespace UI {
 
 	void ThemeComponents::Register(flecs::world& world) {
-		world.component<UIScale>();
+		world.component<UIScale>().member<float>("Value");		
 	}
-
 }

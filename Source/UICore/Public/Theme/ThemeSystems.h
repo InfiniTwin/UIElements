@@ -5,8 +5,13 @@
 #include "flecs.h"
 
 namespace UI {
-	struct UICORE_API Module {
+
+	struct ThemeSystems
+	{
 	public:
-		Module(flecs::world& world);
+		static void Register(flecs::world& world);
+
+	private:
+		static void Initialize(flecs::world& world);
 	};
 }

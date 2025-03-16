@@ -12,7 +12,8 @@ public class UICore : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[] {
 				"Core",
-				"FlecsLibrary"
+				"ECSCore",
+				"FlecsLibrary",
 			});
 
 
