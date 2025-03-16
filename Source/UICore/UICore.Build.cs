@@ -8,8 +8,6 @@ public class UICore : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicIncludePaths.AddRange(new string[] { "UICore/Public" });
-
 		PublicDependencyModuleNames.AddRange(new string[] {
 				"Core",
 				"ECSCore",

@@ -12,6 +12,6 @@ namespace UI {
 	}
 
 	void ThemeSystems::Initialize(flecs::world& world) {
-		world.set<UIScale>({2.2f});
+		world.set<UIScale>({ 1.0f });
 	}
 }
