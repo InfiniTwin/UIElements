@@ -1,9 +1,6 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Theme/ThemeComponents.h"
-#include "CoreMinimal.h"
-#include "flecs.h"
-#include "World.h"
 
 namespace UI {
 	void ThemeComponents::Register(flecs::world& world) {

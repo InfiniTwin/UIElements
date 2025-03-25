@@ -2,17 +2,116 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "flecs.h"
+#include "World.h"
 
 namespace UI {
-
-	struct ThemeComponents
-	{
-	public:
+	struct ThemeComponents {
 		static void Register(flecs::world& world);
 	};
 
-	struct UIScale {
-		float Value = 1;
+#pragma region Singletons
+
+	struct UIScale { float Value = 1; };
+
+	struct Colors {
+		// Primary Colors
+		FString Primary;
+		FString OnPrimary;
+		FString PrimaryContainer;
+		FString OnPrimaryContainer;
+
+		// Secondary Colors
+		FString Secondary;
+		FString OnSecondary;
+		FString SecondaryContainer;
+		FString OnSecondaryContainer;
+
+		// Tertiary Colors
+		FString Tertiary;
+		FString OnTertiary;
+		FString TertiaryContainer;
+		FString OnTertiaryContainer;
+
+		// Error Colors
+		FString Error;
+		FString OnError;
+		FString ErrorContainer;
+		FString OnErrorContainer;
+
+		// Fixed Colors
+		FString PrimaryFixed;
+		FString PrimaryFixedDim;
+		FString OnPrimaryFixed;
+		FString OnPrimaryFixedVariant;
+
+		FString SecondaryFixed;
+		FString SecondaryFixedDim;
+		FString OnSecondaryFixed;
+		FString OnSecondaryFixedVariant;
+
+		FString TertiaryFixed;
+		FString TertiaryFixedDim;
+		FString OnTertiaryFixed;
+		FString OnTertiaryFixedVariant;
+
+		// Surface Colors
+		FString SurfaceDim;
+		FString Surface;
+		FString SurfaceBright;
+
+		FString SurfaceContainerLowest;
+		FString SurfaceContainerLow;
+		FString SurfaceContainer;
+		FString SurfaceContainerHigh;
+		FString SurfaceContainerHighest;
+
+		// Other Colors
+		FString OnSurface;
+		FString OnSurfaceVariant;
+		FString Outline;
+		FString OutlineVariant;
+
+		FString InverseSurface;
+		FString InverseOnSurface;
+		FString InversePrimary;
+
+		FString Scrim;
+		FString Shadow;
 	};
+
+	// https://m3.material.io/styles/typography/type-scale-tokens
+	struct TextFont { FString Value; };
+	struct TextTypes {
+		// Display
+		FSlateFontInfo DisplayLarge;
+		FSlateFontInfo DisplayMedium;
+		FSlateFontInfo DisplaySmall;
+
+		// Headline
+		FSlateFontInfo HeadlineLarge;
+		FSlateFontInfo HeadlineMedium;
+		FSlateFontInfo HeadlineSmall;
+
+		// Title
+		FSlateFontInfo TitleLarge;
+		FSlateFontInfo TitleMedium;
+		FSlateFontInfo TitleSmall;
+
+		// Body
+		FSlateFontInfo BodyLarge;
+		FSlateFontInfo BodyMedium;
+		FSlateFontInfo BodySmall;
+
+		// Label
+		FSlateFontInfo LabelLarge;
+		FSlateFontInfo LabelMedium;
+		FSlateFontInfo LabelSmall;
+	};
+
+	struct IconFont { FString Value; };
+	struct IconFontFill { FString Value; };
+
+#pragma endregion
 }
