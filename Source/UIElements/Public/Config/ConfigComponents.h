@@ -2,18 +2,31 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "flecs.h"
-#include "World.h"
+#include "dynamiccolor/variant.h"
+#include "utils/utils.h"
 
 namespace UIElements {
-	struct ThemeComponents {
+	struct ConfigComponents {
 		static void Register(flecs::world& world);
 	};
 
 #pragma region Singletons
 
-	struct UIScale { float Value = 1; };
+	struct UIScale { double Value = 1; };
+
+	using namespace material_color_utilities;
+	struct UIScheme {
+		bool DarkMode;
+		double Contrast;
+		Variant Variant;
+		Argb PrimaryColor;
+		Argb SecondaryColor;
+		Argb TertiaryColor;
+		Argb NuetralColor;
+		Argb NeutralVariantColor;
+		Argb ErrorColor;
+	};
 
 	struct Colors {
 		// Primary Colors

@@ -3,11 +3,10 @@
 #pragma once
 
 #include "flecs.h"
-#include "Theme/ThemeComponents.h"
 
 namespace UIElements {
 
-	struct ThemeSystems
+	struct ConfigSystems
 	{
 	public:
 		static void Register(flecs::world& world);

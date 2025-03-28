@@ -2,14 +2,14 @@
 
 
 #include "Module.h"
-#include "Theme/ThemeComponents.h"
-#include "Theme/ThemeSystems.h"
+#include "Config/ConfigComponents.h"
+#include "Config/ConfigSystems.h"
 
 namespace UIElements {
 	Module::Module(flecs::world& world) {
 		world.module<Module>();
 
-		ThemeComponents::Register(world);
-		ThemeSystems::Register(world);
+		ConfigComponents::Register(world);
+		ConfigSystems::Register(world);
 	}
 }
