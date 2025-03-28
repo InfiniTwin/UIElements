@@ -3,8 +3,9 @@
 #pragma once
 
 #include "flecs.h"
+#include "Theme/ThemeComponents.h"
 
-namespace UI {
+namespace UIElements {
 
 	struct ThemeSystems
 	{

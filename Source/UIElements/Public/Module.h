@@ -4,9 +4,9 @@
 
 #include "flecs.h"
 
-namespace UI {
-	struct UICORE_API UICoreModule {
+namespace UIElements {
+	struct UIELEMENTS_API Module {
 	public:
-		UICoreModule(flecs::world& world);
+		Module(flecs::world& world);
 	};
 }

@@ -6,7 +6,7 @@
 #include "flecs.h"
 #include "World.h"
 
-namespace UI {
+namespace UIElements {
 	struct ThemeComponents {
 		static void Register(flecs::world& world);
 	};

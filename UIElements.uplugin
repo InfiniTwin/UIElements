@@ -2,8 +2,8 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "UI",
-	"Description": "UI extensions for Slate and Material You",
+	"FriendlyName": "UI Elements",
+	"Description": "Slate UI Elements",
 	"Category": "UI",
 	"CreatedBy": "Cuku",
 	"CreatedByURL": "",
@@ -16,7 +16,7 @@
 	"Installed": false,
 	"Modules": [
 		{
-			"Name": "UICore",
+			"Name": "UIElements",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

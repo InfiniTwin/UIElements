@@ -1,15 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "UICore.h"
+#include "UIElements.h"
 
-#define LOCTEXT_NAMESPACE "FUICoreModule"
+#define LOCTEXT_NAMESPACE "FUIElementsModule"
 
-void FUICoreModule::StartupModule()
+void FUIElementsModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 }
 
-void FUICoreModule::ShutdownModule()
+void FUIElementsModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
@@ -17,4 +17,4 @@ void FUICoreModule::ShutdownModule()
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FUICoreModule, UICore)
+IMPLEMENT_MODULE(FUIElementsModule, UIElements)

@@ -2,7 +2,7 @@
 
 #include "Theme/ThemeComponents.h"
 
-namespace UI {
+namespace UIElements {
 	void ThemeComponents::Register(flecs::world& world) {
 		world.component<FString>()
 			.opaque(flecs::String)
