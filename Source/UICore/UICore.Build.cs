@@ -10,10 +10,10 @@ public class UICore : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[] {
 				"Core",
-				"ECSCore",
 				"FlecsLibrary",
+				"ECSCore",
+				"UIMCU",
 			});
-
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
 				"CoreUObject",

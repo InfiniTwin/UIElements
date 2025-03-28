@@ -3,8 +3,8 @@
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "UI",
-	"Description": "UI extensions",
-	"Category": "Cuku",
+	"Description": "UI extensions for Slate and Material You",
+	"Category": "UI",
 	"CreatedBy": "Cuku",
 	"CreatedByURL": "",
 	"DocsURL": "",
@@ -24,6 +24,10 @@
 	"Plugins": [
 		{
 			"Name": "ECS",
+			"Enabled": true
+		},
+		{
+			"Name": "UIMCU",
 			"Enabled": true
 		}
 	]
