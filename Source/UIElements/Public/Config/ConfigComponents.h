@@ -9,6 +9,7 @@
 namespace UIElements {
 	struct ConfigComponents {
 		static void Register(flecs::world& world);
+		static void RegisterOpaqueTypes(flecs::world& world);
 	};
 
 #pragma region Singletons
@@ -20,12 +21,12 @@ namespace UIElements {
 		bool DarkMode;
 		double Contrast;
 		Variant Variant;
-		Argb PrimaryColor;
-		Argb SecondaryColor;
-		Argb TertiaryColor;
-		Argb NuetralColor;
-		Argb NeutralVariantColor;
-		Argb ErrorColor;
+		Argb Primary;
+		Argb Secondary;
+		Argb Tertiary;
+		Argb Neutral;
+		Argb NeutralVariant;
+		Argb Error;
 	};
 
 	struct Colors {

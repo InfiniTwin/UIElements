@@ -2,10 +2,29 @@
 
 #include "Config/ConfigComponents.h"
 #include "UIUtils.h"
-#include "World.h"
+#include "Component.h"
 
 namespace UIElements {
 	void ConfigComponents::Register(flecs::world& world) {
+		RegisterOpaqueTypes(world);
+
+		world.component<UIScale>().member<double>(NAMEOF_MEMBER(UIScale::Value));
+
+		world.component<UIScheme>()
+			.member<bool>(NAMEOF_MEMBER(UIScheme::DarkMode))
+			.member<double>(NAMEOF_MEMBER(UIScheme::Contrast))
+			.member<Variant>(NAMEOF_MEMBER(UIScheme::Variant))
+			.member<Argb>(NAMEOF_MEMBER(UIScheme::Primary))
+			.member<Argb>(NAMEOF_MEMBER(UIScheme::Secondary))
+			.member<Argb>(NAMEOF_MEMBER(UIScheme::Tertiary))
+			.member<Argb>(NAMEOF_MEMBER(UIScheme::Neutral))
+			.member<Argb>(NAMEOF_MEMBER(UIScheme::NeutralVariant))
+			.member<Argb>(NAMEOF_MEMBER(UIScheme::Error));
+
+		world.component<TextFont>().member<FString>(NAMEOF_MEMBER(TextFont::Value));
+	}
+
+	void ConfigComponents::RegisterOpaqueTypes(flecs::world& world) {
 		// FString <=> std::string
 		world.component<FString>()
 			.opaque(flecs::String)
@@ -51,21 +70,5 @@ namespace UIElements {
 				{
 					*data = UIUtils::ArgbFromHex(value);
 				});
-
-		world.component<UIScale>().member<double>("Value");
-		world.component<UIScheme>()
-			.member<bool>("DarkMode")
-			.member<double>("Contrast")
-			.member<Variant>("Variant")
-			.member<Argb>("PrimaryColor")
-			.member<Argb>("SecondaryColor")
-			.member<Argb>("TertiaryColor")
-			.member<Argb>("NuetralColor")
-			.member<Argb>("NeutralVariantColor")
-			.member<Argb>("ErrorColor");
-
-		world.component<TextFont>().member<FString>("Value");
-
-		World::DeserializeSingletons(world, "UIConfig");
 	}
 }
