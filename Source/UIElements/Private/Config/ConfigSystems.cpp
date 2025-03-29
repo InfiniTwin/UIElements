@@ -30,25 +30,56 @@ namespace UIElements {
 			TonalPalette(uiScheme->NeutralVariant),
 			TonalPalette(uiScheme->Error));
 
-		//auto scheme = DynamicScheme(
-		//	/*source_color_argb=*/ Hct(0xFF1B6EF3),
-		//	/*variant=*/ Variant::kFidelity,
-		//	/*contrast_level=*/ 0.5,
-		//	/*is_dark=*/ false,
-		//	/*primary_palette=*/ TonalPalette(0xFF1B6EF3),
-		//	/*secondary_palette=*/ TonalPalette(0xFF8E909B),
-		//	/*tertiary_palette=*/ TonalPalette(0xFF4A90E2),
-		//	/*neutral_palette=*/ TonalPalette(0xFF919094),
-		//	/*neutral_variant_palette=*/ TonalPalette(0xFF8F9099),
-		//	/*error_palette=*/ TonalPalette(0xFFAB342C));
-
-		Argb argb = MaterialDynamicColors::Surface().GetArgb(dynamicScheme);
-		//UE_LOG(LogTemp, Log, TEXT(">>> %u"), argb);
-		//std::stringstream ss;
-		//ss << "0x" << std::setw(8) << std::setfill('0') << std::hex << argb;
-		//UE_LOG(LogTemp, Log, TEXT(">>> %s"), *FString(ss.str().c_str()));
-		UE_LOG(LogTemp, Log, TEXT(">>> %hs"), UIUtils::HexFromArgb(argb).c_str());
-
+		world.set<UIColors>({
+			MaterialDynamicColors::Background().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnBackground().GetLinear(dynamicScheme),
+			MaterialDynamicColors::Surface().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SurfaceDim().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SurfaceBright().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SurfaceContainerLowest().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SurfaceContainerLow().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SurfaceContainer().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SurfaceContainerHigh().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SurfaceContainerHighest().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnSurface().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SurfaceVariant().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnSurfaceVariant().GetLinear(dynamicScheme),
+			MaterialDynamicColors::InverseSurface().GetLinear(dynamicScheme),
+			MaterialDynamicColors::InverseOnSurface().GetLinear(dynamicScheme),
+			MaterialDynamicColors::Outline().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OutlineVariant().GetLinear(dynamicScheme),
+			MaterialDynamicColors::Shadow().GetLinear(dynamicScheme),
+			MaterialDynamicColors::Scrim().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SurfaceTint().GetLinear(dynamicScheme),
+			MaterialDynamicColors::Primary().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnPrimary().GetLinear(dynamicScheme),
+			MaterialDynamicColors::PrimaryContainer().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnPrimaryContainer().GetLinear(dynamicScheme),
+			MaterialDynamicColors::InversePrimary().GetLinear(dynamicScheme),
+			MaterialDynamicColors::Secondary().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnSecondary().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SecondaryContainer().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnSecondaryContainer().GetLinear(dynamicScheme),
+			MaterialDynamicColors::Tertiary().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnTertiary().GetLinear(dynamicScheme),
+			MaterialDynamicColors::TertiaryContainer().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnTertiaryContainer().GetLinear(dynamicScheme),
+			MaterialDynamicColors::Error().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnError().GetLinear(dynamicScheme),
+			MaterialDynamicColors::ErrorContainer().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnErrorContainer().GetLinear(dynamicScheme),
+			MaterialDynamicColors::PrimaryFixed().GetLinear(dynamicScheme),
+			MaterialDynamicColors::PrimaryFixedDim().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnPrimaryFixed().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnPrimaryFixedVariant().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SecondaryFixed().GetLinear(dynamicScheme),
+			MaterialDynamicColors::SecondaryFixedDim().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnSecondaryFixed().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnSecondaryFixedVariant().GetLinear(dynamicScheme),
+			MaterialDynamicColors::TertiaryFixed().GetLinear(dynamicScheme),
+			MaterialDynamicColors::TertiaryFixedDim().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnTertiaryFixed().GetLinear(dynamicScheme),
+			MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(dynamicScheme) });
 
 		// Read from config 
 		//FString FontPath = TEXT("Fonts"); // get from config

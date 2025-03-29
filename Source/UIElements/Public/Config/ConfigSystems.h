@@ -6,12 +6,8 @@
 
 namespace UIElements {
 
-	struct ConfigSystems
-	{
-	public:
+	struct ConfigSystems {
 		static void Register(flecs::world& world);
-
-	private:
 		static void Initialize(flecs::world& world);
 	};
 }

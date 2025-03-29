@@ -8,8 +8,8 @@
 
 namespace UIElements {
 	struct ConfigComponents {
-		static void Register(flecs::world& world);
 		static void RegisterOpaqueTypes(flecs::world& world);
+		static void Register(flecs::world& world);
 	};
 
 #pragma region Singletons
@@ -29,70 +29,56 @@ namespace UIElements {
 		Argb Error;
 	};
 
-	struct Colors {
-		// Primary Colors
-		FString Primary;
-		FString OnPrimary;
-		FString PrimaryContainer;
-		FString OnPrimaryContainer;
-
-		// Secondary Colors
-		FString Secondary;
-		FString OnSecondary;
-		FString SecondaryContainer;
-		FString OnSecondaryContainer;
-
-		// Tertiary Colors
-		FString Tertiary;
-		FString OnTertiary;
-		FString TertiaryContainer;
-		FString OnTertiaryContainer;
-
-		// Error Colors
-		FString Error;
-		FString OnError;
-		FString ErrorContainer;
-		FString OnErrorContainer;
-
-		// Fixed Colors
-		FString PrimaryFixed;
-		FString PrimaryFixedDim;
-		FString OnPrimaryFixed;
-		FString OnPrimaryFixedVariant;
-
-		FString SecondaryFixed;
-		FString SecondaryFixedDim;
-		FString OnSecondaryFixed;
-		FString OnSecondaryFixedVariant;
-
-		FString TertiaryFixed;
-		FString TertiaryFixedDim;
-		FString OnTertiaryFixed;
-		FString OnTertiaryFixedVariant;
-
-		// Surface Colors
-		FString SurfaceDim;
-		FString Surface;
-		FString SurfaceBright;
-
-		FString SurfaceContainerLowest;
-		FString SurfaceContainerLow;
-		FString SurfaceContainer;
-		FString SurfaceContainerHigh;
-		FString SurfaceContainerHighest;
-
-		// Other Colors
-		FString OnSurface;
-		FString OnSurfaceVariant;
-		FString Outline;
-		FString OutlineVariant;
-
-		FString InverseSurface;
-		FString InverseOnSurface;
-		FString InversePrimary;
-
-		FString Scrim;
-		FString Shadow;
+	struct UIColors {
+		FLinearColor Background;
+		FLinearColor OnBackground;
+		FLinearColor Surface;
+		FLinearColor SurfaceDim;
+		FLinearColor SurfaceBright;
+		FLinearColor SurfaceContainerLowest;
+		FLinearColor SurfaceContainerLow;
+		FLinearColor SurfaceContainer;
+		FLinearColor SurfaceContainerHigh;
+		FLinearColor SurfaceContainerHighest;
+		FLinearColor OnSurface;
+		FLinearColor SurfaceVariant;
+		FLinearColor OnSurfaceVariant;
+		FLinearColor InverseSurface;
+		FLinearColor InverseOnSurface;
+		FLinearColor Outline;
+		FLinearColor OutlineVariant;
+		FLinearColor Shadow;
+		FLinearColor Scrim;
+		FLinearColor SurfaceTint;
+		FLinearColor Primary;
+		FLinearColor OnPrimary;
+		FLinearColor PrimaryContainer;
+		FLinearColor OnPrimaryContainer;
+		FLinearColor InversePrimary;
+		FLinearColor Secondary;
+		FLinearColor OnSecondary;
+		FLinearColor SecondaryContainer;
+		FLinearColor OnSecondaryContainer;
+		FLinearColor Tertiary;
+		FLinearColor OnTertiary;
+		FLinearColor TertiaryContainer;
+		FLinearColor OnTertiaryContainer;
+		FLinearColor Error;
+		FLinearColor OnError;
+		FLinearColor ErrorContainer;
+		FLinearColor OnErrorContainer;
+		FLinearColor PrimaryFixed;
+		FLinearColor PrimaryFixedDim;
+		FLinearColor OnPrimaryFixed;
+		FLinearColor OnPrimaryFixedVariant;
+		FLinearColor SecondaryFixed;
+		FLinearColor SecondaryFixedDim;
+		FLinearColor OnSecondaryFixed;
+		FLinearColor OnSecondaryFixedVariant;
+		FLinearColor TertiaryFixed;
+		FLinearColor TertiaryFixedDim;
+		FLinearColor OnTertiaryFixed;
+		FLinearColor OnTertiaryFixedVariant;
 	};
 
 	// https://m3.material.io/styles/typography/type-scale-tokens
