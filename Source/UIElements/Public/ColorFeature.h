@@ -7,14 +7,15 @@
 #include "utils/utils.h"
 
 namespace UIElements {
-	struct ConfigComponents {
+	struct ColorFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
-		static void Register(flecs::world& world);
+		static void RegisterComponents(flecs::world& world);
+		static void RegisterSystems(flecs::world& world);
+
+		static void Initialize(flecs::world& world);
 	};
 
-#pragma region Singletons
-
-	struct UIScale { double Value = 1; };
+#pragma region Config
 
 	using namespace material_color_utilities;
 	struct UIScheme {
@@ -80,38 +81,6 @@ namespace UIElements {
 		FLinearColor OnTertiaryFixed;
 		FLinearColor OnTertiaryFixedVariant;
 	};
-
-	// https://m3.material.io/styles/typography/type-scale-tokens
-	struct TextFont { FString Value; };
-	struct TextTypes {
-		// Display
-		FSlateFontInfo DisplayLarge;
-		FSlateFontInfo DisplayMedium;
-		FSlateFontInfo DisplaySmall;
-
-		// Headline
-		FSlateFontInfo HeadlineLarge;
-		FSlateFontInfo HeadlineMedium;
-		FSlateFontInfo HeadlineSmall;
-
-		// Title
-		FSlateFontInfo TitleLarge;
-		FSlateFontInfo TitleMedium;
-		FSlateFontInfo TitleSmall;
-
-		// Body
-		FSlateFontInfo BodyLarge;
-		FSlateFontInfo BodyMedium;
-		FSlateFontInfo BodySmall;
-
-		// Label
-		FSlateFontInfo LabelLarge;
-		FSlateFontInfo LabelMedium;
-		FSlateFontInfo LabelSmall;
-	};
-
-	struct IconFont { FString Value; };
-	struct IconFontFill { FString Value; };
 
 #pragma endregion
 }

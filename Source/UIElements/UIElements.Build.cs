@@ -9,17 +9,17 @@ public class UIElements : ModuleRules
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] {
-				"Core",
-				"FlecsLibrary",
-				"ECSCore",
-				"UIMCU",
-			});
+			"Core",
+			"FlecsLibrary",
+			"ECSCore",
+			"UIMCU",
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-				"CoreUObject",
-				"Engine",
-				"Slate",
-				"SlateCore",
-			});
+			"CoreUObject",
+			"Engine",
+			"Slate",
+			"SlateCore",
+		});
 	}
 }
