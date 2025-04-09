@@ -8,6 +8,7 @@ namespace UIElements {
 	struct FontFeature {
 		static void RegisterComponents(flecs::world& world);
 		static void RegisterSystems(flecs::world& world);
+		static void Initialize(flecs::world& world);
 
 		static void UpdateTextStyles(flecs::world& world);
 		static void AwaitDelay(flecs::entity entity, float seconds, std::function<void()> onCompleted);

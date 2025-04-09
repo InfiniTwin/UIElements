@@ -24,4 +24,8 @@ namespace UIElements {
 	void UIFeature::RegisterComponents(flecs::world& world) {
 		world.component<UIScale>().member<double>(NAMEOF_MEMBER(UIScale::Value));
 	}
+
+	void UIFeature::Initialize(flecs::world& world) {
+		Component::SingletonsFromAsset(world, DefaultUIStyle);
+	}
 }

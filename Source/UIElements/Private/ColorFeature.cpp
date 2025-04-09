@@ -111,8 +111,6 @@ namespace UIElements {
 	}
 
 	void ColorFeature::Initialize(flecs::world& world) {
-		Component::DeserializeSingletons(world, "UIConfig");
-
 		using namespace material_color_utilities;
 		auto uiScheme = world.get<UIScheme>();
 		auto dynamicScheme = DynamicScheme(

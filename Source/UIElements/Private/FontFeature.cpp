@@ -8,56 +8,60 @@
 
 namespace UIElements {
 	void FontFeature::RegisterComponents(flecs::world& world) {
+		world.component<TextFont>().member<FString>(NAMEOF_MEMBER(TextFont::Value));
+	}
+
+	void FontFeature::RegisterSystems(flecs::world& world) {}
+
+	void FontFeature::Initialize(flecs::world& world) {
 		world.set<TextStyles>({ MakeShareable(new FSlateStyleSet(NAMEOF_COMPONENT(TextStyles))) });
 		if (FSlateStyleRegistry::FindSlateStyle(NAMEOF_COMPONENT(TextStyles))) {
 			FSlateStyleRegistry::UnRegisterSlateStyle(*world.get<TextStyles>()->Value.Get());
 		}
 		FSlateStyleRegistry::RegisterSlateStyle(*world.get<TextStyles>()->Value.Get());
 
-		world.component<TextFont>().member<FString>(NAMEOF_MEMBER(TextFont::Value));
-	}
-
-	void FontFeature::RegisterSystems(flecs::world& world) {
 		UpdateTextStyles(world);
 
-		TSharedPtr<SWindow> SlateWindow =
-			SNew(SWindow)
-			.Title(FText::FromString(TEXT("Slate Test")))
-			.ClientSize(FVector2D(400, 200))
-			.SupportsMaximize(false)
-			.SupportsMinimize(false)
-			[
-				SNew(STextBlock)
-					//.Font(world.get<TextStyles>()->Value->GetFontStyle(NAMEOF_MEMBER(TextTypes::DisplayLarge)))
-					//.TextStyle(&world.get<TextStyles>()->Value.Get()->GetWidgetStyle<FTextBlockStyle>(NAMEOF_MEMBER(TextTypes::DisplayLarge)))
-					.Text(FText::FromString(TEXT("Slate Test")))
-					.Font_Lambda([&world]() -> FSlateFontInfo
-						{
-							return world.get<TextStyles>()->Value->GetFontStyle(NAMEOF_MEMBER(TextTypes::DisplayLarge));
-						})
-					.Justification(ETextJustify::Center)
-			];
+		//TSharedPtr<SWindow> SlateWindow =
+		//	SNew(SWindow)
+		//	.Title(FText::FromString(TEXT("Slate Test")))
+		//	.ClientSize(FVector2D(400, 200))
+		//	.IsTopmostWindow(true)
+		//	.UseOSWindowBorder(true)
+		//	.CreateTitleBar(true)
+		//	.SaneWindowPlacement(true)
+		//	[
+		//		SNew(STextBlock)
+		//			//.Font(world.get<TextStyles>()->Value->GetFontStyle(NAMEOF_MEMBER(TextTypes::DisplayLarge)))
+		//			//.TextStyle(&world.get<TextStyles>()->Value.Get()->GetWidgetStyle<FTextBlockStyle>(NAMEOF_MEMBER(TextTypes::DisplayLarge)))
+		//			.Text(FText::FromString(TEXT("Slate Test")))
+		//			.Font_Lambda([&world]() -> FSlateFontInfo
+		//				{
+		//					return world.get<TextStyles>()->Value->GetFontStyle(NAMEOF_MEMBER(TextTypes::DisplayLarge));
+		//				})
+		//			.Justification(ETextJustify::Center)
+		//	];
 
-		FSlateApplication::Get().AddWindow(SlateWindow.ToSharedRef());
+		//FSlateApplication::Get().AddWindow(SlateWindow.ToSharedRef());
 
-		world.system<Delay>()
-			.each([](flecs::entity e, Delay& delay) {
-			delay.RemainingTime -= e.world().delta_time();
-			if (delay.RemainingTime <= 0.f) {
-				if (delay.Callback) {
-					delay.Callback();
-				}
-				e.remove<Delay>();
-			}
-				});
+		//world.system<Delay>()
+		//	.each([](flecs::entity e, Delay& delay) {
+		//	delay.RemainingTime -= e.world().delta_time();
+		//	if (delay.RemainingTime <= 0.f) {
+		//		if (delay.Callback) {
+		//			delay.Callback();
+		//		}
+		//		e.remove<Delay>();
+		//	}
+		//		});
 
-		flecs::entity myEntity = world.entity();
+		//flecs::entity myEntity = world.entity();
 
-		AwaitDelay(myEntity, 5.f, [&world]() {
-			UE_LOG(LogTemp, Warning, TEXT(">>> 5 seconds have passed!"));
-			world.set<TextFont>({ "Roboto" });
-			UpdateTextStyles(world);
-			});
+		//AwaitDelay(myEntity, 5.f, [&world]() {
+		//	UE_LOG(LogTemp, Warning, TEXT(">>> 5 seconds have passed!"));
+		//	world.set<TextFont>({ "Roboto" });
+		//	UpdateTextStyles(world);
+		//	});
 
 		//world.set<IconFont>({ IconFont() });
 		//world.set<IconFontFill>({ IconFontFill() });
