@@ -2,6 +2,7 @@
 
 #include "UIElements.h"
 #include "UIFeature.h"
+#include "LocalizationFeature.h"
 #include "WidgetFeature.h"
 #include "FontFeature.h"
 #include "ColorFeature.h"
@@ -23,18 +24,22 @@ IMPLEMENT_MODULE(FUIElementsModule, UIElements)
 
 void UIElements::Register(flecs::world& world) {
 	UIFeature::RegisterOpaqueTypes(world);
+	LocalizationFeature::RegisterOpaqueTypes(world);
 	ColorFeature::RegisterOpaqueTypes(world);
 
 	UIFeature::RegisterComponents(world);
+	LocalizationFeature::RegisterComponents(world);
 	WidgetFeature::RegisterComponents(world);
 	ColorFeature::RegisterComponents(world);
 	FontFeature::RegisterComponents(world);
 
 	WidgetFeature::RegisterSystems(world);
+	LocalizationFeature::RegisterSystems(world);
 	ColorFeature::RegisterSystems(world);
 	FontFeature::RegisterSystems(world);
 
 	UIFeature::Initialize(world);
+	LocalizationFeature::Initialize(world);
 	WidgetFeature::Initialize(world);
 	ColorFeature::Initialize(world);
 	FontFeature::Initialize(world);

@@ -3,11 +3,11 @@
 
 #include "UIFeature.h"
 #include "flecs.h"
-#include "Component.h"
+#include "ECS.h"
 
 namespace UIElements {
 	void UIFeature::RegisterOpaqueTypes(flecs::world& world) {
-		// FString <=> std::string
+		// FString <=> flecs::String
 		world.component<FString>()
 			.opaque(flecs::String)
 			.serialize([](const flecs::serializer* s, const FString* data)
@@ -22,10 +22,10 @@ namespace UIElements {
 	}
 
 	void UIFeature::RegisterComponents(flecs::world& world) {
-		world.component<UIScale>().member<double>(NAMEOF_MEMBER(UIScale::Value));
+		world.component<UIScale>().member<double>(MEMBER(UIScale::Value));
 	}
 
 	void UIFeature::Initialize(flecs::world& world) {
-		Component::SingletonsFromAsset(world, DefaultUIStyle);
+		ECS::SingletonsFromAsset(world, DefaultUIStyle);
 	}
 }
