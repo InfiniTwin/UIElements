@@ -22,6 +22,4 @@ namespace UIElements {
 	};
 
 	struct Widget { TSharedPtr<CompoundWidget> Value; };
-
-	struct TextBlock { TSharedPtr<STextBlock> Value; };
 }

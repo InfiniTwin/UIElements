@@ -11,14 +11,6 @@
 inline constexpr TCHAR LocalizationFolder[] = TEXT("Localization");
 inline constexpr TCHAR KeyValueDelimiter = '=';
 
-constexpr const char* Table(const char* str) {
-	const char* start = str;
-	while (*str && !(str[0] == ':' && str[1] == ':'))
-		++str;
-	return (*str == '\0') ? start : str;
-}
-#define TABLE(str) Table(str.c_str())
-
 constexpr const char* Key(const char* str) {
 	while (*str != '\0' && *str != ':')
 		++str;
@@ -29,16 +21,23 @@ constexpr const char* Key(const char* str) {
 #define KEY(str) Key(str.c_str())
 
 namespace UIElements {
-	struct LocalizationFeature {
+	struct TextFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);
-		static void RegisterSystems(flecs::world& world);
+		static void RegisterObservers(flecs::world& world);
 		static void Initialize(flecs::world& world);
+
+		static inline std::string Table(const std::string& tableKey) {
+			size_t pos = tableKey.find("::");
+			if (pos != std::string::npos)
+				return tableKey.substr(0, pos);
+			return tableKey;
+		}
 
 		static inline std::string GetStringTablePath(const std::string& tableKey, const std::string& locale) {
 			return TCHAR_TO_UTF8(*Assets::GetAssetPath(TextExtension,
 				LocalizationFolder,
-				TABLE(tableKey),
+				UTF8_TO_TCHAR(Table(tableKey).c_str()),
 				UTF8_TO_TCHAR(locale.c_str())
 			));
 		}
@@ -64,4 +63,6 @@ namespace UIElements {
 	struct LocalizedText { std::string Value; };
 
 	struct Text { FText Value; };
+
+	struct TextBlock { TSharedPtr<STextBlock> Value; };
 }

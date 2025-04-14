@@ -4,6 +4,7 @@
 #include "WidgetFeature.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "UIFeature.h"
+#include "TextFeature.h"
 #include "FontFeature.h"
 #include "Logging/StructuredLog.h"
 
@@ -12,16 +13,14 @@ namespace UIElements {
 		world.component<Widget>()
 			.on_add([](flecs::entity e, Widget& w) { SAssignNew(w.Value, CompoundWidget); })
 			.on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
-
-		world.component<TextBlock>()
-			.on_add([](flecs::entity e, TextBlock& tb) { SAssignNew(tb.Value, STextBlock); })
-			.on_remove([](flecs::entity e, TextBlock& w) {w.Value.Reset(); });
 	}
 
 	void WidgetFeature::RegisterSystems(flecs::world& world) {}
 
 	void WidgetFeature::Initialize(flecs::world& world) {
-		world.entity("textblock").add<TextBlock>();
+		//world.entity("textblock")
+		//	.add<TextBlock>()
+		//	.set<LocalizedText>({ "IT::Window" });
 		//world.entity("widget").add<Widget>();
 
 		world.system<Delay>()
@@ -33,7 +32,7 @@ namespace UIElements {
 				}
 				e.remove<Delay>();
 			}
-				});
+		});
 
 		flecs::entity myEntity = world.entity();
 
@@ -45,10 +44,10 @@ namespace UIElements {
 			flecs::query<Widget> qWidgets = world.query<Widget>();
 
 			std::vector<flecs::entity> textBlocks;
-			qTextBlocks.each([&](flecs::entity e, TextBlock& tb) {
-				tb.Value->SetText(FText::FromString("Hello, Dynamic World!"));
-				textBlocks.push_back(e);
-				});
+			//qTextBlocks.each([&](flecs::entity e, TextBlock& tb) {
+			//	tb.Value->SetText(FText::FromString("Hello, Dynamic World!"));
+			//	textBlocks.push_back(e);
+			//});
 
 			qWidgets.each([&](flecs::entity e, Widget& widget) {
 				for (auto& textBlockEntity : textBlocks) {
@@ -65,7 +64,7 @@ namespace UIElements {
 				const char* jsonser = ecs_world_to_json(world, &desc);
 				FString JsonString(jsonser);
 				UE_LOGFMT(LogTemp, Warning, "Whole World >>> '{json}'", *JsonString);
-				});
 			});
+		});
 	}
 }
