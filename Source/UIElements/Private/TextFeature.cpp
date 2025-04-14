@@ -36,8 +36,15 @@ namespace UIElements {
 
 		world.component<LocalizedText>()
 			.on_set([&world](flecs::entity entity, LocalizedText& lt) { // Localize on creation
-			auto value = LoadStringTable(GetStringTablePath(lt.Value, world.get<Locale>()->Value)).find(KEY(lt.Value));
-			entity.set<Text>({ FText::FromString(FString(value->second.c_str())) });
+			auto path = GetStringTablePath(lt.Value, world.get<Locale>()->Value);
+			auto table = LoadStringTable(path); 
+			auto key = Key(lt.Value);
+			auto value = table.find(key);
+			auto str = value->second.c_str();
+			entity.set<Text>({ FText::FromString(FString(str)) });
+			auto text = FString(str);
+			//auto value = LoadStringTable(GetStringTablePath(lt.Value, world.get<Locale>()->Value)).find(KEY(lt.Value));
+			//entity.set<Text>({ FText::FromString(FString(value->second.c_str())) });
 		})
 			.member<std::string>(MEMBER(LocalizedText::Value));
 
@@ -66,7 +73,7 @@ namespace UIElements {
 				auto stringTable = LoadStringTable(GetStringTablePath(stringTableName, locale.Value));
 				localizableTexts.each([&stringTableName, &stringTable](Text& text, const LocalizedText& localizedText) {
 					if (Table(localizedText.Value) == stringTableName)
-						text.Value = FText::FromString(FString(stringTable.find(KEY(localizedText.Value))->second.c_str()));
+						text.Value = FText::FromString(FString(stringTable.find(Key(localizedText.Value))->second.c_str()));
 				});
 			}
 		});

@@ -9,16 +9,8 @@
 #include <sstream>
 
 inline constexpr TCHAR LocalizationFolder[] = TEXT("Localization");
-inline constexpr TCHAR KeyValueDelimiter = '=';
-
-constexpr const char* Key(const char* str) {
-	while (*str != '\0' && *str != ':')
-		++str;
-	if (*str == ':')
-		++str;
-	return str;
-}
-#define KEY(str) Key(str.c_str())
+constexpr const char* TableKeyDelimiter = "::";
+constexpr const TCHAR KeyValueDelimiter = '=';
 
 namespace UIElements {
 	struct TextFeature {
@@ -28,9 +20,17 @@ namespace UIElements {
 		static void Initialize(flecs::world& world);
 
 		static inline std::string Table(const std::string& tableKey) {
-			size_t pos = tableKey.find("::");
+			size_t pos = tableKey.find(TableKeyDelimiter);
 			if (pos != std::string::npos)
 				return tableKey.substr(0, pos);
+			return tableKey;
+		}
+
+		static inline std::string Key(const std::string& tableKey) {
+			size_t pos = tableKey.find(TableKeyDelimiter);
+			if (pos != std::string::npos) {
+				return tableKey.substr(pos + 2);
+			}
 			return tableKey;
 		}
 
