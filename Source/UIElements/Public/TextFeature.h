@@ -4,13 +4,11 @@
 
 #include "flecs.h"
 #include "Assets.h"
-#include <unordered_map>
-#include <fstream>
-#include <sstream>
+#include "Containers/UnrealString.h"
 
 inline constexpr TCHAR LocalizationFolder[] = TEXT("Localization");
 constexpr const char* TableKeyDelimiter = "::";
-constexpr const TCHAR KeyValueDelimiter = '=';
+constexpr const TCHAR KeyValueDelimiter[] = TEXT("=");
 
 namespace UIElements {
 	struct TextFeature {
@@ -19,50 +17,52 @@ namespace UIElements {
 		static void RegisterObservers(flecs::world& world);
 		static void Initialize(flecs::world& world);
 
-		static inline std::string Table(const std::string& tableKey) {
-			size_t pos = tableKey.find(TableKeyDelimiter);
-			if (pos != std::string::npos)
-				return tableKey.substr(0, pos);
-			return tableKey;
+		static inline FString GetTable(const FString& tableKey) {
+			FString tableKeyString(tableKey);
+			int32 pos = tableKeyString.Find(TableKeyDelimiter);
+			if (pos != INDEX_NONE)
+				return tableKeyString.Left(pos);
+			return tableKeyString;
 		}
 
-		static inline std::string Key(const std::string& tableKey) {
-			size_t pos = tableKey.find(TableKeyDelimiter);
-			if (pos != std::string::npos) {
-				return tableKey.substr(pos + 2);
-			}
-			return tableKey;
+		static inline FString GetKey(const FString& tableKey) {
+			FString tableKeyString(tableKey);
+			int32 pos = tableKeyString.Find(TableKeyDelimiter);
+			if (pos != INDEX_NONE)
+				return tableKeyString.RightChop(pos + 2);
+			return tableKeyString;
 		}
 
-		static inline std::string GetStringTablePath(const std::string& tableKey, const std::string& locale) {
-			return TCHAR_TO_UTF8(*Assets::GetAssetPath(TextExtension,
+		static inline FString GetTablePath(const FString& tableKey, const FString locale) {
+			return Assets::GetAssetPath(TextExtension,
 				LocalizationFolder,
-				UTF8_TO_TCHAR(Table(tableKey).c_str()),
-				UTF8_TO_TCHAR(locale.c_str())
-			));
+				*GetTable(tableKey),
+				*FString(locale)
+			);
 		}
 
-		static inline std::unordered_map<std::string, std::string> LoadStringTable(const std::string& path) {
-			std::unordered_map<std::string, std::string> map;
-			std::ifstream file(path);
-
-			std::string line;
-			while (std::getline(file, line)) {
-				size_t delimiterPos = line.find(KeyValueDelimiter);
-				if (delimiterPos != std::string::npos)
-					map[line.substr(0, delimiterPos)] = line.substr(delimiterPos + 1);
+		static inline TMap<FString, FString> LoadTable(const FString& path)
+		{
+			TMap<FString, FString> map;
+			FString fileContents;
+			if (FFileHelper::LoadFileToString(fileContents, *path))
+			{
+				TArray<FString> lines;
+				fileContents.ParseIntoArrayLines(lines);
+				for (const FString& line : lines)
+				{
+					FString key, value;
+					if (line.Split(KeyValueDelimiter, &key, &value))
+						map.Add(key, value);
+				}
 			}
-
-			file.close();
 			return map;
 		}
 	};
 
-	struct Locale { std::string Value; };
+	struct Locale { FString Value; };
 
-	struct LocalizedText { std::string Value; };
-
-	struct Text { FText Value; };
+	struct LocalizedText { FString Value; };
 
 	struct TextBlock { TSharedPtr<STextBlock> Value; };
 }

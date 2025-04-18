@@ -32,22 +32,18 @@ namespace UIElements {
 				}
 				e.remove<Delay>();
 			}
-		});
+				});
 
 		flecs::entity myEntity = world.entity();
-
 		FontFeature::AwaitDelay(myEntity, 3, [&world]() {
-			UE_LOG(LogTemp, Warning, TEXT(">>> 3 seconds have passed!"));
-
-
 			flecs::query<TextBlock> qTextBlocks = world.query<TextBlock>();
 			flecs::query<Widget> qWidgets = world.query<Widget>();
 
 			std::vector<flecs::entity> textBlocks;
-			//qTextBlocks.each([&](flecs::entity e, TextBlock& tb) {
-			//	tb.Value->SetText(FText::FromString("Hello, Dynamic World!"));
-			//	textBlocks.push_back(e);
-			//});
+			qTextBlocks.each([&](flecs::entity e, TextBlock& tb) {
+				//tb.Value->SetText(FText::FromString("Hello, Dynamic World!"));
+				textBlocks.push_back(e);
+				});
 
 			qWidgets.each([&](flecs::entity e, Widget& widget) {
 				for (auto& textBlockEntity : textBlocks) {
@@ -64,7 +60,12 @@ namespace UIElements {
 				const char* jsonser = ecs_world_to_json(world, &desc);
 				FString JsonString(jsonser);
 				UE_LOGFMT(LogTemp, Warning, "Whole World >>> '{json}'", *JsonString);
+				});
 			});
-		});
+
+		flecs::entity myEntity1 = world.entity();
+		FontFeature::AwaitDelay(myEntity1, 6, [&world]() {
+			world.set<Locale>({ "it" });
+			});
 	}
 }
