@@ -1,7 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "TextFeature.h"
+#include "WidgetFeature.h"
 #include "ECS.h"
 
 namespace UIElements {
@@ -32,40 +33,44 @@ namespace UIElements {
 
 	void TextFeature::RegisterComponents(flecs::world& world) {
 		world.component<Locale>().member<FString>(MEMBER(Locale::Value));
-
 		world.component<LocalizedText>().member<FString>(MEMBER(LocalizedText::Value));
 
-		world.component<TextBlock>()
-			.on_add([](flecs::entity e, TextBlock& tb) { SAssignNew(tb.Value, STextBlock); })
-			.on_remove([](flecs::entity e, TextBlock& w) {w.Value.Reset(); });
+		world.component<TextBlock>();
 	};
 
 	void TextFeature::RegisterObservers(flecs::world& world) {
-		// Localize STextBlock on creattion
-		world.observer<const LocalizedText, const TextBlock>()
+		// Add STextBlock Widget
+		world.observer<const TextBlock>()
+			.event(flecs::OnAdd)
+			.each([](flecs::entity e, const TextBlock& tb) { e.set<Widget>({ SNew(STextBlock) }); });
+
+		// Localize TextBlock on creattion
+		world.observer<const LocalizedText, const TextBlock, const Widget>()
 			.event(flecs::OnSet)
-			.each([&world](const LocalizedText& localizedText, const TextBlock& textBlock) {
-			auto table = LoadTable(GetTablePath(localizedText.Value, world.get<Locale>()->Value));
-			textBlock.Value->SetText(FText::FromString(*table.Find(GetKey(localizedText.Value))));
+			.each([&world](const LocalizedText& lt, const TextBlock& tb, const Widget& w) {
+			auto table = LoadTable(GetTablePath(lt.Value, world.get<Locale>()->Value));
+			StaticCastSharedPtr<STextBlock>(w.Value)
+				->SetText(FText::FromString(*table.Find(GetKey(lt.Value))));
 				});
 
-		static auto textBlocks = world.query_builder<const LocalizedText, const TextBlock>().cached().build();
+		static auto textBlocks = world.query_builder<const LocalizedText, const TextBlock, const Widget>()
+			.cached().build();
 
 		// Localize all on locale change
-		world.observer<Locale>()
+		world.observer<const Locale>()
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
-			.each([](flecs::iter& iter, size_t i, Locale& locale) {
+			.each([](const Locale& locale) {
 			auto tableNames = Assets::GetFolders(Assets::GetAssetPath("", LocalizationFolder));
 			for (const FString& tableName : tableNames) {
 				auto table = LoadTable(GetTablePath(tableName, locale.Value));
-				textBlocks.each([&tableName, &table](const LocalizedText& localizedText, const TextBlock& textBlock) {
-					if (GetTable(localizedText.Value) == tableName)
-						textBlock.Value->SetText(FText::FromString(*table.Find(GetKey(localizedText.Value))));
+
+				textBlocks.each([&tableName, &table](const LocalizedText& lt, const TextBlock& tb, const Widget& w) {
+					if (GetTable(lt.Value) == tableName)
+						StaticCastSharedPtr<STextBlock>(w.Value)
+						->SetText(FText::FromString(*table.Find(GetKey(lt.Value))));
 					});
 			}
 				});
 	};
-
-	void TextFeature::Initialize(flecs::world& world) {};
 }

@@ -11,11 +11,15 @@ constexpr const char* TableKeyDelimiter = "::";
 constexpr const TCHAR KeyValueDelimiter[] = TEXT("=");
 
 namespace UIElements {
+	struct Locale { FString Value; };
+	struct LocalizedText { FString Value; };
+
+	struct TextBlock {};
+
 	struct TextFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);
 		static void RegisterObservers(flecs::world& world);
-		static void Initialize(flecs::world& world);
 
 		static inline FString GetTable(const FString& tableKey) {
 			FString tableKeyString(tableKey);
@@ -59,8 +63,4 @@ namespace UIElements {
 			return map;
 		}
 	};
-
-	struct Locale { FString Value; };
-	struct LocalizedText { FString Value; };
-	struct TextBlock { TSharedPtr<STextBlock> Value; };
 }

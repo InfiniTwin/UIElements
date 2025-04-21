@@ -4,6 +4,7 @@
 #include "WidgetFeature.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "flecs.h"
+#include "ECS.h"
 #include "UIFeature.h"
 #include "TextFeature.h"
 #include "FontFeature.h"
@@ -11,23 +12,45 @@
 
 namespace UIElements {
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
+		world.component<Viewport>();
+
+		world.component<CompoundWidget>()
+			.on_add([](flecs::entity e, CompoundWidget& cw) { SAssignNew(cw.Value, CompoundWidgetInstance); })
+			.on_remove([](flecs::entity e, CompoundWidget& cw) {cw.Value.Reset(); });
+
 		world.component<Widget>()
-			.on_add([](flecs::entity e, Widget& w) { SAssignNew(w.Value, CompoundWidget); })
 			.on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
 	}
 
 	void WidgetFeature::RegisterObservers(flecs::world& world) {
-		world.observer<>()
-			.event(flecs::OnSet)
-			.each([&world](const LocalizedText& localizedText, const TextBlock& textBlock) {
+		// Attach child SCompoundWidget to parent GameViewport
+		world.observer()
+			.with<CompoundWidget>()
+			.with(flecs::ChildOf)
+			.second(flecs::Wildcard)
+			.event(flecs::OnAdd)
+			.each([](flecs::iter& it, size_t i) {
+			auto parent = it.pair(1).second();
+			if (parent.has<Viewport>())
+				GEngine->GameViewport->AddViewportWidgetContent(it.entity(i).get_mut<CompoundWidget>()->Value.ToSharedRef());
+				});
+
+		// Attach child SWidget to parent SCompoundWidget
+		world.observer()
+			.with<Widget>()
+			.with(flecs::ChildOf)
+			.second(flecs::Wildcard)
+			.event(flecs::OnAdd)
+			.each([](flecs::iter& it, size_t i) {
+			auto parent = it.pair(1).second();
+			if (parent.has<CompoundWidget>())
+				it.pair(1).second().get_mut<CompoundWidget>()->Value->Slot()
+				.AttachWidget(it.entity(i).get<Widget>()->Value.ToSharedRef());
 				});
 	}
 
 	void WidgetFeature::Initialize(flecs::world& world) {
-		//world.entity("textblock")
-		//	.add<TextBlock>()
-		//	.set<LocalizedText>({ "IT::Window" });
-		//world.entity("widget").add<Widget>();
+		world.entity("GameViewport").add<Viewport>();
 
 		world.system<Delay>()
 			.each([](flecs::entity e, Delay& delay) {
@@ -41,24 +64,7 @@ namespace UIElements {
 
 		flecs::entity myEntity = world.entity();
 		FontFeature::AwaitDelay(myEntity, 3, [&world]() {
-			flecs::query<TextBlock> qTextBlocks = world.query<TextBlock>();
-			flecs::query<Widget> qWidgets = world.query<Widget>();
-
-			std::vector<flecs::entity> textBlocks;
-			qTextBlocks.each([&](flecs::entity e, TextBlock& tb) {
-				textBlocks.push_back(e);
-				});
-
-			qWidgets.each([&](flecs::entity e, Widget& widget) {
-				for (auto& textBlockEntity : textBlocks)
-					if (textBlockEntity.is_valid() && widget.Value.IsValid()) {
-						widget.Value->Slot()
-							.AttachWidget(textBlockEntity.get_mut<TextBlock>()->Value.ToSharedRef());
-						//textBlockEntity.child_of(e);
-					}
-				if (GEngine && GEngine->GameViewport)
-					GEngine->GameViewport->AddViewportWidgetContent(e.get<Widget>()->Value.ToSharedRef());
-				});
+			world.set<Locale>({ "de" });
 			});
 
 		flecs::entity myEntity1 = world.entity();

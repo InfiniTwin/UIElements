@@ -3,17 +3,14 @@
 #pragma once
 
 #include "flecs.h"
+#include "Widgets/DeclarativeSyntaxSupport.h"
 
 namespace UIElements {
-	struct WidgetFeature {
-		static void RegisterComponents(flecs::world& world);
-		static void RegisterObservers(flecs::world& world);
-		static void Initialize(flecs::world& world);
-	};
+	struct Widget { TSharedPtr<SWidget> Value; };
 
-	struct CompoundWidget : public SCompoundWidget {
+	struct CompoundWidgetInstance : public SCompoundWidget {
 	public:
-		SLATE_BEGIN_ARGS(CompoundWidget) {}
+		SLATE_BEGIN_ARGS(CompoundWidgetInstance) {}
 		SLATE_END_ARGS()
 
 		void Construct(const FArguments& InArgs) {}
@@ -21,5 +18,13 @@ namespace UIElements {
 		FCompoundWidgetOneChildSlot& Slot() { return ChildSlot; }
 	};
 
-	struct Widget { TSharedPtr<CompoundWidget> Value; };
+	struct CompoundWidget { TSharedPtr<CompoundWidgetInstance> Value; };
+	
+	struct Viewport {};
+
+	struct WidgetFeature {
+		static void RegisterComponents(flecs::world& world);
+		static void RegisterObservers(flecs::world& world);
+		static void Initialize(flecs::world& world);
+	};
 }
