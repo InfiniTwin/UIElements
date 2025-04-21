@@ -39,12 +39,10 @@ void UIElements::Register(flecs::world& world) {
 	TextFeature::RegisterObservers(world);
 	WidgetFeature::RegisterObservers(world);
 
-	TextFeature::RegisterSystems(world);
 	ColorFeature::RegisterSystems(world);
 	FontFeature::RegisterSystems(world);
 
 	UIFeature::Initialize(world);
-	TextFeature::Initialize(world);
 	WidgetFeature::Initialize(world);
 	ColorFeature::Initialize(world);
 	FontFeature::Initialize(world);
