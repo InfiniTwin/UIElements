@@ -7,7 +7,7 @@
 namespace UIElements {
 	struct WidgetFeature {
 		static void RegisterComponents(flecs::world& world);
-		static void RegisterSystems(flecs::world& world);
+		static void RegisterObservers(flecs::world& world);
 		static void Initialize(flecs::world& world);
 	};
 

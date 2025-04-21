@@ -61,8 +61,6 @@ namespace UIElements {
 	};
 
 	struct Locale { FString Value; };
-
 	struct LocalizedText { FString Value; };
-
 	struct TextBlock { TSharedPtr<STextBlock> Value; };
 }

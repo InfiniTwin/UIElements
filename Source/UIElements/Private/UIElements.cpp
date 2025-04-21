@@ -6,6 +6,8 @@
 #include "WidgetFeature.h"
 #include "FontFeature.h"
 #include "ColorFeature.h"
+#include "ButtonFeature.h"
+#include "ToggleFeature.h"
 
 #define LOCTEXT_NAMESPACE "FUIElementsModule"
 
@@ -31,10 +33,12 @@ void UIElements::Register(flecs::world& world) {
 	WidgetFeature::RegisterComponents(world);
 	ColorFeature::RegisterComponents(world);
 	FontFeature::RegisterComponents(world);
+	ButtonFeature::RegisterComponents(world);
+	ToggleFeature::RegisterComponents(world);
 
 	TextFeature::RegisterObservers(world);
+	WidgetFeature::RegisterObservers(world);
 
-	WidgetFeature::RegisterSystems(world);
 	ColorFeature::RegisterSystems(world);
 	FontFeature::RegisterSystems(world);
 

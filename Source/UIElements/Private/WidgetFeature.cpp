@@ -3,6 +3,7 @@
 
 #include "WidgetFeature.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
+#include "flecs.h"
 #include "UIFeature.h"
 #include "TextFeature.h"
 #include "FontFeature.h"
@@ -15,7 +16,12 @@ namespace UIElements {
 			.on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
 	}
 
-	void WidgetFeature::RegisterSystems(flecs::world& world) {}
+	void WidgetFeature::RegisterObservers(flecs::world& world) {
+		world.observer<>()
+			.event(flecs::OnSet)
+			.each([&world](const LocalizedText& localizedText, const TextBlock& textBlock) {
+				});
+	}
 
 	void WidgetFeature::Initialize(flecs::world& world) {
 		//world.entity("textblock")
@@ -27,9 +33,8 @@ namespace UIElements {
 			.each([](flecs::entity e, Delay& delay) {
 			delay.RemainingTime -= e.world().delta_time();
 			if (delay.RemainingTime <= 0.f) {
-				if (delay.Callback) {
+				if (delay.Callback)
 					delay.Callback();
-				}
 				e.remove<Delay>();
 			}
 				});
@@ -41,31 +46,29 @@ namespace UIElements {
 
 			std::vector<flecs::entity> textBlocks;
 			qTextBlocks.each([&](flecs::entity e, TextBlock& tb) {
-				//tb.Value->SetText(FText::FromString("Hello, Dynamic World!"));
 				textBlocks.push_back(e);
 				});
 
 			qWidgets.each([&](flecs::entity e, Widget& widget) {
-				for (auto& textBlockEntity : textBlocks) {
+				for (auto& textBlockEntity : textBlocks)
 					if (textBlockEntity.is_valid() && widget.Value.IsValid()) {
 						widget.Value->Slot()
 							.AttachWidget(textBlockEntity.get_mut<TextBlock>()->Value.ToSharedRef());
+						//textBlockEntity.child_of(e);
 					}
-				}
-				if (GEngine && GEngine->GameViewport) {
+				if (GEngine && GEngine->GameViewport)
 					GEngine->GameViewport->AddViewportWidgetContent(e.get<Widget>()->Value.ToSharedRef());
-				}
-
-				ecs_world_to_json_desc_t desc = { false, true };
-				const char* jsonser = ecs_world_to_json(world, &desc);
-				FString JsonString(jsonser);
-				UE_LOGFMT(LogTemp, Warning, "Whole World >>> '{json}'", *JsonString);
 				});
 			});
 
 		flecs::entity myEntity1 = world.entity();
 		FontFeature::AwaitDelay(myEntity1, 6, [&world]() {
 			world.set<Locale>({ "it" });
+
+			ecs_world_to_json_desc_t desc = { false, true };
+			const char* jsonser = ecs_world_to_json(world, &desc);
+			FString JsonString(jsonser);
+			UE_LOGFMT(LogTemp, Warning, "Whole World >>> '{json}'", *JsonString);
 			});
 	}
 }
