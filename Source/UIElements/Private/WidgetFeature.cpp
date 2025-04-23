@@ -50,7 +50,7 @@ namespace UIElements {
 	}
 
 	void WidgetFeature::Initialize(flecs::world& world) {
-		world.entity("GameViewport").add<Viewport>();
+		world.entity(GameViewport).add<Viewport>();
 
 		world.system<Delay>()
 			.each([](flecs::entity e, Delay& delay) {

@@ -11,6 +11,6 @@ namespace UIElements {
 	}
 
 	void UIFeature::Initialize(flecs::world& world) {
-		ECS::SingletonsFromAsset(world, DefaultUIStyle);
+		ECS::FromJsonAsset(world, DefaultUIStyle);
 	}
 }

@@ -5,6 +5,8 @@
 #include "flecs.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 
+constexpr const char* GameViewport = "GameViewport";
+
 namespace UIElements {
 	struct Widget { TSharedPtr<SWidget> Value; };
 
