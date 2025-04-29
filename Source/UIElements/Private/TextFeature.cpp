@@ -32,10 +32,15 @@ namespace UIElements {
 	}
 
 	void TextFeature::RegisterComponents(flecs::world& world) {
-		world.component<Locale>().member<FString>(MEMBER(Locale::Value));
-		world.component<LocalizedText>().member<FString>(MEMBER(LocalizedText::Value));
+		world.component<Locale>().member<FString>(VALUE);
+		world.component<LocalizedText>().member<FString>(VALUE);
 
-		world.component<TextBlock>();
+		world.component<TextBlock>()
+			.add(flecs::OnInstantiate, flecs::Inherit);
+
+		world.component<LabelSmall>()
+			.member<FSlateFontInfo>(VALUE)
+			.add(flecs::OnInstantiate, flecs::Inherit);
 	};
 
 	void TextFeature::RegisterObservers(flecs::world& world) {

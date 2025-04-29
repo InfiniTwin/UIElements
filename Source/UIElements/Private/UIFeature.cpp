@@ -7,7 +7,7 @@
 
 namespace UIElements {
 	void UIFeature::RegisterComponents(flecs::world& world) {
-		world.component<UIScale>().member<double>(MEMBER(UIScale::Value));
+		world.component<UIScale>().member<double>(VALUE);
 	}
 
 	void UIFeature::Initialize(flecs::world& world) {

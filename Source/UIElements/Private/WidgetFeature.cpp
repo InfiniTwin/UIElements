@@ -19,7 +19,8 @@ namespace UIElements {
 			.on_remove([](flecs::entity e, CompoundWidget& cw) {cw.Value.Reset(); });
 
 		world.component<Widget>()
-			.on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
+			.on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); })
+			.add(flecs::OnInstantiate, flecs::Inherit);
 	}
 
 	void WidgetFeature::RegisterObservers(flecs::world& world) {
@@ -33,7 +34,7 @@ namespace UIElements {
 			auto parent = it.pair(1).second();
 			if (parent.has<Viewport>())
 				GEngine->GameViewport->AddViewportWidgetContent(it.entity(i).get_mut<CompoundWidget>()->Value.ToSharedRef());
-				});
+		});
 
 		// Attach child SWidget to parent SCompoundWidget
 		world.observer()
@@ -46,7 +47,7 @@ namespace UIElements {
 			if (parent.has<CompoundWidget>())
 				it.pair(1).second().get_mut<CompoundWidget>()->Value->Slot()
 				.AttachWidget(it.entity(i).get<Widget>()->Value.ToSharedRef());
-				});
+		});
 	}
 
 	void WidgetFeature::Initialize(flecs::world& world) {
@@ -60,12 +61,12 @@ namespace UIElements {
 					delay.Callback();
 				e.remove<Delay>();
 			}
-				});
+		});
 
 		flecs::entity myEntity = world.entity();
 		FontFeature::AwaitDelay(myEntity, 3, [&world]() {
 			world.set<Locale>({ "de" });
-			});
+		});
 
 		flecs::entity myEntity1 = world.entity();
 		FontFeature::AwaitDelay(myEntity1, 6, [&world]() {
@@ -74,7 +75,37 @@ namespace UIElements {
 			ecs_world_to_json_desc_t desc = { false, true };
 			const char* jsonser = ecs_world_to_json(world, &desc);
 			FString JsonString(jsonser);
-			UE_LOGFMT(LogTemp, Warning, "Whole World >>> '{json}'", *JsonString);
-			});
+			//UE_LOGFMT(LogTemp, Warning, "Whole World >>> '{json}'", *JsonString);
+		});
+
+
+		//auto widget = world.prefab(COMPONENT(Widget))
+		//	.set_auto_override(Widget{});
+
+		auto icon = world.prefab(COMPONENT(Icon))
+			.set<IconFont>({ FSlateFontInfo() })
+			.set_auto_override(Icon{ "??" });
+
+		//auto localizedText = world.prefab(COMPONENT(LocalizedText))
+		//	.set_auto_override(LocalizedText{});
+
+		//auto labelSmall = world.prefab(COMPONENT(LabelSmall))
+		//	.set<LabelSmall>({ FSlateFontInfo("font400", 10) });
+
+		//auto textBlock = world.prefab(COMPONENT(TextBlock))
+		//	.is_a(widget)
+		//	.is_a(localizedText)
+		//	.add<TextBlock>();
+
+		//auto assistChip = world.prefab()
+
+		//auto windowToggle = world.entity("WindowToggle PREFABED")
+
+		FString JsonStr(icon.to_json().c_str());
+
+		UE_LOGFMT(LogTemp, Warning, "PREFAB >>> '{json}'", *JsonStr);
+
+		//FString JsonStr(world.get_scope().to_json().c_str());
+		// UE_LOGFMT(LogTemp, Warning, "SCOPE >>> '{json}'", *JsonStr);
 	}
 }

@@ -14,7 +14,11 @@ namespace UIElements {
 	struct Locale { FString Value; };
 	struct LocalizedText { FString Value; };
 
+	struct LabelSmall { FSlateFontInfo Value; };	
 	struct TextBlock {};
+
+	struct Icon{ FString Value; };
+	struct IconFont { FSlateFontInfo Value; };
 
 	struct TextFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);

@@ -16,9 +16,6 @@ namespace UIElements {
 
 	struct TextFont { FString Value; };
 
-	struct IconFont { FString Value; };
-	struct IconFontFill { FString Value; };
-
 	struct TextStyles { TSharedPtr<FSlateStyleSet> Value; };
 
 	struct TextTypes {

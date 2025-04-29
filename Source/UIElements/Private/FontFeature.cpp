@@ -9,7 +9,7 @@
 
 namespace UIElements {
 	void FontFeature::RegisterComponents(flecs::world& world) {
-		world.component<TextFont>().member<FString>(MEMBER(TextFont::Value));
+		world.component<TextFont>().member<FString>(VALUE);
 	}
 
 	void FontFeature::RegisterSystems(flecs::world& world) {}

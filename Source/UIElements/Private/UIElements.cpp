@@ -43,7 +43,7 @@ void UIElements::Register(flecs::world& world) {
 	FontFeature::RegisterSystems(world);
 
 	UIFeature::Initialize(world);
-	WidgetFeature::Initialize(world);
 	ColorFeature::Initialize(world);
 	FontFeature::Initialize(world);
+	WidgetFeature::Initialize(world);
 }
