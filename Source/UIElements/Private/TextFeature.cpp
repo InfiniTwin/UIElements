@@ -71,7 +71,6 @@ namespace UIElements {
 			auto tableNames = Assets::GetFolders(Assets::GetAssetPath("", LocalizationFolder));
 			for (const FString& tableName : tableNames) {
 				auto table = LoadTable(GetTablePath(tableName, locale.Value));
-
 				world.get<TextBlocksQuery>()->Value.each([&tableName, &table](const LocalizedText& lt, const TextBlock& tb, const Widget& w) {
 					if (GetTable(lt.Value) == tableName)
 						StaticCastSharedPtr<STextBlock>(w.Value)

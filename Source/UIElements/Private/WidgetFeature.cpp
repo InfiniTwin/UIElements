@@ -41,12 +41,12 @@ namespace UIElements {
 			.with<Widget>()
 			.with(flecs::ChildOf)
 			.second(flecs::Wildcard)
-			.event(flecs::OnAdd)
+			.event(flecs::OnSet)
 			.each([](flecs::iter& it, size_t i) {
 			auto parent = it.pair(1).second();
-			//if (parent.has<CompoundWidget>())
-			//	it.pair(1).second().get_mut<CompoundWidget>()->Value->Slot()
-			//	.AttachWidget(it.entity(i).get<Widget>()->Value.ToSharedRef());
+			if (parent.has<CompoundWidget>())
+				it.pair(1).second().get_mut<CompoundWidget>()->Value->Slot()
+				.AttachWidget(it.entity(i).get<Widget>()->Value.ToSharedRef());
 		});
 	}
 
