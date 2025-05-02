@@ -44,9 +44,9 @@ namespace UIElements {
 			.event(flecs::OnAdd)
 			.each([](flecs::iter& it, size_t i) {
 			auto parent = it.pair(1).second();
-			if (parent.has<CompoundWidget>())
-				it.pair(1).second().get_mut<CompoundWidget>()->Value->Slot()
-				.AttachWidget(it.entity(i).get<Widget>()->Value.ToSharedRef());
+			//if (parent.has<CompoundWidget>())
+			//	it.pair(1).second().get_mut<CompoundWidget>()->Value->Slot()
+			//	.AttachWidget(it.entity(i).get<Widget>()->Value.ToSharedRef());
 		});
 	}
 
@@ -82,9 +82,9 @@ namespace UIElements {
 		//auto widget = world.prefab(COMPONENT(Widget))
 		//	.set_auto_override(Widget{});
 
-		auto icon = world.prefab(COMPONENT(Icon))
-			.set<IconFont>({ FSlateFontInfo() })
-			.set_auto_override(Icon{ "??" });
+		//auto icon = world.prefab(COMPONENT(Icon))
+		//	.set<IconFont>({ FSlateFontInfo() })
+		//	.set_auto_override(Icon{ "??" });
 
 		//auto localizedText = world.prefab(COMPONENT(LocalizedText))
 		//	.set_auto_override(LocalizedText{});
@@ -101,9 +101,9 @@ namespace UIElements {
 
 		//auto windowToggle = world.entity("WindowToggle PREFABED")
 
-		FString JsonStr(icon.to_json().c_str());
+		//FString JsonStr(icon.to_json().c_str());
 
-		UE_LOGFMT(LogTemp, Warning, "PREFAB >>> '{json}'", *JsonStr);
+		//UE_LOGFMT(LogTemp, Warning, "PREFAB >>> '{json}'", *JsonStr);
 
 		//FString JsonStr(world.get_scope().to_json().c_str());
 		// UE_LOGFMT(LogTemp, Warning, "SCOPE >>> '{json}'", *JsonStr);

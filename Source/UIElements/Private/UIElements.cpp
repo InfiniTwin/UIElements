@@ -36,6 +36,8 @@ void UIElements::Register(flecs::world& world) {
 	ButtonFeature::RegisterComponents(world);
 	ToggleFeature::RegisterComponents(world);
 
+	TextFeature::CreateQueries(world);
+
 	TextFeature::RegisterObservers(world);
 	WidgetFeature::RegisterObservers(world);
 

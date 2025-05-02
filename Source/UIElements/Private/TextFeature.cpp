@@ -2,7 +2,6 @@
 
 
 #include "TextFeature.h"
-#include "WidgetFeature.h"
 #include "ECS.h"
 
 namespace UIElements {
@@ -13,10 +12,10 @@ namespace UIElements {
 			.serialize([](const flecs::serializer* s, const FString* data) {
 			const char* str = TCHAR_TO_UTF8(**data);
 			return s->value(flecs::String, &str);
-				})
+		})
 			.assign_string([](FString* data, const char* value) {
 			*data = UTF8_TO_TCHAR(value);
-				});
+		});
 
 		// FText <=> flecs::String
 		world.component<FText>()
@@ -25,10 +24,10 @@ namespace UIElements {
 			FString temp = data->ToString();
 			const char* str = TCHAR_TO_UTF8(*temp);
 			return s->value(flecs::String, &str);
-				})
+		})
 			.assign_string([](FText* data, const char* value) {
 			*data = FText::FromString(UTF8_TO_TCHAR(value));
-				});
+		});
 	}
 
 	void TextFeature::RegisterComponents(flecs::world& world) {
@@ -39,8 +38,14 @@ namespace UIElements {
 			.add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<LabelSmall>()
-			.member<FSlateFontInfo>(VALUE)
 			.add(flecs::OnInstantiate, flecs::Inherit);
+	};
+
+	void TextFeature::CreateQueries(flecs::world& world) {
+		world.set<TextBlocksQuery>({
+			world.query_builder<const LocalizedText, const TextBlock, const Widget>()
+				 .cached().build()
+			});
 	};
 
 	void TextFeature::RegisterObservers(flecs::world& world) {
@@ -56,26 +61,23 @@ namespace UIElements {
 			auto table = LoadTable(GetTablePath(lt.Value, world.get<Locale>()->Value));
 			StaticCastSharedPtr<STextBlock>(w.Value)
 				->SetText(FText::FromString(*table.Find(GetKey(lt.Value))));
-				});
-
-		static auto textBlocks = world.query_builder<const LocalizedText, const TextBlock, const Widget>()
-			.cached().build();
+		});
 
 		// Localize all on locale change
 		world.observer<const Locale>()
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
-			.each([](const Locale& locale) {
+			.each([&world](const Locale& locale) {
 			auto tableNames = Assets::GetFolders(Assets::GetAssetPath("", LocalizationFolder));
 			for (const FString& tableName : tableNames) {
 				auto table = LoadTable(GetTablePath(tableName, locale.Value));
 
-				textBlocks.each([&tableName, &table](const LocalizedText& lt, const TextBlock& tb, const Widget& w) {
+				world.get<TextBlocksQuery>()->Value.each([&tableName, &table](const LocalizedText& lt, const TextBlock& tb, const Widget& w) {
 					if (GetTable(lt.Value) == tableName)
 						StaticCastSharedPtr<STextBlock>(w.Value)
 						->SetText(FText::FromString(*table.Find(GetKey(lt.Value))));
-					});
-			}
 				});
+			}
+		});
 	};
 }
