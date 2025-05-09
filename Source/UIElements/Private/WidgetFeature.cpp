@@ -4,7 +4,6 @@
 #include "WidgetFeature.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "flecs.h"
-#include "ECS.h"
 #include "UIFeature.h"
 #include "TextFeature.h"
 #include "FontFeature.h"
@@ -19,8 +18,7 @@ namespace UIElements {
 			.on_remove([](flecs::entity e, CompoundWidget& cw) {cw.Value.Reset(); });
 
 		world.component<Widget>()
-			.on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); })
-			.add(flecs::OnInstantiate, flecs::Inherit);
+			.on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
 	}
 
 	void WidgetFeature::RegisterObservers(flecs::world& world) {
@@ -29,7 +27,7 @@ namespace UIElements {
 			.with<CompoundWidget>()
 			.with(flecs::ChildOf)
 			.second(flecs::Wildcard)
-			.event(flecs::OnAdd)
+			.event(flecs::OnSet)
 			.each([](flecs::iter& it, size_t i) {
 			auto parent = it.pair(1).second();
 			if (parent.has<Viewport>())
@@ -79,33 +77,33 @@ namespace UIElements {
 		});
 
 
-		//auto widget = world.prefab(COMPONENT(Widget))
-		//	.set_auto_override(Widget{});
-
+		auto widget = world.prefab("WidgetPREFAB")
+			.set_auto_override(Widget{});
+		SHorizontalBox
 		//auto icon = world.prefab(COMPONENT(Icon))
 		//	.set<IconFont>({ FSlateFontInfo() })
 		//	.set_auto_override(Icon{ "??" });
 
-		//auto localizedText = world.prefab(COMPONENT(LocalizedText))
-		//	.set_auto_override(LocalizedText{});
-
+		auto localizedText = world.prefab("LocalizedTextPREFAB")
+			.set_auto_override(LocalizedText{});
+		
 		//auto labelSmall = world.prefab(COMPONENT(LabelSmall))
 		//	.set<LabelSmall>({ FSlateFontInfo("font400", 10) });
 
-		//auto textBlock = world.prefab(COMPONENT(TextBlock))
-		//	.is_a(widget)
-		//	.is_a(localizedText)
-		//	.add<TextBlock>();
+		auto textBlock = world.prefab("TextBlockPREFAB")
+			.is_a(widget)
+			.is_a(localizedText)
+			.add<TextBlock>();
 
 		//auto assistChip = world.prefab()
 
 		//auto windowToggle = world.entity("WindowToggle PREFABED")
 
-		//FString JsonStr(icon.to_json().c_str());
+		FString JsonStr(textBlock.to_json().c_str());
 
 		//UE_LOGFMT(LogTemp, Warning, "PREFAB >>> '{json}'", *JsonStr);
 
 		//FString JsonStr(world.get_scope().to_json().c_str());
-		// UE_LOGFMT(LogTemp, Warning, "SCOPE >>> '{json}'", *JsonStr);
+		 UE_LOGFMT(LogTemp, Warning, "PREFAB >>> '{json}'", *JsonStr);
 	}
 }

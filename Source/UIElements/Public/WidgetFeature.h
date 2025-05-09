@@ -8,6 +8,8 @@
 constexpr const char* GameViewport = "GameViewport";
 
 namespace UIElements {
+	struct Viewport {};
+
 	struct Widget { TSharedPtr<SWidget> Value; };
 
 	struct CompoundWidgetInstance : public SCompoundWidget {
@@ -22,7 +24,9 @@ namespace UIElements {
 
 	struct CompoundWidget { TSharedPtr<CompoundWidgetInstance> Value; };
 	
-	struct Viewport {};
+	struct Border {};
+
+
 
 	struct WidgetFeature {
 		static void RegisterComponents(flecs::world& world);
