@@ -24,28 +24,37 @@ void FUIElementsModule::ShutdownModule() {
 
 IMPLEMENT_MODULE(FUIElementsModule, UIElements)
 
-void UIElements::Register(flecs::world& world) {
-	TextFeature::RegisterOpaqueTypes(world);
-	ColorFeature::RegisterOpaqueTypes(world);
+namespace UIElements {
+	FString& Scope() {
+		static FString scope = TEXT("");
+		return scope;
+	}
 
-	UIFeature::RegisterComponents(world);
-	TextFeature::RegisterComponents(world);
-	WidgetFeature::RegisterComponents(world);
-	ColorFeature::RegisterComponents(world);
-	FontFeature::RegisterComponents(world);
-	ButtonFeature::RegisterComponents(world);
-	ToggleFeature::RegisterComponents(world);
+	void Register(flecs::world& world, const FString scope) {
+		Scope() = scope;
 
-	TextFeature::CreateQueries(world);
+		TextFeature::RegisterOpaqueTypes(world);
+		ColorFeature::RegisterOpaqueTypes(world);
 
-	TextFeature::RegisterObservers(world);
-	WidgetFeature::RegisterObservers(world);
+		UIFeature::RegisterComponents(world);
+		TextFeature::RegisterComponents(world);
+		WidgetFeature::RegisterComponents(world);
+		ColorFeature::RegisterComponents(world);
+		FontFeature::RegisterComponents(world);
+		ButtonFeature::RegisterComponents(world);
+		ToggleFeature::RegisterComponents(world);
 
-	ColorFeature::RegisterSystems(world);
-	FontFeature::RegisterSystems(world);
+		TextFeature::CreateQueries(world);
 
-	UIFeature::Initialize(world);
-	ColorFeature::Initialize(world);
-	FontFeature::Initialize(world);
-	WidgetFeature::Initialize(world);
+		TextFeature::RegisterObservers(world);
+		WidgetFeature::RegisterObservers(world);
+
+		ColorFeature::RegisterSystems(world);
+		FontFeature::RegisterSystems(world);
+
+		UIFeature::Initialize(world);
+		ColorFeature::Initialize(world);
+		FontFeature::Initialize(world);
+		WidgetFeature::Initialize(world);
+	}
 }

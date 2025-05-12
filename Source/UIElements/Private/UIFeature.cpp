@@ -4,6 +4,7 @@
 #include "UIFeature.h"
 #include "flecs.h"
 #include "ECS.h"
+#include "UIElements.h"
 
 namespace UIElements {
 	void UIFeature::RegisterComponents(flecs::world& world) {
@@ -11,6 +12,6 @@ namespace UIElements {
 	}
 
 	void UIFeature::Initialize(flecs::world& world) {
-		ECS::FromJsonAsset(world, DefaultUIStyle);
+		ECS::FromJsonAsset(world, DefaultUIStyle, UIElements::Scope());
 	}
 }

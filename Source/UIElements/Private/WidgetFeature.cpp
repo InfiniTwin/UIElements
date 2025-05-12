@@ -27,7 +27,7 @@ namespace UIElements {
 			.with<CompoundWidget>()
 			.with(flecs::ChildOf)
 			.second(flecs::Wildcard)
-			.event(flecs::OnSet)
+			.event(flecs::OnAdd)
 			.each([](flecs::iter& it, size_t i) {
 			auto parent = it.pair(1).second();
 			if (parent.has<Viewport>())
@@ -79,7 +79,7 @@ namespace UIElements {
 
 		auto widget = world.prefab("WidgetPREFAB")
 			.set_auto_override(Widget{});
-		SHorizontalBox
+
 		//auto icon = world.prefab(COMPONENT(Icon))
 		//	.set<IconFont>({ FSlateFontInfo() })
 		//	.set_auto_override(Icon{ "??" });
