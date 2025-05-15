@@ -2,7 +2,6 @@
 
 
 #include "WidgetFeature.h"
-#include "Widgets/DeclarativeSyntaxSupport.h"
 #include "flecs.h"
 #include "UIFeature.h"
 #include "TextFeature.h"
@@ -11,41 +10,61 @@
 
 namespace UIElements {
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
-		world.component<Viewport>();
+		world.component<Attached>().add(flecs::CanToggle);
 
-		world.component<CompoundWidget>()
-			.on_add([](flecs::entity e, CompoundWidget& cw) { SAssignNew(cw.Value, CompoundWidgetInstance); })
-			.on_remove([](flecs::entity e, CompoundWidget& cw) {cw.Value.Reset(); });
+		world.component<Viewport>();
 
 		world.component<Widget>()
 			.on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
+
+		world.component<CompoundWidget>();
+
+		world.component<Border>();
 	}
 
-	void WidgetFeature::RegisterObservers(flecs::world& world) {
-		// Attach child SCompoundWidget to parent GameViewport
-		world.observer()
-			.with<CompoundWidget>()
-			.with(flecs::ChildOf)
-			.second(flecs::Wildcard)
-			.event(flecs::OnAdd)
-			.each([](flecs::iter& it, size_t i) {
-			auto parent = it.pair(1).second();
-			if (parent.has<Viewport>())
-				GEngine->GameViewport->AddViewportWidgetContent(it.entity(i).get_mut<CompoundWidget>()->Value.ToSharedRef());
-		});
+	void WidgetFeature::CreateSystems(flecs::world& world) {
+		flecs::query<> viewports = world.query_builder<>("ViewportsQuery")
+			.with<Viewport>()
+			.build();
 
-		// Attach child SWidget to parent SCompoundWidget
-		world.observer()
+		flecs::query<Widget> compoundWidgets = world.query_builder<Widget>("CompoundWidgetsQuery")
+			.with<CompoundWidget>()
+			.build();
+
+		world.system("AddWidgetToCompoundWidget")
+			.with<CompoundWidget>()
+			.without<Widget>()
+			.each([](flecs::entity e) { e.set(Widget{ SNew(CompoundWidgetInstance) }); });
+
+		world.system("AddWidgetToBorder")
+			.with<Border>()
+			.without<Widget>()
+			.each([](flecs::entity e) { e.set(Widget{ SNew(SBorder) }); });
+
+		world.system("MakeWidgetsAttachable")
 			.with<Widget>()
-			.with(flecs::ChildOf)
-			.second(flecs::Wildcard)
-			.event(flecs::OnSet)
-			.each([](flecs::iter& it, size_t i) {
-			auto parent = it.pair(1).second();
-			if (parent.has<CompoundWidget>())
-				it.pair(1).second().get_mut<CompoundWidget>()->Value->Slot()
-				.AttachWidget(it.entity(i).get<Widget>()->Value.ToSharedRef());
-		});
+			.without<Attached>()
+			.each([](flecs::entity e) { e.add<Attached>().disable<Attached>(); });
+
+		world.system("AttachWidgetsToParent")
+			.run([viewports, compoundWidgets](flecs::iter&) {
+			// Attach Compound Widget to Viewport
+			viewports.each([&](flecs::entity viewport) {
+				viewport.children([](flecs::entity child) {
+					if (!child.enabled<Attached>() && child.has<CompoundWidget>() && child.has<Widget>()) {
+						child.enable<Attached>();
+						GEngine->GameViewport->AddViewportWidgetContent(
+							StaticCastSharedPtr<CompoundWidgetInstance>(child.get_mut<Widget>()->Value).ToSharedRef());
+					} });
+				});
+			// Attach Widget to Compound Widget
+			compoundWidgets.each([&](flecs::entity compoundWidget, Widget& widget) {
+				compoundWidget.children([&widget](flecs::entity child) {
+					if (!child.enabled<Attached>() && child.has<Widget>()) {
+						child.enable<Attached>();
+						StaticCastSharedPtr<CompoundWidgetInstance>(widget.Value)->Slot()
+							.AttachWidget(child.get<Widget>()->Value.ToSharedRef());
+					} }); }); });
 	}
 
 	void WidgetFeature::Initialize(flecs::world& world) {
@@ -59,12 +78,12 @@ namespace UIElements {
 					delay.Callback();
 				e.remove<Delay>();
 			}
-		});
+				});
 
 		flecs::entity myEntity = world.entity();
 		FontFeature::AwaitDelay(myEntity, 3, [&world]() {
 			world.set<Locale>({ "de" });
-		});
+			});
 
 		flecs::entity myEntity1 = world.entity();
 		FontFeature::AwaitDelay(myEntity1, 6, [&world]() {
@@ -74,7 +93,7 @@ namespace UIElements {
 			const char* jsonser = ecs_world_to_json(world, &desc);
 			FString JsonString(jsonser);
 			//UE_LOGFMT(LogTemp, Warning, "Whole World >>> '{json}'", *JsonString);
-		});
+			});
 
 
 		auto widget = world.prefab("WidgetPREFAB")
@@ -86,7 +105,7 @@ namespace UIElements {
 
 		auto localizedText = world.prefab("LocalizedTextPREFAB")
 			.set_auto_override(LocalizedText{});
-		
+
 		//auto labelSmall = world.prefab(COMPONENT(LabelSmall))
 		//	.set<LabelSmall>({ FSlateFontInfo("font400", 10) });
 
@@ -104,6 +123,6 @@ namespace UIElements {
 		//UE_LOGFMT(LogTemp, Warning, "PREFAB >>> '{json}'", *JsonStr);
 
 		//FString JsonStr(world.get_scope().to_json().c_str());
-		 UE_LOGFMT(LogTemp, Warning, "PREFAB >>> '{json}'", *JsonStr);
+		UE_LOGFMT(LogTemp, Warning, "PREFAB >>> '{json}'", *JsonStr);
 	}
 }

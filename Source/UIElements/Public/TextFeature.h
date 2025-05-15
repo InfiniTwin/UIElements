@@ -21,13 +21,14 @@ namespace UIElements {
 	struct Icon{ FString Value; };
 	struct IconFont { FSlateFontInfo Value; };
 
-	struct TextBlocksQuery { flecs::query<const LocalizedText, const TextBlock, const Widget> Value; };
+	struct TextBlocksQuery { flecs::query<const TextBlock, const LocalizedText, const Widget> Value; };
 
 	struct TextFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
-		static void RegisterObservers(flecs::world& world);
+		static void CreateObservers(flecs::world& world);
+		static void CreateSystems(flecs::world& world);
 
 		static inline FString GetTable(const FString& tableKey) {
 			FString tableKeyString(tableKey);

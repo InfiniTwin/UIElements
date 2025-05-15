@@ -58,7 +58,7 @@ namespace UIElements {
 		world.component<UIColors>();
 	}
 
-	void ColorFeature::RegisterSystems(flecs::world& world) {
+	void ColorFeature::CreateSystems(flecs::world& world) {
 	}
 
 	void ColorFeature::Initialize(flecs::world& world) {

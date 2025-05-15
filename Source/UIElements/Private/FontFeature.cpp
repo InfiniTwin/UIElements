@@ -13,7 +13,7 @@ namespace UIElements {
 		world.component<TextStyles>();
 	}
 
-	void FontFeature::RegisterSystems(flecs::world& world) {}
+	void FontFeature::CreateSystems(flecs::world& world) {}
 
 	void FontFeature::Initialize(flecs::world& world) {
 		world.set<TextStyles>({ MakeShareable(new FSlateStyleSet(COMPONENT(TextStyles))) });

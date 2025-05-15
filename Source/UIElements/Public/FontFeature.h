@@ -7,7 +7,7 @@
 namespace UIElements {
 	struct FontFeature {
 		static void RegisterComponents(flecs::world& world);
-		static void RegisterSystems(flecs::world& world);
+		static void CreateSystems(flecs::world& world);
 		static void Initialize(flecs::world& world);
 
 		static void UpdateTextStyles(flecs::world& world);

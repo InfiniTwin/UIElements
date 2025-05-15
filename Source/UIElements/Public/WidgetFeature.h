@@ -3,11 +3,12 @@
 #pragma once
 
 #include "flecs.h"
-#include "Widgets/DeclarativeSyntaxSupport.h"
 
 constexpr const char* GameViewport = "GameViewport";
 
 namespace UIElements {
+	struct Attached {};
+
 	struct Viewport {};
 
 	struct Widget { TSharedPtr<SWidget> Value; };
@@ -21,16 +22,13 @@ namespace UIElements {
 
 		FCompoundWidgetOneChildSlot& Slot() { return ChildSlot; }
 	};
+	struct CompoundWidget {};
 
-	struct CompoundWidget { TSharedPtr<CompoundWidgetInstance> Value; };
-	
 	struct Border {};
-
-
 
 	struct WidgetFeature {
 		static void RegisterComponents(flecs::world& world);
-		static void RegisterObservers(flecs::world& world);
+		static void CreateSystems(flecs::world& world);
 		static void Initialize(flecs::world& world);
 	};
 }

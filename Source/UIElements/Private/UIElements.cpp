@@ -37,8 +37,8 @@ namespace UIElements {
 		ColorFeature::RegisterOpaqueTypes(world);
 
 		UIFeature::RegisterComponents(world);
-		TextFeature::RegisterComponents(world);
 		WidgetFeature::RegisterComponents(world);
+		TextFeature::RegisterComponents(world);
 		ColorFeature::RegisterComponents(world);
 		FontFeature::RegisterComponents(world);
 		ButtonFeature::RegisterComponents(world);
@@ -46,11 +46,12 @@ namespace UIElements {
 
 		TextFeature::CreateQueries(world);
 
-		TextFeature::RegisterObservers(world);
-		WidgetFeature::RegisterObservers(world);
+		TextFeature::CreateObservers(world);
 
-		ColorFeature::RegisterSystems(world);
-		FontFeature::RegisterSystems(world);
+		WidgetFeature::CreateSystems(world);
+		TextFeature::CreateSystems(world);
+		ColorFeature::CreateSystems(world);
+		FontFeature::CreateSystems(world);
 
 		UIFeature::Initialize(world);
 		ColorFeature::Initialize(world);
