@@ -23,14 +23,6 @@ namespace UIElements {
 	}
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
-		flecs::query<> viewports = world.query_builder<>("ViewportsQuery")
-			.with<Viewport>()
-			.build();
-
-		flecs::query<Widget> compoundWidgets = world.query_builder<Widget>("CompoundWidgetsQuery")
-			.with<CompoundWidget>()
-			.build();
-
 		world.system("AddWidgetToCompoundWidget")
 			.with<CompoundWidget>()
 			.without<Widget>()
@@ -41,30 +33,30 @@ namespace UIElements {
 			.without<Widget>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(SBorder) }); });
 
-		world.system("MakeWidgetsAttachable")
+		world.system("MakeWidgetAttachable")
 			.with<Widget>()
 			.without<Attached>()
-			.each([](flecs::entity e) { e.add<Attached>().disable<Attached>(); });
+			.each([](flecs::entity e) { e.add<Attached>(); e.disable<Attached>(); });
 
-		world.system("AttachWidgetsToParent")
-			.run([viewports, compoundWidgets](flecs::iter&) {
-			// Attach Compound Widget to Viewport
-			viewports.each([&](flecs::entity viewport) {
-				viewport.children([](flecs::entity child) {
-					if (!child.enabled<Attached>() && child.has<CompoundWidget>() && child.has<Widget>()) {
-						child.enable<Attached>();
-						GEngine->GameViewport->AddViewportWidgetContent(
-							StaticCastSharedPtr<CompoundWidgetInstance>(child.get_mut<Widget>()->Value).ToSharedRef());
-					} });
+		world.system<const Widget>("AttachedWidgetToParent")
+			.with(flecs::ChildOf)
+			.second(flecs::Wildcard)
+			.with<Attached>().id_flags(flecs::TOGGLE)
+			.without<Attached>()
+			.each([](flecs::entity child, const Widget& widget) {
+			auto parent = child.parent();
+			if (parent.has<Viewport>() && child.has<CompoundWidget>()) {
+				child.enable<Attached>();
+				GEngine->GameViewport->AddViewportWidgetContent(
+					StaticCastSharedPtr<CompoundWidgetInstance>(widget.Value).ToSharedRef());
+				return;
+			}
+			if (parent.has<CompoundWidget>() && parent.has<Widget>()) {
+				child.enable<Attached>();
+				StaticCastSharedPtr<CompoundWidgetInstance>(parent.get_mut<Widget>()->Value)->Slot()
+					.AttachWidget(widget.Value.ToSharedRef());
+			}
 				});
-			// Attach Widget to Compound Widget
-			compoundWidgets.each([&](flecs::entity compoundWidget, Widget& widget) {
-				compoundWidget.children([&widget](flecs::entity child) {
-					if (!child.enabled<Attached>() && child.has<Widget>()) {
-						child.enable<Attached>();
-						StaticCastSharedPtr<CompoundWidgetInstance>(widget.Value)->Slot()
-							.AttachWidget(child.get<Widget>()->Value.ToSharedRef());
-					} }); }); });
 	}
 
 	void WidgetFeature::Initialize(flecs::world& world) {
