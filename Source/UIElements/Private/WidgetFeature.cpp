@@ -36,7 +36,7 @@ namespace UIElements {
 		world.system("MakeWidgetAttachable")
 			.with<Widget>()
 			.without<Attached>()
-			.each([](flecs::entity e) { e.add<Attached>(); e.disable<Attached>(); });
+			.each([](flecs::entity e) { e.add<Attached>().disable<Attached>(); });
 
 		world.system<const Widget>("AttachedWidgetToParent")
 			.with(flecs::ChildOf)
