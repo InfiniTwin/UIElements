@@ -12,14 +12,18 @@ constexpr const char* TableKeyDelimiter = "::";
 constexpr const TCHAR KeyValueDelimiter[] = TEXT("=");
 
 namespace UIElements {
-	struct Locale { FString Value; };
-	struct LocalizedText { FString Value; };
+	struct Font { FString Value; };
+	struct FontFace { FString Value; };
+	struct FontSize { int Value; };
+	struct FontInfo { FSlateFontInfo Value; };
 
-	struct LabelSmall { FSlateFontInfo Value; };	
 	struct TextBlock {};
 
-	struct Icon{ FString Value; };
+	struct Icon { FString Value; };
 	struct IconFont { FSlateFontInfo Value; };
+
+	struct Locale { FString Value; };
+	struct LocalizedText { FString Value; };
 
 	struct TextBlocksQuery { flecs::query<const TextBlock, const LocalizedText, const Widget> Value; };
 

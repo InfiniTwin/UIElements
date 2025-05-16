@@ -10,16 +10,15 @@
 
 namespace UIElements {
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
-		world.component<Attached>().add(flecs::CanToggle);
+		world.component<Widget>().on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
 
 		world.component<Viewport>();
-
-		world.component<Widget>()
-			.on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
 
 		world.component<CompoundWidget>();
 
 		world.component<Border>();
+
+		world.component<Attached>().add(flecs::CanToggle);
 	}
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
@@ -86,35 +85,5 @@ namespace UIElements {
 			FString JsonString(jsonser);
 			//UE_LOGFMT(LogTemp, Warning, "Whole World >>> '{json}'", *JsonString);
 			});
-
-
-		auto widget = world.prefab("WidgetPREFAB")
-			.set_auto_override(Widget{});
-
-		//auto icon = world.prefab(COMPONENT(Icon))
-		//	.set<IconFont>({ FSlateFontInfo() })
-		//	.set_auto_override(Icon{ "??" });
-
-		auto localizedText = world.prefab("LocalizedTextPREFAB")
-			.set_auto_override(LocalizedText{});
-
-		//auto labelSmall = world.prefab(COMPONENT(LabelSmall))
-		//	.set<LabelSmall>({ FSlateFontInfo("font400", 10) });
-
-		auto textBlock = world.prefab("TextBlockPREFAB")
-			.is_a(widget)
-			.is_a(localizedText)
-			.add<TextBlock>();
-
-		//auto assistChip = world.prefab()
-
-		//auto windowToggle = world.entity("WindowToggle PREFABED")
-
-		FString JsonStr(textBlock.to_json().c_str());
-
-		//UE_LOGFMT(LogTemp, Warning, "PREFAB >>> '{json}'", *JsonStr);
-
-		//FString JsonStr(world.get_scope().to_json().c_str());
-		UE_LOGFMT(LogTemp, Warning, "PREFAB >>> '{json}'", *JsonStr);
 	}
 }

@@ -9,7 +9,6 @@
 
 namespace UIElements {
 	void FontFeature::RegisterComponents(flecs::world& world) {
-		world.component<TextFont>().member<FString>(VALUE);
 		world.component<TextStyles>();
 	}
 
@@ -73,7 +72,8 @@ namespace UIElements {
 		auto uiScale = world.get<UIScale>()->Value;
 		GetMutableDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())->ApplicationScale = world.get<UIScale>()->Value;
 
-		const FString FontName = world.get<TextFont>()->Value;
+		//const FString FontName = world.get<TextFont>()->Value;
+		const FString FontName = TEXT("MeowScript");
 		const FString font400 = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + FontName + TEXT("400.ttf");
 		const FString font500 = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + FontName + TEXT("500.ttf");
 

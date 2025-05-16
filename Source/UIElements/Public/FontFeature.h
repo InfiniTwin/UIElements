@@ -14,7 +14,7 @@ namespace UIElements {
 		static void AwaitDelay(flecs::entity entity, float seconds, std::function<void()> onCompleted);
 	};
 
-	struct TextFont { FString Value; };
+	//struct TextFont { FString Value; };
 
 	struct TextStyles { TSharedPtr<FSlateStyleSet> Value; };
 
