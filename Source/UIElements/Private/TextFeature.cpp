@@ -80,6 +80,8 @@ namespace UIElements {
 		world.system("AddFontInfo")
 			.with(flecs::Prefab)
 			.with<Font>()
+			.with<FontFace>()
+			.with<FontSize>()
 			.without<FontInfo>()
 			.each([](flecs::entity e) { e.add<FontInfo>().disable<FontInfo>(); });
 
