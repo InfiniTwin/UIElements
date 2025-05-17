@@ -15,7 +15,7 @@ namespace UIElements {
 	struct Font { FString Value; };
 	struct FontFace { FString Value; };
 	struct FontSize { int Value; };
-	struct FontInfo { FSlateFontInfo Value; };
+	struct FontInfo {};
 
 	struct TextBlock {};
 
@@ -25,7 +25,7 @@ namespace UIElements {
 	struct Locale { FString Value; };
 	struct LocalizedText { FString Value; };
 
-	struct TextBlocksQuery { flecs::query<const TextBlock, const LocalizedText, const Widget> Value; };
+	struct LocalizedTextQuery { flecs::query<const LocalizedText, const Widget> Value; };
 
 	struct TextFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);

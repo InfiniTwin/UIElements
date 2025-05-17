@@ -78,21 +78,21 @@ namespace UIElements {
 		const FString font500 = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + FontName + TEXT("500.ttf");
 
 		TextTypes textTypes = {
-			FSlateFontInfo(font400, 32), // DisplayLarge
-			FSlateFontInfo(font400, 28), // DisplayMedium
-			FSlateFontInfo(font400, 24), // DisplaySmall
-			FSlateFontInfo(font400, 22), // HeadlineLarge
-			FSlateFontInfo(font400, 20), // HeadlineMedium
-			FSlateFontInfo(font400, 18), // HeadlineSmall
-			FSlateFontInfo(font400, 16), // TitleLarge
-			FSlateFontInfo(font500, 14), // TitleMedium
-			FSlateFontInfo(font500, 12), // TitleSmall
+			FSlateFontInfo(font400, 24), // DisplayLarge
+			FSlateFontInfo(font400, 22), // DisplayMedium
+			FSlateFontInfo(font400, 20), // DisplaySmall
+			FSlateFontInfo(font400, 18), // HeadlineLarge
+			FSlateFontInfo(font400, 16), // HeadlineMedium
+			FSlateFontInfo(font400, 14), // HeadlineSmall
+			FSlateFontInfo(font500, 13), // TitleLarge
+			FSlateFontInfo(font500, 12), // TitleMedium
+			FSlateFontInfo(font500, 11), // TitleSmall
 			FSlateFontInfo(font400, 12), // BodyLarge
 			FSlateFontInfo(font400, 11), // BodyMedium
 			FSlateFontInfo(font400, 10), // BodySmall
-			FSlateFontInfo(font500, 14), // LabelLarge
-			FSlateFontInfo(font500, 12), // LabelMedium
-			FSlateFontInfo(font500, 10)  // LabelSmall
+			FSlateFontInfo(font500, 11), // LabelLarge
+			FSlateFontInfo(font500, 10), // LabelMedium
+			FSlateFontInfo(font500, 9)  // LabelSmall
 		};
 
 		world.get<TextStyles>()->Value.ToSharedRef()->Set(FName(UTF8_TO_TCHAR(MEMBER(TextTypes::DisplayLarge))), textTypes.DisplayLarge);

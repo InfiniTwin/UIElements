@@ -40,21 +40,16 @@ namespace UIElements {
 		world.system<const Widget>("AttachedWidgetToParent")
 			.with(flecs::ChildOf)
 			.second(flecs::Wildcard)
-			.with<Attached>().id_flags(flecs::TOGGLE)
-			.without<Attached>()
+			.with<Attached>().id_flags(flecs::TOGGLE).without<Attached>()
 			.each([](flecs::entity child, const Widget& widget) {
 			auto parent = child.parent();
-			if (parent.has<Viewport>() && child.has<CompoundWidget>()) {
-				child.enable<Attached>();
+			child.enable<Attached>();
+			if (parent.has<Viewport>() && child.has<CompoundWidget>())
 				GEngine->GameViewport->AddViewportWidgetContent(
 					StaticCastSharedPtr<CompoundWidgetInstance>(widget.Value).ToSharedRef());
-				return;
-			}
-			if (parent.has<CompoundWidget>() && parent.has<Widget>()) {
-				child.enable<Attached>();
+			if (parent.has<CompoundWidget>() && parent.has<Widget>())
 				StaticCastSharedPtr<CompoundWidgetInstance>(parent.get_mut<Widget>()->Value)->Slot()
-					.AttachWidget(widget.Value.ToSharedRef());
-			}
+				.AttachWidget(widget.Value.ToSharedRef());
 				});
 	}
 
