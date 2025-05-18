@@ -7,15 +7,7 @@
 #include "utils/utils.h"
 
 namespace UIElements {
-	struct ColorFeature {
-		static void RegisterOpaqueTypes(flecs::world& world);
-		static void RegisterComponents(flecs::world& world);
-		static void CreateSystems(flecs::world& world);
-
-		static void Initialize(flecs::world& world);
-	};
-
-#pragma region Config
+	struct Color { FLinearColor Value; };
 
 	using namespace material_color_utilities;
 	struct UIScheme {
@@ -30,57 +22,26 @@ namespace UIElements {
 		Argb Error;
 	};
 
-	struct UIColors {
-		FLinearColor Background;
-		FLinearColor OnBackground;
-		FLinearColor Surface;
-		FLinearColor SurfaceDim;
-		FLinearColor SurfaceBright;
-		FLinearColor SurfaceContainerLowest;
-		FLinearColor SurfaceContainerLow;
-		FLinearColor SurfaceContainer;
-		FLinearColor SurfaceContainerHigh;
-		FLinearColor SurfaceContainerHighest;
-		FLinearColor OnSurface;
-		FLinearColor SurfaceVariant;
-		FLinearColor OnSurfaceVariant;
-		FLinearColor InverseSurface;
-		FLinearColor InverseOnSurface;
-		FLinearColor Outline;
-		FLinearColor OutlineVariant;
-		FLinearColor Shadow;
-		FLinearColor Scrim;
-		FLinearColor SurfaceTint;
-		FLinearColor Primary;
-		FLinearColor OnPrimary;
-		FLinearColor PrimaryContainer;
-		FLinearColor OnPrimaryContainer;
-		FLinearColor InversePrimary;
-		FLinearColor Secondary;
-		FLinearColor OnSecondary;
-		FLinearColor SecondaryContainer;
-		FLinearColor OnSecondaryContainer;
-		FLinearColor Tertiary;
-		FLinearColor OnTertiary;
-		FLinearColor TertiaryContainer;
-		FLinearColor OnTertiaryContainer;
-		FLinearColor Error;
-		FLinearColor OnError;
-		FLinearColor ErrorContainer;
-		FLinearColor OnErrorContainer;
-		FLinearColor PrimaryFixed;
-		FLinearColor PrimaryFixedDim;
-		FLinearColor OnPrimaryFixed;
-		FLinearColor OnPrimaryFixedVariant;
-		FLinearColor SecondaryFixed;
-		FLinearColor SecondaryFixedDim;
-		FLinearColor OnSecondaryFixed;
-		FLinearColor OnSecondaryFixedVariant;
-		FLinearColor TertiaryFixed;
-		FLinearColor TertiaryFixedDim;
-		FLinearColor OnTertiaryFixed;
-		FLinearColor OnTertiaryFixedVariant;
-	};
+	struct ColorPrefabQuery { flecs::query<Color> Value; };
 
-#pragma endregion
+	struct ColorFeature {
+		static void RegisterOpaqueTypes(flecs::world& world);
+		static void RegisterComponents(flecs::world& world);
+		static void CreateQueries(flecs::world& world);
+		static void CreateObservers(flecs::world& world);
+
+		static inline void SetColor(flecs::world& world, const FString name, const FLinearColor color) {
+			auto cn = TEXT("Color") + name;
+			FTCHARToUTF8 colorName(*cn);
+			world.get<ColorPrefabQuery>()->Value.run([&colorName, &color](flecs::iter& it) {
+				while (it.next())
+					for (auto i : it)
+						if (std::strcmp(it.entity(i).name(), colorName.Get()) == 0)
+						{
+							it.entity(i).set<Color>({ color });
+							return;
+						}
+				});
+		}
+	};
 }

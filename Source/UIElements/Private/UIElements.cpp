@@ -2,9 +2,8 @@
 
 #include "UIElements.h"
 #include "UIFeature.h"
-#include "TextFeature.h"
+#include "TypographyFeature.h"
 #include "WidgetFeature.h"
-#include "FontFeature.h"
 #include "ColorFeature.h"
 #include "ButtonFeature.h"
 #include "ToggleFeature.h"
@@ -33,29 +32,27 @@ namespace UIElements {
 	void Register(flecs::world& world, const FString scope) {
 		Scope() = scope;
 
-		TextFeature::RegisterOpaqueTypes(world);
 		ColorFeature::RegisterOpaqueTypes(world);
+		TypographyFeature::RegisterOpaqueTypes(world);
 
 		UIFeature::RegisterComponents(world);
 		WidgetFeature::RegisterComponents(world);
-		TextFeature::RegisterComponents(world);
 		ColorFeature::RegisterComponents(world);
-		FontFeature::RegisterComponents(world);
+		TypographyFeature::RegisterComponents(world);
 		ButtonFeature::RegisterComponents(world);
 		ToggleFeature::RegisterComponents(world);
 
-		TextFeature::CreateQueries(world);
+		ColorFeature::CreateQueries(world);
+		TypographyFeature::CreateQueries(world);
 
-		TextFeature::CreateObservers(world);
+		UIFeature::CreateObservers(world);
+		ColorFeature::CreateObservers(world);
+		TypographyFeature::CreateObservers(world);
 
 		WidgetFeature::CreateSystems(world);
-		TextFeature::CreateSystems(world);
-		ColorFeature::CreateSystems(world);
-		FontFeature::CreateSystems(world);
+		TypographyFeature::CreateSystems(world);
+		ButtonFeature::CreateSystems(world);
 
 		UIFeature::Initialize(world);
-		ColorFeature::Initialize(world);
-		FontFeature::Initialize(world);
-		WidgetFeature::Initialize(world);
 	}
 }

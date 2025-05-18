@@ -1,12 +1,12 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TextFeature.h"
+#include "TypographyFeature.h"
 #include "ECS.h"
 #include "Logging/StructuredLog.h"
 
 namespace UIElements {
-	void TextFeature::RegisterOpaqueTypes(flecs::world& world) {
+	void TypographyFeature::RegisterOpaqueTypes(flecs::world& world) {
 		// FString <=> flecs::String
 		world.component<FString>()
 			.opaque(flecs::String)
@@ -31,7 +31,7 @@ namespace UIElements {
 				});
 	}
 
-	void TextFeature::RegisterComponents(flecs::world& world) {
+	void TypographyFeature::RegisterComponents(flecs::world& world) {
 		world.component<Font>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontFace>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontSize>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
@@ -43,11 +43,11 @@ namespace UIElements {
 		world.component<TextBlock>().add(flecs::OnInstantiate, flecs::Inherit);
 	};
 
-	void TextFeature::CreateQueries(flecs::world& world) {
+	void TypographyFeature::CreateQueries(flecs::world& world) {
 		world.set(LocalizedTextQuery{ world.query_builder<const LocalizedText, const Widget>().cached().build() });
 	};
 
-	void TextFeature::CreateObservers(flecs::world& world) {
+	void TypographyFeature::CreateObservers(flecs::world& world) {
 		world.observer<const LocalizedText, const Widget>("LocalizeTextBlock")
 			.with<TextBlock>()
 			.event(flecs::OnSet)
@@ -71,7 +71,7 @@ namespace UIElements {
 			}});
 	};
 
-	void TextFeature::CreateSystems(flecs::world& world) {
+	void TypographyFeature::CreateSystems(flecs::world& world) {
 		world.system("AddWidgetToTextBlock")
 			.with<TextBlock>()
 			.without<Widget>()
@@ -88,11 +88,11 @@ namespace UIElements {
 		world.system<const Font, const FontFace, const FontSize>("UpdateFontInfo")
 			.with(flecs::Prefab)
 			.with<FontInfo>().id_flags(flecs::TOGGLE).without<FontInfo>()
-			.each([&world](flecs::entity e, const Font& f, const FontFace& fw, const FontSize& fs) {
-			e.enable<FontInfo>();
+			.each([&world](flecs::entity p, const Font& f, const FontFace& fw, const FontSize& fs) {
+			p.enable<FontInfo>();
 			const FString fp = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + f.Value + TEXT("-") + fw.Value + TEXT(".ttf");
 			FSlateFontInfo fi = FSlateFontInfo(fp, fs.Value);
-			world.each(world.pair(flecs::IsA, e), [&fi](flecs::entity i) {
+			world.each(world.pair(flecs::IsA, p), [&fi](flecs::entity i) {
 				if (i.has<TextBlock>())
 					StaticCastSharedPtr<STextBlock>(i.get_mut<Widget>()->Value)->SetFont(fi);
 				}); });

@@ -4,8 +4,8 @@
 #include "WidgetFeature.h"
 #include "flecs.h"
 #include "UIFeature.h"
-#include "TextFeature.h"
-#include "FontFeature.h"
+#include "TypographyFeature.h"
+#include "ButtonFeature.h"
 #include "Logging/StructuredLog.h"
 
 namespace UIElements {
@@ -19,6 +19,7 @@ namespace UIElements {
 		world.component<Border>();
 
 		world.component<Attached>().add(flecs::CanToggle);
+		world.component<StyleIsSet>().add(flecs::CanToggle);
 	}
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
@@ -47,38 +48,14 @@ namespace UIElements {
 			if (parent.has<Viewport>() && child.has<CompoundWidget>())
 				GEngine->GameViewport->AddViewportWidgetContent(
 					StaticCastSharedPtr<CompoundWidgetInstance>(widget.Value).ToSharedRef());
-			if (parent.has<CompoundWidget>() && parent.has<Widget>())
+			if (parent.has<CompoundWidget>())
+			{
 				StaticCastSharedPtr<CompoundWidgetInstance>(parent.get_mut<Widget>()->Value)->Slot()
-				.AttachWidget(widget.Value.ToSharedRef());
-				});
-	}
-
-	void WidgetFeature::Initialize(flecs::world& world) {
-		world.entity(GameViewport).add<Viewport>();
-
-		world.system<Delay>()
-			.each([](flecs::entity e, Delay& delay) {
-			delay.RemainingTime -= e.world().delta_time();
-			if (delay.RemainingTime <= 0.f) {
-				if (delay.Callback)
-					delay.Callback();
-				e.remove<Delay>();
+					.AttachWidget(widget.Value.ToSharedRef());
+				return;
 			}
+			if (parent.has<Border>() || parent.has<Button>())
+				StaticCastSharedPtr<SBorder>(parent.get_mut<Widget>()->Value)->SetContent(widget.Value.ToSharedRef());
 				});
-
-		flecs::entity myEntity = world.entity();
-		FontFeature::AwaitDelay(myEntity, 3, [&world]() {
-			world.set<Locale>({ "de" });
-			});
-
-		flecs::entity myEntity1 = world.entity();
-		FontFeature::AwaitDelay(myEntity1, 6, [&world]() {
-			world.set<Locale>({ "it" });
-
-			ecs_world_to_json_desc_t desc = { false, true };
-			const char* jsonser = ecs_world_to_json(world, &desc);
-			FString JsonString(jsonser);
-			//UE_LOGFMT(LogTemp, Warning, "Whole World >>> '{json}'", *JsonString);
-			});
 	}
 }

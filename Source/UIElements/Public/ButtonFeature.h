@@ -7,6 +7,7 @@
 namespace UIElements {
 	struct ButtonFeature {
 		static void RegisterComponents(flecs::world& world);
+		static void CreateSystems(flecs::world& world);
 	};
 
 	struct Button {};

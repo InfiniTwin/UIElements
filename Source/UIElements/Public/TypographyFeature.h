@@ -27,7 +27,7 @@ namespace UIElements {
 
 	struct LocalizedTextQuery { flecs::query<const LocalizedText, const Widget> Value; };
 
-	struct TextFeature {
+	struct TypographyFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
@@ -41,7 +41,6 @@ namespace UIElements {
 				return tableKeyString.Left(pos);
 			return tableKeyString;
 		}
-
 		static inline FString GetKey(const FString& tableKey) {
 			FString tableKeyString(tableKey);
 			int32 pos = tableKeyString.Find(TableKeyDelimiter);
@@ -49,7 +48,6 @@ namespace UIElements {
 				return tableKeyString.RightChop(pos + 2);
 			return tableKeyString;
 		}
-
 		static inline FString GetTablePath(const FString& tableKey, const FString locale) {
 			return Assets::GetAssetPath(TextExtension,
 				LocalizationFolder,
@@ -57,7 +55,6 @@ namespace UIElements {
 				*FString(locale)
 			);
 		}
-
 		static inline TMap<FString, FString> LoadTable(const FString& path)
 		{
 			TMap<FString, FString> map;

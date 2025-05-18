@@ -22,4 +22,30 @@ public:
 		}
 		return 0xffffffff;
 	}
+
+	static inline std::string HexFromLinearColor(const FLinearColor& color)
+	{
+		FColor srgb = color.ToFColor(true);
+		std::stringstream ss;
+		ss << "0x"
+			<< std::hex << std::setw(2) << std::setfill('0') << (int)srgb.A
+			<< std::setw(2) << (int)srgb.R
+			<< std::setw(2) << (int)srgb.G
+			<< std::setw(2) << (int)srgb.B;
+		return ss.str();
+	}
+
+	static inline FLinearColor LinearColorFromHex(const std::string& hex)
+	{
+		uint32_t argb = 0xffffffff;
+		if ((hex.length() == 9 && hex[0] == '#') || (hex.length() == 10 && hex.substr(0, 2) == "0x"))
+			argb = static_cast<uint32_t>(std::stoul(hex.substr(hex[0] == '#' ? 1 : 2), nullptr, 16));
+
+		uint8 A = (argb >> 24) & 0xFF;
+		uint8 R = (argb >> 16) & 0xFF;
+		uint8 G = (argb >> 8) & 0xFF;
+		uint8 B = (argb) & 0xFF;
+
+		return FLinearColor(FColor(R, G, B, A));
+	}
 };

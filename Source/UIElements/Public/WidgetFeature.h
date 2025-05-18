@@ -4,8 +4,6 @@
 
 #include "flecs.h"
 
-constexpr const char* GameViewport = "GameViewport";
-
 namespace UIElements {
 	struct Widget { TSharedPtr<SWidget> Value; };
 
@@ -22,13 +20,15 @@ namespace UIElements {
 	};
 	struct CompoundWidget {};
 
+	struct HBox {};
 	struct Border {};
+	struct RoundBorder {};
 
 	struct Attached {};
+	struct StyleIsSet {};
 
 	struct WidgetFeature {
 		static void RegisterComponents(flecs::world& world);
 		static void CreateSystems(flecs::world& world);
-		static void Initialize(flecs::world& world);
 	};
 }
