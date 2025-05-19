@@ -38,16 +38,17 @@ namespace UIElements {
 			.without<Attached>()
 			.each([](flecs::entity e) { e.add<Attached>().disable<Attached>(); });
 
-		world.system<const Widget>("AttachedWidgetToParent")
-			.with(flecs::ChildOf)
-			.second(flecs::Wildcard)
+		world.system<const Widget>("ParentWidget")
+			.with(flecs::ChildOf).second(flecs::Wildcard)
 			.with<Attached>().id_flags(flecs::TOGGLE).without<Attached>()
 			.each([](flecs::entity child, const Widget& widget) {
 			auto parent = child.parent();
 			child.enable<Attached>();
-			if (parent.has<Viewport>() && child.has<CompoundWidget>())
-				GEngine->GameViewport->AddViewportWidgetContent(
-					StaticCastSharedPtr<CompoundWidgetInstance>(widget.Value).ToSharedRef());
+			if (parent.has<Viewport>())
+			{
+				GEngine->GameViewport->AddViewportWidgetContent(widget.Value.ToSharedRef());
+				return;
+			}
 			if (parent.has<CompoundWidget>())
 			{
 				StaticCastSharedPtr<CompoundWidgetInstance>(parent.get_mut<Widget>()->Value)->Slot()
