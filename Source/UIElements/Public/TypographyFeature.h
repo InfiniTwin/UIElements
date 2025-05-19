@@ -15,7 +15,7 @@ namespace UIElements {
 	struct Font { FString Value; };
 	struct FontFace { FString Value; };
 	struct FontSize { int Value; };
-	struct FontInfo {};
+	struct FontSet {};
 
 	struct TextBlock {};
 

@@ -35,7 +35,7 @@ namespace UIElements {
 		world.component<Font>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontFace>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontSize>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<FontInfo>().add(flecs::CanToggle);
+		world.component<FontSet>().add(flecs::CanToggle);
 
 		world.component<Locale>().member<FString>(VALUE);
 		world.component<LocalizedText>().member<FString>(VALUE);
@@ -64,9 +64,11 @@ namespace UIElements {
 			for (const FString& tableName : tableNames) {
 				auto table = LoadTable(GetTablePath(tableName, l.Value));
 				texts.each([&tableName, &table](flecs::entity e, const LocalizedText& lt, const Widget& w) {
-					if (GetTable(lt.Value) == tableName)
+					if (GetTable(lt.Value) == tableName) {
+						FText text = FText::FromString(*table.Find(GetKey(lt.Value)));
 						if (e.has<TextBlock>())
-							StaticCastSharedPtr<STextBlock>(w.Value)->SetText(FText::FromString(*table.Find(GetKey(lt.Value))));
+							StaticCastSharedPtr<STextBlock>(w.Value)->SetText(text);
+					}
 					});
 			}});
 	};
@@ -77,19 +79,19 @@ namespace UIElements {
 			.without<Widget>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(STextBlock) }); });
 
-		world.system("AddFontInfo")
+		world.system("AddFontSet")
 			.with(flecs::Prefab)
 			.with<Font>()
 			.with<FontFace>()
 			.with<FontSize>()
-			.without<FontInfo>()
-			.each([](flecs::entity e) { e.add<FontInfo>().disable<FontInfo>(); });
+			.without<FontSet>()
+			.each([](flecs::entity e) { e.add<FontSet>().disable<FontSet>(); });
 
 		world.system<const Font, const FontFace, const FontSize>("UpdateFontInfo")
 			.with(flecs::Prefab)
-			.with<FontInfo>().id_flags(flecs::TOGGLE).without<FontInfo>()
+			.with<FontSet>().id_flags(flecs::TOGGLE).without<FontSet>()
 			.each([&world](flecs::entity p, const Font& f, const FontFace& fw, const FontSize& fs) {
-			p.enable<FontInfo>();
+			p.enable<FontSet>();
 			const FString fp = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + f.Value + TEXT("-") + fw.Value + TEXT(".ttf");
 			FSlateFontInfo fi = FSlateFontInfo(fp, fs.Value);
 			world.each(world.pair(flecs::IsA, p), [&fi](flecs::entity i) {

@@ -62,6 +62,7 @@ namespace UIElements {
 	void ColorFeature::RegisterComponents(flecs::world& world) {
 		world.component<Color>().member<FLinearColor>(VALUE)
 			.add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<ColorSet>().add(flecs::CanToggle);
 
 		world.component<UIScheme>()
 			.member<bool>(MEMBER(UIScheme::DarkMode))
@@ -146,14 +147,23 @@ namespace UIElements {
 			SetColor(world, "TertiaryFixedDim", MaterialDynamicColors::TertiaryFixedDim().GetLinear(ds));
 			SetColor(world, "OnTertiaryFixed", MaterialDynamicColors::OnTertiaryFixed().GetLinear(ds));
 			SetColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds)); });
+	}
 
-		world.observer<const Color>("UpdateInstanceColor")
+	void ColorFeature::CreateSystems(flecs::world& world) {
+		world.system("AddColorSet")
 			.with(flecs::Prefab)
-			.event(flecs::OnSet)
+			.with<Color>()
+			.without<ColorSet>()
+			.each([](flecs::entity e) { e.add<ColorSet>().disable<ColorSet>(); });
+
+		world.system<const Color>("UpdateColor")
+			.with(flecs::Prefab)
+			.with<ColorSet>().id_flags(flecs::TOGGLE).without<ColorSet>()
 			.each([&world](flecs::entity p, const Color& c) {
+			p.enable<ColorSet>();
 			world.each(world.pair(flecs::IsA, p), [&c](flecs::entity i) {
 				if (i.has<TextBlock>() && i.has<Widget>())
-					StaticCastSharedPtr<STextBlock>(i.get_mut<Widget>()->Value)->SetColorAndOpacity(c.Value);
-				}); });
+					StaticCastSharedPtr<STextBlock>(i.get_mut<Widget>()->Value)->SetColorAndOpacity(c.Value); });
+				});
 	}
 }
