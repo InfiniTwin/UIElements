@@ -23,17 +23,17 @@ namespace UIElements {
 	}
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
-		world.system("AddWidgetToCompoundWidget")
+		world.system("AddCompoundWidgetWidget")
 			.with<CompoundWidget>()
 			.without<Widget>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(CompoundWidgetInstance) }); });
 
-		world.system("AddWidgetToBorder")
+		world.system("AddBorderWidget")
 			.with<Border>()
 			.without<Widget>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(SBorder) }); });
 
-		world.system("MakeWidgetAttachable")
+		world.system("AddAttached")
 			.with<Widget>()
 			.without<Attached>()
 			.each([](flecs::entity e) { e.add<Attached>().disable<Attached>(); });

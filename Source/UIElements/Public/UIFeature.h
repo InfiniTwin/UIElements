@@ -10,6 +10,5 @@ namespace UIElements {
 	struct UIFeature {
 		static void RegisterComponents(flecs::world& world);
 		static void CreateObservers(flecs::world& world);
-		static void Initialize(flecs::world& world);
 	};
 }

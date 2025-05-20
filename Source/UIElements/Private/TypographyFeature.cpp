@@ -36,7 +36,7 @@ namespace UIElements {
 		world.component<Font>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontFace>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontSize>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<FontSet>().add(flecs::CanToggle);
+		world.component<FontSynced>().add(flecs::CanToggle);
 
 		world.component<Locale>().member<FString>(VALUE);
 		world.component<LocalizedText>().member<FString>(VALUE);
@@ -75,26 +75,25 @@ namespace UIElements {
 	};
 
 	void TypographyFeature::CreateSystems(flecs::world& world) {
-		world.system("AddWidgetToTextBlock")
+		world.system("AddTextBlockWidget")
 			.with<TextBlock>()
 			.without<Widget>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(STextBlock) }); });
 
-		world.system("AddFontSet")
+		world.system("AddFontSynced")
 			.with(flecs::Prefab)
 			.with<Font>()
 			.with<FontFace>()
 			.with<FontSize>()
-			.without<FontSet>()
-			.each([](flecs::entity e) { e.add<FontSet>().disable<FontSet>(); });
+			.without<FontSynced>()
+			.each([](flecs::entity e) { e.add<FontSynced>().disable<FontSynced>(); });
 
 		world.system<const Font, const FontFace, const FontSize>("UpdateFontInfo")
 			.with(flecs::Prefab)
-			.with<FontSet>().id_flags(flecs::TOGGLE).without<FontSet>()
+			.with<FontSynced>().id_flags(flecs::TOGGLE).without<FontSynced>()
 			.each([&world](flecs::entity p, const Font& f, const FontFace& fw, const FontSize& fs) {
-			p.enable<FontSet>();
-			const FString fp = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + f.Value + TEXT("-") + fw.Value + TEXT(".ttf");
-			FSlateFontInfo fi = FSlateFontInfo(fp, fs.Value);
+			p.enable<FontSynced>();
+			FSlateFontInfo fi = GetFontInfo(f.Value, fw.Value, fs.Value);
 			world.each(world.pair(flecs::IsA, p), [&fi](flecs::entity i) {
 				if (i.has<TextBlock>())
 					StaticCastSharedPtr<STextBlock>(i.get_mut<Widget>()->Value)->SetFont(fi);

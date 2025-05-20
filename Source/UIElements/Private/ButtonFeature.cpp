@@ -10,7 +10,7 @@ namespace UIElements {
 	};
 
 	void ButtonFeature::CreateSystems(flecs::world& world) {
-		world.system("AddWidgetToButton")
+		world.system("AddButtonWidget")
 			.with<Button>()
 			.without<Widget>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(SButton) }); });

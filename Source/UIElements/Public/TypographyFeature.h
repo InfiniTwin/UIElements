@@ -15,7 +15,7 @@ namespace UIElements {
 	struct Font { FString Value; };
 	struct FontFace { FString Value; };
 	struct FontSize { int Value; };
-	struct FontSet {};
+	struct FontSynced {};
 
 	struct TextBlock {};
 
@@ -76,5 +76,11 @@ namespace UIElements {
 			}
 		}
 		return map;
+	}
+
+	static inline FSlateFontInfo GetFontInfo(const FString& name, const FString& weight, int32 size)
+	{
+		const FString FilePath = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + name + TEXT("-") + weight + TEXT(".ttf");
+		return FSlateFontInfo(FilePath, size);
 	}
 }

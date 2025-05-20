@@ -8,7 +8,7 @@
 
 namespace UIElements {
 	struct Color { FLinearColor Value; };
-	struct SyncedColor {};
+	struct ColorSynced {};
 
 	using namespace material_color_utilities;
 	struct UIScheme {

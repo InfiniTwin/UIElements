@@ -63,7 +63,7 @@ namespace UIElements {
 		using namespace ECS;
 		world.component<Color>().member<FLinearColor>(VALUE)
 			.add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<SyncedColor>().add(flecs::CanToggle);
+		world.component<ColorSynced>().add(flecs::CanToggle);
 
 		world.component<UIScheme>()
 			.member<bool>(MEMBER(UIScheme::DarkMode))
@@ -78,7 +78,7 @@ namespace UIElements {
 	}
 
 	void ColorFeature::CreateQueries(flecs::world& world) {
-		world.set(ColorPrefabQuery{ world.query_builder<Color>().with(flecs::Prefab).cached().build() });
+		world.set(ColorPrefabQuery{ world.query_builder<Color>("ColorPrefabQuery").with(flecs::Prefab).cached().build()});
 	};
 
 	void ColorFeature::CreateObservers(flecs::world& world) {
@@ -151,16 +151,16 @@ namespace UIElements {
 	}
 
 	void ColorFeature::CreateSystems(flecs::world& world) {
-		world.system("AddDirtyColor")
+		world.system("AddColorSynced")
 			.with<Color>()
-			.without<SyncedColor>()
-			.each([](flecs::entity e) { e.add<SyncedColor>().disable<SyncedColor>(); });
+			.without<ColorSynced>()
+			.each([](flecs::entity e) { e.add<ColorSynced>().disable<ColorSynced>(); });
 
 		world.system<const Color, const Widget>("UpdateTextBlockColor")
 			.with<TextBlock>()
-			.with<SyncedColor>().id_flags(flecs::TOGGLE).without<SyncedColor>()
+			.with<ColorSynced>().id_flags(flecs::TOGGLE).without<ColorSynced>()
 			.each([&world](flecs::entity e, const Color& c, const Widget& w) {
-			e.enable<SyncedColor>();
+			e.enable<ColorSynced>();
 			StaticCastSharedPtr<STextBlock>(w.Value)->SetColorAndOpacity(c.Value); });
 	}
 
@@ -176,7 +176,7 @@ namespace UIElements {
 					{
 						p.set<Color>({ c });
 						world.each(world.pair(flecs::IsA, p), [](flecs::entity i) {
-							i.disable<SyncedColor>();
+							i.disable<ColorSynced>();
 							});
 						return;
 					}
