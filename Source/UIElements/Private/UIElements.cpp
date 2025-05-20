@@ -24,14 +24,7 @@ void FUIElementsModule::ShutdownModule() {
 IMPLEMENT_MODULE(FUIElementsModule, UIElements)
 
 namespace UIElements {
-	FString& Scope() {
-		static FString scope = TEXT("");
-		return scope;
-	}
-
-	void Register(flecs::world& world, const FString scope) {
-		Scope() = scope;
-
+	void Register(flecs::world& world) {
 		ColorFeature::RegisterOpaqueTypes(world);
 		TypographyFeature::RegisterOpaqueTypes(world);
 
@@ -53,7 +46,5 @@ namespace UIElements {
 		ColorFeature::CreateSystems(world);
 		TypographyFeature::CreateSystems(world);
 		ButtonFeature::CreateSystems(world);
-
-		UIFeature::Initialize(world);
 	}
 }

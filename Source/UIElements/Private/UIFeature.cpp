@@ -20,9 +20,4 @@ namespace UIElements {
 			GetMutableDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())
 				->ApplicationScale = scale.Value; });
 	}
-
-	void UIFeature::Initialize(flecs::world& world) {
-		ECS::FromJsonAsset(world, "UIColor", UIElements::Scope());
-		ECS::FromJsonAsset(world, "UITypography", UIElements::Scope());
-	}
 }

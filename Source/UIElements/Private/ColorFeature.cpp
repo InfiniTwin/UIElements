@@ -62,7 +62,7 @@ namespace UIElements {
 	void ColorFeature::RegisterComponents(flecs::world& world) {
 		world.component<Color>().member<FLinearColor>(VALUE)
 			.add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<ColorSet>().add(flecs::CanToggle);
+		world.component<SyncedColor>().add(flecs::CanToggle);
 
 		world.component<UIScheme>()
 			.member<bool>(MEMBER(UIScheme::DarkMode))
@@ -98,72 +98,88 @@ namespace UIElements {
 				TonalPalette(s.NeutralVariant),
 				TonalPalette(s.Error));
 
-			SetColor(world, "Background", MaterialDynamicColors::Background().GetLinear(ds));
-			SetColor(world, "OnBackground", MaterialDynamicColors::OnBackground().GetLinear(ds));
-			SetColor(world, "Surface", MaterialDynamicColors::Surface().GetLinear(ds));
-			SetColor(world, "SurfaceDim", MaterialDynamicColors::SurfaceDim().GetLinear(ds));
-			SetColor(world, "SurfaceBright", MaterialDynamicColors::SurfaceBright().GetLinear(ds));
-			SetColor(world, "SurfaceContainerLowest", MaterialDynamicColors::SurfaceContainerLowest().GetLinear(ds));
-			SetColor(world, "SurfaceContainerLow", MaterialDynamicColors::SurfaceContainerLow().GetLinear(ds));
-			SetColor(world, "SurfaceContainer", MaterialDynamicColors::SurfaceContainer().GetLinear(ds));
-			SetColor(world, "SurfaceContainerHigh", MaterialDynamicColors::SurfaceContainerHigh().GetLinear(ds));
-			SetColor(world, "SurfaceContainerHighest", MaterialDynamicColors::SurfaceContainerHighest().GetLinear(ds));
-			SetColor(world, "OnSurface", MaterialDynamicColors::OnSurface().GetLinear(ds));
-			SetColor(world, "SurfaceVariant", MaterialDynamicColors::SurfaceVariant().GetLinear(ds));
-			SetColor(world, "OnSurfaceVariant", MaterialDynamicColors::OnSurfaceVariant().GetLinear(ds));
-			SetColor(world, "InverseSurface", MaterialDynamicColors::InverseSurface().GetLinear(ds));
-			SetColor(world, "InverseOnSurface", MaterialDynamicColors::InverseOnSurface().GetLinear(ds));
-			SetColor(world, "Outline", MaterialDynamicColors::Outline().GetLinear(ds));
-			SetColor(world, "OutlineVariant", MaterialDynamicColors::OutlineVariant().GetLinear(ds));
-			SetColor(world, "Shadow", MaterialDynamicColors::Shadow().GetLinear(ds));
-			SetColor(world, "Scrim", MaterialDynamicColors::Scrim().GetLinear(ds));
-			SetColor(world, "SurfaceTint", MaterialDynamicColors::SurfaceTint().GetLinear(ds));
-			SetColor(world, "Primary", MaterialDynamicColors::Primary().GetLinear(ds));
-			SetColor(world, "OnPrimary", MaterialDynamicColors::OnPrimary().GetLinear(ds));
-			SetColor(world, "PrimaryContainer", MaterialDynamicColors::PrimaryContainer().GetLinear(ds));
-			SetColor(world, "OnPrimaryContainer", MaterialDynamicColors::OnPrimaryContainer().GetLinear(ds));
-			SetColor(world, "InversePrimary", MaterialDynamicColors::InversePrimary().GetLinear(ds));
-			SetColor(world, "Secondary", MaterialDynamicColors::Secondary().GetLinear(ds));
-			SetColor(world, "OnSecondary", MaterialDynamicColors::OnSecondary().GetLinear(ds));
-			SetColor(world, "SecondaryContainer", MaterialDynamicColors::SecondaryContainer().GetLinear(ds));
-			SetColor(world, "OnSecondaryContainer", MaterialDynamicColors::OnSecondaryContainer().GetLinear(ds));
-			SetColor(world, "Tertiary", MaterialDynamicColors::Tertiary().GetLinear(ds));
-			SetColor(world, "OnTertiary", MaterialDynamicColors::OnTertiary().GetLinear(ds));
-			SetColor(world, "TertiaryContainer", MaterialDynamicColors::TertiaryContainer().GetLinear(ds));
-			SetColor(world, "OnTertiaryContainer", MaterialDynamicColors::OnTertiaryContainer().GetLinear(ds));
-			SetColor(world, "Error", MaterialDynamicColors::Error().GetLinear(ds));
-			SetColor(world, "OnError", MaterialDynamicColors::OnError().GetLinear(ds));
-			SetColor(world, "ErrorContainer", MaterialDynamicColors::ErrorContainer().GetLinear(ds));
-			SetColor(world, "OnErrorContainer", MaterialDynamicColors::OnErrorContainer().GetLinear(ds));
-			SetColor(world, "PrimaryFixed", MaterialDynamicColors::PrimaryFixed().GetLinear(ds));
-			SetColor(world, "PrimaryFixedDim", MaterialDynamicColors::PrimaryFixedDim().GetLinear(ds));
-			SetColor(world, "OnPrimaryFixed", MaterialDynamicColors::OnPrimaryFixed().GetLinear(ds));
-			SetColor(world, "OnPrimaryFixedVariant", MaterialDynamicColors::OnPrimaryFixedVariant().GetLinear(ds));
-			SetColor(world, "SecondaryFixed", MaterialDynamicColors::SecondaryFixed().GetLinear(ds));
-			SetColor(world, "SecondaryFixedDim", MaterialDynamicColors::SecondaryFixedDim().GetLinear(ds));
-			SetColor(world, "OnSecondaryFixed", MaterialDynamicColors::OnSecondaryFixed().GetLinear(ds));
-			SetColor(world, "OnSecondaryFixedVariant", MaterialDynamicColors::OnSecondaryFixedVariant().GetLinear(ds));
-			SetColor(world, "TertiaryFixed", MaterialDynamicColors::TertiaryFixed().GetLinear(ds));
-			SetColor(world, "TertiaryFixedDim", MaterialDynamicColors::TertiaryFixedDim().GetLinear(ds));
-			SetColor(world, "OnTertiaryFixed", MaterialDynamicColors::OnTertiaryFixed().GetLinear(ds));
-			SetColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds)); });
+			SetPrefabColor(world, "Background", MaterialDynamicColors::Background().GetLinear(ds));
+			SetPrefabColor(world, "OnBackground", MaterialDynamicColors::OnBackground().GetLinear(ds));
+			SetPrefabColor(world, "Surface", MaterialDynamicColors::Surface().GetLinear(ds));
+			SetPrefabColor(world, "SurfaceDim", MaterialDynamicColors::SurfaceDim().GetLinear(ds));
+			SetPrefabColor(world, "SurfaceBright", MaterialDynamicColors::SurfaceBright().GetLinear(ds));
+			SetPrefabColor(world, "SurfaceContainerLowest", MaterialDynamicColors::SurfaceContainerLowest().GetLinear(ds));
+			SetPrefabColor(world, "SurfaceContainerLow", MaterialDynamicColors::SurfaceContainerLow().GetLinear(ds));
+			SetPrefabColor(world, "SurfaceContainer", MaterialDynamicColors::SurfaceContainer().GetLinear(ds));
+			SetPrefabColor(world, "SurfaceContainerHigh", MaterialDynamicColors::SurfaceContainerHigh().GetLinear(ds));
+			SetPrefabColor(world, "SurfaceContainerHighest", MaterialDynamicColors::SurfaceContainerHighest().GetLinear(ds));
+			SetPrefabColor(world, "OnSurface", MaterialDynamicColors::OnSurface().GetLinear(ds));
+			SetPrefabColor(world, "SurfaceVariant", MaterialDynamicColors::SurfaceVariant().GetLinear(ds));
+			SetPrefabColor(world, "OnSurfaceVariant", MaterialDynamicColors::OnSurfaceVariant().GetLinear(ds));
+			SetPrefabColor(world, "InverseSurface", MaterialDynamicColors::InverseSurface().GetLinear(ds));
+			SetPrefabColor(world, "InverseOnSurface", MaterialDynamicColors::InverseOnSurface().GetLinear(ds));
+			SetPrefabColor(world, "Outline", MaterialDynamicColors::Outline().GetLinear(ds));
+			SetPrefabColor(world, "OutlineVariant", MaterialDynamicColors::OutlineVariant().GetLinear(ds));
+			SetPrefabColor(world, "Shadow", MaterialDynamicColors::Shadow().GetLinear(ds));
+			SetPrefabColor(world, "Scrim", MaterialDynamicColors::Scrim().GetLinear(ds));
+			SetPrefabColor(world, "SurfaceTint", MaterialDynamicColors::SurfaceTint().GetLinear(ds));
+			SetPrefabColor(world, "Primary", MaterialDynamicColors::Primary().GetLinear(ds));
+			SetPrefabColor(world, "OnPrimary", MaterialDynamicColors::OnPrimary().GetLinear(ds));
+			SetPrefabColor(world, "PrimaryContainer", MaterialDynamicColors::PrimaryContainer().GetLinear(ds));
+			SetPrefabColor(world, "OnPrimaryContainer", MaterialDynamicColors::OnPrimaryContainer().GetLinear(ds));
+			SetPrefabColor(world, "InversePrimary", MaterialDynamicColors::InversePrimary().GetLinear(ds));
+			SetPrefabColor(world, "Secondary", MaterialDynamicColors::Secondary().GetLinear(ds));
+			SetPrefabColor(world, "OnSecondary", MaterialDynamicColors::OnSecondary().GetLinear(ds));
+			SetPrefabColor(world, "SecondaryContainer", MaterialDynamicColors::SecondaryContainer().GetLinear(ds));
+			SetPrefabColor(world, "OnSecondaryContainer", MaterialDynamicColors::OnSecondaryContainer().GetLinear(ds));
+			SetPrefabColor(world, "Tertiary", MaterialDynamicColors::Tertiary().GetLinear(ds));
+			SetPrefabColor(world, "OnTertiary", MaterialDynamicColors::OnTertiary().GetLinear(ds));
+			SetPrefabColor(world, "TertiaryContainer", MaterialDynamicColors::TertiaryContainer().GetLinear(ds));
+			SetPrefabColor(world, "OnTertiaryContainer", MaterialDynamicColors::OnTertiaryContainer().GetLinear(ds));
+			SetPrefabColor(world, "Error", MaterialDynamicColors::Error().GetLinear(ds));
+			SetPrefabColor(world, "OnError", MaterialDynamicColors::OnError().GetLinear(ds));
+			SetPrefabColor(world, "ErrorContainer", MaterialDynamicColors::ErrorContainer().GetLinear(ds));
+			SetPrefabColor(world, "OnErrorContainer", MaterialDynamicColors::OnErrorContainer().GetLinear(ds));
+			SetPrefabColor(world, "PrimaryFixed", MaterialDynamicColors::PrimaryFixed().GetLinear(ds));
+			SetPrefabColor(world, "PrimaryFixedDim", MaterialDynamicColors::PrimaryFixedDim().GetLinear(ds));
+			SetPrefabColor(world, "OnPrimaryFixed", MaterialDynamicColors::OnPrimaryFixed().GetLinear(ds));
+			SetPrefabColor(world, "OnPrimaryFixedVariant", MaterialDynamicColors::OnPrimaryFixedVariant().GetLinear(ds));
+			SetPrefabColor(world, "SecondaryFixed", MaterialDynamicColors::SecondaryFixed().GetLinear(ds));
+			SetPrefabColor(world, "SecondaryFixedDim", MaterialDynamicColors::SecondaryFixedDim().GetLinear(ds));
+			SetPrefabColor(world, "OnSecondaryFixed", MaterialDynamicColors::OnSecondaryFixed().GetLinear(ds));
+			SetPrefabColor(world, "OnSecondaryFixedVariant", MaterialDynamicColors::OnSecondaryFixedVariant().GetLinear(ds));
+			SetPrefabColor(world, "TertiaryFixed", MaterialDynamicColors::TertiaryFixed().GetLinear(ds));
+			SetPrefabColor(world, "TertiaryFixedDim", MaterialDynamicColors::TertiaryFixedDim().GetLinear(ds));
+			SetPrefabColor(world, "OnTertiaryFixed", MaterialDynamicColors::OnTertiaryFixed().GetLinear(ds));
+			SetPrefabColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds)); });
 	}
 
 	void ColorFeature::CreateSystems(flecs::world& world) {
-		world.system("AddColorSet")
-			.with(flecs::Prefab)
+		world.system("AddDirtyColor")
 			.with<Color>()
-			.without<ColorSet>()
-			.each([](flecs::entity e) { e.add<ColorSet>().disable<ColorSet>(); });
+			.without<SyncedColor>()
+			.each([](flecs::entity e) { e.add<SyncedColor>().disable<SyncedColor>(); });
 
-		world.system<const Color>("UpdateColor")
-			.with(flecs::Prefab)
-			.with<ColorSet>().id_flags(flecs::TOGGLE).without<ColorSet>()
-			.each([&world](flecs::entity p, const Color& c) {
-			p.enable<ColorSet>();
-			world.each(world.pair(flecs::IsA, p), [&c](flecs::entity i) {
-				if (i.has<TextBlock>() && i.has<Widget>())
-					StaticCastSharedPtr<STextBlock>(i.get_mut<Widget>()->Value)->SetColorAndOpacity(c.Value); });
-				});
+		world.system<const Color, const Widget>("UpdateTextBlockColor")
+			.with<TextBlock>()
+			.with<SyncedColor>().id_flags(flecs::TOGGLE).without<SyncedColor>()
+			.each([&world](flecs::entity e, const Color& c, const Widget& w) {
+			e.enable<SyncedColor>();
+			StaticCastSharedPtr<STextBlock>(w.Value)->SetColorAndOpacity(c.Value); });
+	}
+
+	void UIElements::SetPrefabColor(flecs::world& world, const FString name, const FLinearColor c) {
+		auto colorName = TEXT("Color") + name;
+		FTCHARToUTF8 cn(*colorName);
+		world.get<ColorPrefabQuery>()->Value.run([&world, &cn, &c](flecs::iter& it) {
+			while (it.next())
+				for (auto i : it)
+				{
+					auto p = it.entity(i);
+					if (std::strcmp(p.name(), cn.Get()) == 0)
+					{
+						p.set<Color>({ c });
+						world.each(world.pair(flecs::IsA, p), [](flecs::entity i) {
+							i.disable<SyncedColor>();
+							});
+						return;
+					}
+				}
+			});
 	}
 }

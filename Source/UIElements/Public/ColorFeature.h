@@ -8,7 +8,7 @@
 
 namespace UIElements {
 	struct Color { FLinearColor Value; };
-	struct ColorSet {};
+	struct SyncedColor {};
 
 	using namespace material_color_utilities;
 	struct UIScheme {
@@ -32,21 +32,7 @@ namespace UIElements {
 		static void CreateObservers(flecs::world& world);
 		static void CreateSystems(flecs::world& world);
 
-		static inline void SetColor(flecs::world& world, const FString name, const FLinearColor color) {
-			auto cn = TEXT("Color") + name;
-			FTCHARToUTF8 colorName(*cn);
-			world.get<ColorPrefabQuery>()->Value.run([&colorName, &color](flecs::iter& it) {
-				while (it.next())
-					for (auto i : it)
-					{
-						auto e = it.entity(i);
-						if (std::strcmp(e.name(), colorName.Get()) == 0)
-						{
-							e.set<Color>({ color }).disable<ColorSet>();
-							return;
-						}
-					}
-				});
-		}
 	};
+
+	void SetPrefabColor(flecs::world& world, const FString name, const FLinearColor color);
 }
