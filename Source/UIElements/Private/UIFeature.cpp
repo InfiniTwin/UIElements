@@ -9,6 +9,7 @@
 
 namespace UIElements {
 	void UIFeature::RegisterComponents(flecs::world& world) {
+		using namespace ECS;
 		world.component<UIScale>().member<double>(VALUE);
 	}
 

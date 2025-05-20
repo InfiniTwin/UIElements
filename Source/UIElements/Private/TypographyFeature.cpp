@@ -32,6 +32,7 @@ namespace UIElements {
 	}
 
 	void TypographyFeature::RegisterComponents(flecs::world& world) {
+		using namespace ECS;
 		world.component<Font>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontFace>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontSize>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
