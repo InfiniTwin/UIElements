@@ -78,7 +78,7 @@ namespace UIElements {
 	}
 
 	void ColorFeature::CreateQueries(flecs::world& world) {
-		world.set(ColorPrefabQuery{ world.query_builder<Color>("ColorPrefabQuery").with(flecs::Prefab).cached().build()});
+		world.set(ColorPrefabQuery{ world.query_builder<Color>("ColorPrefabQuery").with(flecs::Prefab).cached().build() });
 	};
 
 	void ColorFeature::CreateObservers(flecs::world& world) {
@@ -156,11 +156,11 @@ namespace UIElements {
 			.without<ColorSynced>()
 			.each([](flecs::entity e) { e.add<ColorSynced>().disable<ColorSynced>(); });
 
-		world.system<const Color, const Widget>("UpdateTextBlockColor")
+		world.system<const Color, const Widget>("SyncTextBlockColor")
 			.with<TextBlock>()
 			.with<ColorSynced>().id_flags(flecs::TOGGLE).without<ColorSynced>()
-			.each([&world](flecs::entity e, const Color& c, const Widget& w) {
-			e.enable<ColorSynced>();
+			.each([&world](flecs::entity tb, const Color& c, const Widget& w) {
+			tb.enable<ColorSynced>();
 			StaticCastSharedPtr<STextBlock>(w.Value)->SetColorAndOpacity(c.Value); });
 	}
 

@@ -33,9 +33,10 @@ namespace UIElements {
 
 	void TypographyFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
-		world.component<Font>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<TextFont>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontFace>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontSize>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<FontInfo>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontSynced>().add(flecs::CanToggle);
 
 		world.component<Locale>().member<FString>(VALUE);
@@ -45,10 +46,23 @@ namespace UIElements {
 	};
 
 	void TypographyFeature::CreateQueries(flecs::world& world) {
-		world.set(LocalizedTextQuery{ world.query_builder<const LocalizedText, const Widget>().cached().build() });
+		world.set(LocalizedTextQuery{ world.query_builder<const LocalizedText, const Widget>("LocalizedTextQuery").cached().build() });
+
+		world.set(TextPrefabQuery{ world.query_builder<const FontFace, const FontSize>("TextPrefabQuery").with(flecs::Prefab).cached().build() });
 	};
 
 	void TypographyFeature::CreateObservers(flecs::world& world) {
+		world.observer<const TextFont>("UpdateTextPrefabFontInfo")
+			.term_at(0).singleton()
+			.event(flecs::OnSet)
+			.each([&world](const TextFont& tf) {
+			world.get<TextPrefabQuery>()->Value.each([&world, &tf](flecs::entity tp, const FontFace& ff, const FontSize& fs) {
+				SetFontInfo(tp, tf.Value, ff.Value, fs.Value);
+				world.each(world.pair(flecs::IsA, tp), [](flecs::entity i) {
+					i.disable<FontSynced>();
+					}); });
+				});
+
 		world.observer<const LocalizedText, const Widget>("LocalizeTextBlock")
 			.with<TextBlock>()
 			.event(flecs::OnSet)
@@ -80,23 +94,23 @@ namespace UIElements {
 			.without<Widget>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(STextBlock) }); });
 
-		world.system("AddFontSynced")
+		world.system("AddFontInfo")
 			.with(flecs::Prefab)
-			.with<Font>()
 			.with<FontFace>()
 			.with<FontSize>()
+			.without<FontInfo>()
+			.each([](flecs::entity e) { e.add<FontInfo>(); });
+
+		world.system("AddFontSynced")
+			.with<FontInfo>()
 			.without<FontSynced>()
 			.each([](flecs::entity e) { e.add<FontSynced>().disable<FontSynced>(); });
 
-		world.system<const Font, const FontFace, const FontSize>("UpdateFontInfo")
-			.with(flecs::Prefab)
+		world.system<const FontInfo, const Widget>("SyncTextBlockFont")
+			.with<TextBlock>()
 			.with<FontSynced>().id_flags(flecs::TOGGLE).without<FontSynced>()
-			.each([&world](flecs::entity p, const Font& f, const FontFace& fw, const FontSize& fs) {
-			p.enable<FontSynced>();
-			FSlateFontInfo fi = GetFontInfo(f.Value, fw.Value, fs.Value);
-			world.each(world.pair(flecs::IsA, p), [&fi](flecs::entity i) {
-				if (i.has<TextBlock>())
-					StaticCastSharedPtr<STextBlock>(i.get_mut<Widget>()->Value)->SetFont(fi);
-				}); });
+			.each([&world](flecs::entity tb, const FontInfo& fi, const Widget& w) {
+			tb.enable<FontSynced>();
+			StaticCastSharedPtr<STextBlock>(w.Value)->SetFont(fi.Value); });
 	}
 }

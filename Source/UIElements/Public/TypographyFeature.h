@@ -12,9 +12,10 @@ namespace UIElements {
 	constexpr const char* TableKeyDelimiter = "::";
 	constexpr const TCHAR KeyValueDelimiter[] = TEXT("=");
 
-	struct Font { FString Value; };
+	struct TextFont { FString Value; };
 	struct FontFace { FString Value; };
 	struct FontSize { int Value; };
+	struct FontInfo { FSlateFontInfo Value; };
 	struct FontSynced {};
 
 	struct TextBlock {};
@@ -26,6 +27,7 @@ namespace UIElements {
 	struct LocalizedText { FString Value; };
 
 	struct LocalizedTextQuery { flecs::query<const LocalizedText, const Widget> Value; };
+	struct TextPrefabQuery { flecs::query<const FontFace, const FontSize> Value; };
 
 	struct TypographyFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
@@ -78,9 +80,9 @@ namespace UIElements {
 		return map;
 	}
 
-	static inline FSlateFontInfo GetFontInfo(const FString& name, const FString& weight, int32 size)
+	static inline void SetFontInfo(const flecs::entity e, const FString& name, const FString& fontFace, int32 fontSize)
 	{
-		const FString FilePath = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + name + TEXT("-") + weight + TEXT(".ttf");
-		return FSlateFontInfo(FilePath, size);
+		const FString FilePath = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + name + TEXT("-") + fontFace + TEXT(".ttf");
+		e.set<FontInfo>({ FSlateFontInfo(FilePath, fontSize) });
 	}
 }
