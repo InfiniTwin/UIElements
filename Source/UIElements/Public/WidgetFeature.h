@@ -5,9 +5,9 @@
 #include "flecs.h"
 
 namespace UIElements {
-	struct Widget { TSharedPtr<SWidget> Value; };
-
 	struct Viewport {};
+
+	struct Widget { TSharedPtr<SWidget> Value; };
 
 	struct CompoundWidgetInstance : public SCompoundWidget {
 	public:
@@ -20,15 +20,43 @@ namespace UIElements {
 	};
 	struct CompoundWidget {};
 
+	struct Box {};
 	struct HBox {};
+	struct VBox {};
 	struct Border {};
 	struct RoundBorder {};
 
-	struct Attached {};
-	struct StyleIsSet {};
+	struct ParentSynced {};
+	struct StyleSynced {};
 
 	struct WidgetFeature {
 		static void RegisterComponents(flecs::world& world);
 		static void CreateSystems(flecs::world& world);
 	};
+
+	static inline void ParentToBox(const TSharedRef<SWidget> childWidget, const flecs::entity parent) {
+		TSharedRef<SBox> box = StaticCastSharedRef<SBox>(parent.get_mut<Widget>()->Value.ToSharedRef());
+		box->SetHAlign(HAlign_Center);
+		box->SetVAlign(VAlign_Center);
+		box->SetWidthOverride(FOptionalSize());
+		box->SetHeightOverride(FOptionalSize());
+		box->SetContent(childWidget);
+	}
+
+	static inline void ParentToHorizontalBox(const TSharedRef<SWidget> childWidget, const flecs::entity parent) {
+		StaticCastSharedRef<SHorizontalBox>(parent.get_mut<Widget>()->Value.ToSharedRef())
+			->AddSlot().AutoWidth().HAlign(HAlign_Center).VAlign(VAlign_Center)
+			[childWidget];
+	}
+
+	static inline void ParentToVerticalBox(const TSharedRef<SWidget> childWidget, const flecs::entity parent) {
+		StaticCastSharedRef<SVerticalBox>(parent.get_mut<Widget>()->Value.ToSharedRef())
+			->AddSlot().AutoHeight().HAlign(HAlign_Center).VAlign(VAlign_Center)
+			[childWidget];
+	}
+
+	static inline void ParentToBorder(const TSharedRef<SWidget> childWidget, const flecs::entity parent) {
+		StaticCastSharedRef<SBorder>(parent.get_mut<Widget>()->Value.ToSharedRef())
+			->SetContent(childWidget);
+	}
 }

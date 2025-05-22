@@ -62,8 +62,7 @@ namespace UIElements {
 		);
 	}
 
-	inline TMap<FString, FString> LoadTable(const FString& path)
-	{
+	inline TMap<FString, FString> LoadTable(const FString& path) {
 		TMap<FString, FString> map;
 		FString fileContents;
 		if (FFileHelper::LoadFileToString(fileContents, *path))
@@ -80,8 +79,7 @@ namespace UIElements {
 		return map;
 	}
 
-	static inline void SetFontInfo(const flecs::entity e, const FString& name, const FString& fontFace, int32 fontSize)
-	{
+	static inline void SetFontInfo(const flecs::entity e, const FString& name, const FString& fontFace, int32 fontSize) {
 		const FString FilePath = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + name + TEXT("-") + fontFace + TEXT(".ttf");
 		e.set<FontInfo>({ FSlateFontInfo(FilePath, fontSize) });
 	}

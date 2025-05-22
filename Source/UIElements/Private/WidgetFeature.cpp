@@ -3,23 +3,27 @@
 
 #include "WidgetFeature.h"
 #include "flecs.h"
+#include "ECS.h"
 #include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
 #include "Logging/StructuredLog.h"
+#include <numeric>
 
 namespace UIElements {
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
-		world.component<Widget>().on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
-
+		using namespace ECS;
 		world.component<Viewport>();
 
+		world.component<Widget>().on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
 		world.component<CompoundWidget>();
 
-		world.component<Border>();
+		world.component<Box>();
+		world.component<HBox>();
+		world.component<VBox>();
 
-		world.component<Attached>().add(flecs::CanToggle);
-		world.component<StyleIsSet>().add(flecs::CanToggle);
+		world.component<ParentSynced>().add(flecs::CanToggle);
+		world.component<StyleSynced>().add(flecs::CanToggle);
 	}
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
@@ -28,35 +32,65 @@ namespace UIElements {
 			.without<Widget>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(CompoundWidgetInstance) }); });
 
+		world.system("AddBoxWidget")
+			.with<Box>()
+			.without<Widget>()
+			.each([](flecs::entity e) { e.set(Widget{ SNew(SBox) }); });
+
+		world.system("AddHorizontalBoxWidget")
+			.with<HBox>()
+			.without<Widget>()
+			.each([](flecs::entity e) { e.set(Widget{ SNew(SHorizontalBox) }); });
+
+		world.system("AddVerticalBoxWidget")
+			.with<VBox>()
+			.without<Widget>()
+			.each([](flecs::entity e) { e.set(Widget{ SNew(SVerticalBox) }); });
+
 		world.system("AddBorderWidget")
 			.with<Border>()
 			.without<Widget>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(SBorder) }); });
 
-		world.system("AddAttached")
+		world.system("AddParentSynced")
 			.with<Widget>()
-			.without<Attached>()
-			.each([](flecs::entity e) { e.add<Attached>().disable<Attached>(); });
+			.without<ParentSynced>()
+			.each([](flecs::entity e) { e.add<ParentSynced>().disable<ParentSynced>(); });
 
-		world.system<const Widget>("ParentWidget")
+		world.system<const Widget>("SyncParent")
 			.with(flecs::ChildOf).second(flecs::Wildcard)
-			.with<Attached>().id_flags(flecs::TOGGLE).without<Attached>()
-			.each([](flecs::entity child, const Widget& widget) {
-			auto parent = child.parent();
-			child.enable<Attached>();
+			.with<ParentSynced>().id_flags(flecs::TOGGLE).without<ParentSynced>()
+			.each([](flecs::entity ch, const Widget& w) {
+			flecs::entity parent = ch.parent();
+			TSharedRef<SWidget> childWidget = w.Value.ToSharedRef();
+			ch.enable<ParentSynced>();
 			if (parent.has<Viewport>())
 			{
-				GEngine->GameViewport->AddViewportWidgetContent(widget.Value.ToSharedRef());
+				GEngine->GameViewport->AddViewportWidgetContent(childWidget);
 				return;
 			}
+			TSharedRef<SWidget> parentWidget = parent.get_mut<Widget>()->Value.ToSharedRef();
 			if (parent.has<CompoundWidget>())
 			{
-				StaticCastSharedPtr<CompoundWidgetInstance>(parent.get_mut<Widget>()->Value)->Slot()
-					.AttachWidget(widget.Value.ToSharedRef());
+				StaticCastSharedRef<CompoundWidgetInstance>(parentWidget)
+					->Slot().AttachWidget(childWidget);
 				return;
 			}
-			if (parent.has<Border>() || parent.has<Button>())
-				StaticCastSharedPtr<SBorder>(parent.get_mut<Widget>()->Value)->SetContent(widget.Value.ToSharedRef());
+			if (parent.has<Box>()) {
+				ParentToBox(childWidget, parent);
+				return;
+			}
+			if (parent.has<HBox>()) {
+				ParentToHorizontalBox(childWidget, parent);
+				return;
+			}
+			if (parent.has<VBox>()) {
+				ParentToVerticalBox(childWidget, parent);
+				return;
+			}
+			if (parent.has<Border>() || parent.has<Button>()) {
+				ParentToBorder(childWidget, parent);
+			}
 				});
 	}
 }
