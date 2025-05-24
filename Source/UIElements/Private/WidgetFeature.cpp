@@ -69,6 +69,8 @@ namespace UIElements {
 				GEngine->GameViewport->AddViewportWidgetContent(childWidget);
 				return;
 			}
+			if (!parent.has<Widget>())
+				return;
 			TSharedRef<SWidget> parentWidget = parent.get_mut<Widget>()->Value.ToSharedRef();
 			if (parent.has<CompoundWidget>())
 			{

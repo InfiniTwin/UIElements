@@ -16,7 +16,6 @@ namespace UIElements {
 	struct FontFace { FString Value; };
 	struct FontSize { int Value; };
 	struct FontInfo { FSlateFontInfo Value; };
-	struct FontSynced {};
 
 	struct TextBlock {};
 
@@ -27,7 +26,7 @@ namespace UIElements {
 	struct LocalizedText { FString Value; };
 
 	struct LocalizedTextQuery { flecs::query<const LocalizedText, const Widget> Value; };
-	struct TextPrefabQuery { flecs::query<const FontFace, const FontSize> Value; };
+	struct TextPrefabQuery { flecs::query<const FontInfo, const FontFace, const FontSize> Value; };
 
 	struct TypographyFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
@@ -36,6 +35,11 @@ namespace UIElements {
 		static void CreateObservers(flecs::world& world);
 		static void CreateSystems(flecs::world& world);
 	};
+
+	static inline void SetFontInfo(const flecs::entity e, const FString& name, const FString& fontFace, int32 fontSize) {
+		const FString path = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + name + TEXT("-") + fontFace + TEXT(".ttf");
+		e.set<FontInfo>({ FSlateFontInfo(path, fontSize) });
+	}
 
 	inline FString GetTable(const FString& tableKey) {
 		FString tableKeyString(tableKey);
@@ -79,8 +83,8 @@ namespace UIElements {
 		return map;
 	}
 
-	static inline void SetFontInfo(const flecs::entity e, const FString& name, const FString& fontFace, int32 fontSize) {
-		const FString FilePath = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + name + TEXT("-") + fontFace + TEXT(".ttf");
-		e.set<FontInfo>({ FSlateFontInfo(FilePath, fontSize) });
+	inline void LocalizeText(const flecs::entity entity, FText text) {
+		if (entity.has<TextBlock>())
+			StaticCastSharedPtr<STextBlock>(entity.get_mut<Widget>()->Value)->SetText(text);
 	}
 }
