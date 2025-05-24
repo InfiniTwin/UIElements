@@ -36,15 +36,6 @@ namespace UIElements {
 		static void CreateSystems(flecs::world& world);
 	};
 
-	static inline void SetFontInfo(const flecs::entity e, const FString& name, const FString& fontFace, int32 fontSize) {
-		const FString path = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + name + TEXT("-") + fontFace + TEXT(".ttf");
-		e.set<FontInfo>({ FSlateFontInfo(path, fontSize) });
-	}
-
-	static inline void SetTextBlockFontInfo(const TSharedPtr<SWidget>& widget, const FSlateFontInfo& fontInfo) {
-		StaticCastSharedPtr<STextBlock>(widget)->SetFont(fontInfo);
-	}
-
 	inline FString GetTable(const FString& tableKey) {
 		FString tableKeyString(tableKey);
 		int32 pos = tableKeyString.Find(TableKeyDelimiter);
@@ -87,8 +78,20 @@ namespace UIElements {
 		return map;
 	}
 
-	inline void LocalizeText(const flecs::entity entity, FText text) {
-		if (entity.has<TextBlock>())
-			StaticCastSharedPtr<STextBlock>(entity.get_mut<Widget>()->Value)->SetText(text);
+	static inline void SetFontInfo(const flecs::entity e, const FString& name, const FString& fontFace, int32 fontSize) {
+		const FString path = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + name + TEXT("-") + fontFace + TEXT(".ttf");
+		e.set<FontInfo>({ FSlateFontInfo(path, fontSize) });
+	}
+
+	static inline void SetTextBlockFontInfo(const TSharedPtr<SWidget>& widget, const FSlateFontInfo& fontInfo) {
+		StaticCastSharedPtr<STextBlock>(widget)->SetFont(fontInfo);
+	}
+
+	static inline FText GetLocalizedText(const flecs::world& world, const FString& localizedText) {
+		return FText::FromString(*LoadTable(GetTablePath(localizedText, world.get<Locale>()->Value)).Find(GetKey(localizedText)));
+	}
+
+	static inline void LocalizeTextBlock(const flecs::world& world, const TSharedPtr<SWidget>& widget, const FString& localizedText) {
+		StaticCastSharedPtr<STextBlock>(widget)->SetText(GetLocalizedText(world, localizedText));
 	}
 }

@@ -76,17 +76,7 @@ namespace UIElements {
 					return;
 				TSharedPtr<SWidget> widget = i.get_mut<Widget>()->Value;
 				if (i.has<TextBlock>())
-					SetTextBlockFontInfo(widget, fi.Value);
-				});
-				});
-
-		world.observer<const LocalizedText>("LocalizeTextBlock")
-			.with<Widget>()
-			.event(flecs::OnSet)
-			.each([&world](flecs::entity e, const LocalizedText& lt) {
-			if (!lt.Value.IsEmpty())
-				LocalizeText(e,
-					FText::FromString(*LoadTable(GetTablePath(lt.Value, world.get<Locale>()->Value)).Find(GetKey(lt.Value))));
+					SetTextBlockFontInfo(widget, fi.Value); });
 				});
 
 		world.observer<const Locale>("LocalizeAllText")
@@ -101,7 +91,8 @@ namespace UIElements {
 				.each([&](flecs::entity e, const LocalizedText& lt, const Widget& w) {
 				if (const auto* table = tables.Find(GetTable(lt.Value)); table)
 					if (const auto* result = table->Find(GetKey(lt.Value)))
-						LocalizeText(e, FText::FromString(*result));
+						if (e.has<TextBlock>())
+							StaticCastSharedPtr<STextBlock>(e.get_mut<Widget>()->Value)->SetText(FText::FromString(*result));
 					}); });
 	};
 
@@ -109,10 +100,11 @@ namespace UIElements {
 		world.system("AddTextBlockWidget")
 			.without<Widget>()
 			.with<TextBlock>()
-			.each([](flecs::entity e) {
+			.each([&world](flecs::entity e) {
 			auto widget = SNew(STextBlock);
 			SetTextBlockColor(widget, e.get<Color>()->Value);
 			SetTextBlockFontInfo(widget, e.get<FontInfo>()->Value);
+			LocalizeTextBlock(world, widget, e.get<LocalizedText>()->Value);
 			e.set(Widget{ widget }); });
 	}
 }
