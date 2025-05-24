@@ -8,7 +8,6 @@
 
 namespace UIElements {
 	struct Color { FLinearColor Value; };
-	struct ColorSynced {};
 
 	using namespace material_color_utilities;
 	struct UIScheme {
@@ -30,9 +29,11 @@ namespace UIElements {
 		static void RegisterComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
 		static void CreateObservers(flecs::world& world);
-		static void CreateSystems(flecs::world& world);
-
 	};
 
 	void SetPrefabColor(flecs::world& world, const FString name, const FLinearColor color);
+
+	static inline void SetTextBlockColor(const TSharedPtr<SWidget>& widget, const FLinearColor& color){
+		StaticCastSharedPtr<STextBlock>(widget)->SetColorAndOpacity(color);
+	}
 }

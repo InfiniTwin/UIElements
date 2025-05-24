@@ -3,6 +3,7 @@
 
 #include "TypographyFeature.h"
 #include "ECS.h"
+#include "ColorFeature.h"
 #include "Logging/StructuredLog.h"
 
 namespace UIElements {
@@ -45,13 +46,17 @@ namespace UIElements {
 	};
 
 	void TypographyFeature::CreateQueries(flecs::world& world) {
-		world.set(LocalizedTextQuery{ world.query_builder<const LocalizedText, const Widget>("LocalizedTextQuery").cached().build() });
+		world.set(LocalizedTextQuery{
+			world.query_builder<const LocalizedText, const Widget>(COMPONENT(LocalizedTextQuery))
+			.cached().build() });
 
-		world.set(TextPrefabQuery{ world.query_builder<const FontInfo, const FontFace, const FontSize>("TextPrefabQuery").with(flecs::Prefab).cached().build() });
+		world.set(TextPrefabQuery{
+			world.query_builder<const FontInfo, const FontFace, const FontSize>(COMPONENT(TextPrefabQuery))
+			.with(flecs::Prefab).cached().build() });
 	};
 
 	void TypographyFeature::CreateObservers(flecs::world& world) {
-		world.observer<const TextFont>("UpdatePrefabFontInfo")
+		world.observer<const TextFont>("SetPrefabFontInfo")
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const TextFont& tf) {
@@ -61,7 +66,7 @@ namespace UIElements {
 					});
 				});
 
-		world.observer<const FontInfo>("UpdateInstanceWidgetFontInfo")
+		world.observer<const FontInfo>("SetInstanceFontInfo")
 			.with(flecs::Prefab)
 			.event(flecs::OnSet)
 			.each([&world](flecs::entity p, const FontInfo& fi) {
@@ -69,8 +74,9 @@ namespace UIElements {
 			world.each(world.pair(flecs::IsA, p), [&fi](flecs::entity i) {
 				if (!i.has<Widget>())
 					return;
+				TSharedPtr<SWidget> widget = i.get_mut<Widget>()->Value;
 				if (i.has<TextBlock>())
-					StaticCastSharedPtr<STextBlock>(i.get_mut<Widget>()->Value)->SetFont(fi.Value); 
+					SetTextBlockFontInfo(widget, fi.Value);
 				});
 				});
 
@@ -101,8 +107,12 @@ namespace UIElements {
 
 	void TypographyFeature::CreateSystems(flecs::world& world) {
 		world.system("AddTextBlockWidget")
-			.with<TextBlock>()
 			.without<Widget>()
-			.each([](flecs::entity e) { e.set(Widget{ SNew(STextBlock) }); });
+			.with<TextBlock>()
+			.each([](flecs::entity e) {
+			auto widget = SNew(STextBlock);
+			SetTextBlockColor(widget, e.get<Color>()->Value);
+			SetTextBlockFontInfo(widget, e.get<FontInfo>()->Value);
+			e.set(Widget{ widget }); });
 	}
 }

@@ -41,6 +41,10 @@ namespace UIElements {
 		e.set<FontInfo>({ FSlateFontInfo(path, fontSize) });
 	}
 
+	static inline void SetTextBlockFontInfo(const TSharedPtr<SWidget>& widget, const FSlateFontInfo& fontInfo) {
+		StaticCastSharedPtr<STextBlock>(widget)->SetFont(fontInfo);
+	}
+
 	inline FString GetTable(const FString& tableKey) {
 		FString tableKeyString(tableKey);
 		int32 pos = tableKeyString.Find(TableKeyDelimiter);

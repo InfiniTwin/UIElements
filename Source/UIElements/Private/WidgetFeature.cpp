@@ -28,28 +28,28 @@ namespace UIElements {
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
 		world.system("AddCompoundWidgetWidget")
-			.with<CompoundWidget>()
 			.without<Widget>()
+			.with<CompoundWidget>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(CompoundWidgetInstance) }); });
 
 		world.system("AddBoxWidget")
-			.with<Box>()
 			.without<Widget>()
+			.with<Box>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(SBox) }); });
 
 		world.system("AddHorizontalBoxWidget")
-			.with<HBox>()
 			.without<Widget>()
+			.with<HBox>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(SHorizontalBox) }); });
 
 		world.system("AddVerticalBoxWidget")
-			.with<VBox>()
 			.without<Widget>()
+			.with<VBox>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(SVerticalBox) }); });
 
 		world.system("AddBorderWidget")
-			.with<Border>()
 			.without<Widget>()
+			.with<Border>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(SBorder) }); });
 
 		world.system("AddParentSynced")

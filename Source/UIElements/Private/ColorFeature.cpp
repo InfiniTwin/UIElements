@@ -61,9 +61,7 @@ namespace UIElements {
 
 	void ColorFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
-		world.component<Color>().member<FLinearColor>(VALUE)
-			.add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<ColorSynced>().add(flecs::CanToggle);
+		world.component<Color>().member<FLinearColor>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<UIScheme>()
 			.member<bool>(MEMBER(UIScheme::DarkMode))
@@ -78,11 +76,13 @@ namespace UIElements {
 	}
 
 	void ColorFeature::CreateQueries(flecs::world& world) {
-		world.set(ColorPrefabQuery{ world.query_builder<Color>("ColorPrefabQuery").with(flecs::Prefab).cached().build() });
+		world.set(ColorPrefabQuery{
+			world.query_builder<Color>(COMPONENT(ColorPrefabQuery)).with(flecs::Prefab)
+			.cached().build() });
 	};
 
 	void ColorFeature::CreateObservers(flecs::world& world) {
-		world.observer<const UIScheme>("UpdateColorScheme")
+		world.observer<const UIScheme>("SetPrefabColor")
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const UIScheme& s) {
@@ -148,20 +148,21 @@ namespace UIElements {
 			SetPrefabColor(world, "TertiaryFixedDim", MaterialDynamicColors::TertiaryFixedDim().GetLinear(ds));
 			SetPrefabColor(world, "OnTertiaryFixed", MaterialDynamicColors::OnTertiaryFixed().GetLinear(ds));
 			SetPrefabColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds)); });
-	}
 
-	void ColorFeature::CreateSystems(flecs::world& world) {
-		world.system("AddColorSynced")
-			.with<Color>()
-			.without<ColorSynced>()
-			.each([](flecs::entity e) { e.add<ColorSynced>().disable<ColorSynced>(); });
-
-		world.system<const Color, const Widget>("SyncTextBlockColor")
-			.with<TextBlock>()
-			.with<ColorSynced>().id_flags(flecs::TOGGLE).without<ColorSynced>()
-			.each([&world](flecs::entity tb, const Color& c, const Widget& w) {
-			tb.enable<ColorSynced>();
-			StaticCastSharedPtr<STextBlock>(w.Value)->SetColorAndOpacity(c.Value); });
+		world.observer<const Color>("SetInstanceColor")
+			.with(flecs::Prefab)
+			.event(flecs::OnSet)
+			.each([&world](flecs::entity p, const Color& c) {
+			TArray<flecs::entity> instances;
+			ECS::GetInstances(world, p, instances);
+			for (flecs::entity i : instances)
+			{
+				if (!i.has<Widget>())
+					continue;
+				TSharedPtr<SWidget> widget = i.get_mut<Widget>()->Value;
+				if (i.has<TextBlock>())
+					SetTextBlockColor(widget, c.Value);
+			}});
 	}
 
 	void UIElements::SetPrefabColor(flecs::world& world, const FString name, const FLinearColor c) {
@@ -175,9 +176,6 @@ namespace UIElements {
 					if (std::strcmp(p.name(), cn.Get()) == 0)
 					{
 						p.set<Color>({ c });
-						world.each(world.pair(flecs::IsA, p), [](flecs::entity i) {
-							i.disable<ColorSynced>();
-							});
 						return;
 					}
 				}
