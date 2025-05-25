@@ -26,7 +26,7 @@ namespace UIElements {
 	struct Border {};
 	struct RoundBorder {};
 
-	struct ParentSynced {};
+	struct Parented {};
 	struct StyleSynced {};
 
 	struct WidgetFeature {

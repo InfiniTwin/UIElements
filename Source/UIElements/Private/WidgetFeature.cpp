@@ -22,7 +22,7 @@ namespace UIElements {
 		world.component<HBox>();
 		world.component<VBox>();
 
-		world.component<ParentSynced>().add(flecs::CanToggle);
+		world.component<Parented>().add(flecs::CanToggle);
 		world.component<StyleSynced>().add(flecs::CanToggle);
 	}
 
@@ -52,18 +52,18 @@ namespace UIElements {
 			.with<Border>()
 			.each([](flecs::entity e) { e.set(Widget{ SNew(SBorder) }); });
 
-		world.system("AddParentSynced")
+		world.system("AddParented")
 			.with<Widget>()
-			.without<ParentSynced>()
-			.each([](flecs::entity e) { e.add<ParentSynced>().disable<ParentSynced>(); });
+			.without<Parented>()
+			.each([](flecs::entity e) { e.add<Parented>().disable<Parented>(); });
 
-		world.system<const Widget>("SyncParent")
+		world.system<const Widget>("ParentWidget")
 			.with(flecs::ChildOf).second(flecs::Wildcard)
-			.with<ParentSynced>().id_flags(flecs::TOGGLE).without<ParentSynced>()
+			.with<Parented>().id_flags(flecs::TOGGLE).without<Parented>()
 			.each([](flecs::entity ch, const Widget& w) {
 			flecs::entity parent = ch.parent();
 			TSharedRef<SWidget> childWidget = w.Value.ToSharedRef();
-			ch.enable<ParentSynced>();
+			ch.enable<Parented>();
 			if (parent.has<Viewport>())
 			{
 				GEngine->GameViewport->AddViewportWidgetContent(childWidget);
