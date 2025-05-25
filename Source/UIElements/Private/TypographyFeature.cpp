@@ -40,7 +40,7 @@ namespace UIElements {
 		world.component<FontInfo>().member<FSlateFontInfo>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Locale>().member<FString>(VALUE);
-		world.component<LocalizedText>().member<FString>(VALUE);
+		world.component<LocalizedText>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Override);
 
 		world.component<TextBlock>().add(flecs::OnInstantiate, flecs::Inherit);
 	};
