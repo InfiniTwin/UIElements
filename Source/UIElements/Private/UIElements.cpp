@@ -25,6 +25,7 @@ IMPLEMENT_MODULE(FUIElementsModule, UIElements)
 
 namespace UIElements {
 	void Register(flecs::world& world) {
+		WidgetFeature::RegisterOpaqueTypes(world);
 		ColorFeature::RegisterOpaqueTypes(world);
 		TypographyFeature::RegisterOpaqueTypes(world);
 

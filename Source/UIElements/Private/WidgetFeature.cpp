@@ -11,6 +11,46 @@
 #include <numeric>
 
 namespace UIElements {
+	void WidgetFeature::RegisterOpaqueTypes(flecs::world& world) {
+		// EHorizontalAlignment <=> int
+		world.component<EHorizontalAlignment>()
+			.opaque(flecs::I32)
+			.serialize([](const flecs::serializer* s, const EHorizontalAlignment* data)
+				{
+					int value = static_cast<int>(*data);
+					return s->value(flecs::I32, &value);
+				})
+			.assign_int([](EHorizontalAlignment* data, int64_t value)
+				{
+					if (value >= static_cast<int64_t>(HAlign_Fill) &&
+						value <= static_cast<int64_t>(HAlign_Right)) {
+						*data = static_cast<EHorizontalAlignment>(value);
+					}
+					else {
+						*data = HAlign_Fill;
+					}
+				});
+
+		// EVerticalAlignment <=> int
+		world.component<EVerticalAlignment>()
+			.opaque(flecs::I32)
+			.serialize([](const flecs::serializer* s, const EVerticalAlignment* data)
+				{
+					int value = static_cast<int>(*data);
+					return s->value(flecs::I32, &value);
+				})
+			.assign_int([](EVerticalAlignment* data, int64_t value)
+				{
+					if (value >= static_cast<int64_t>(VAlign_Fill) &&
+						value <= static_cast<int64_t>(VAlign_Bottom)) {
+						*data = static_cast<EVerticalAlignment>(value);
+					}
+					else {
+						*data = VAlign_Fill;
+					}
+				});
+	}
+
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<Viewport>();
@@ -18,11 +58,15 @@ namespace UIElements {
 		world.component<Widget>().on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
 		world.component<CompoundWidget>();
 
+		world.component<Parented>().add(flecs::CanToggle);
+
 		world.component<Box>();
 		world.component<HBox>();
 		world.component<VBox>();
 
-		world.component<Parented>().add(flecs::CanToggle);
+		world.component<HAlign>().member<EHorizontalAlignment>(VALUE);
+		world.component<VAlign>().member<EVerticalAlignment>(VALUE);
+
 		world.component<StyleSynced>().add(flecs::CanToggle);
 	}
 
@@ -60,10 +104,10 @@ namespace UIElements {
 		world.system<const Widget>("ParentWidget")
 			.with(flecs::ChildOf).second(flecs::Wildcard)
 			.with<Parented>().id_flags(flecs::TOGGLE).without<Parented>()
-			.each([](flecs::entity ch, const Widget& w) {
-			flecs::entity parent = ch.parent();
+			.each([](flecs::entity child, const Widget& w) {
+			flecs::entity parent = child.parent();
 			TSharedRef<SWidget> childWidget = w.Value.ToSharedRef();
-			ch.enable<Parented>();
+			child.enable<Parented>();
 			if (parent.has<Viewport>())
 			{
 				GEngine->GameViewport->AddViewportWidgetContent(childWidget);
@@ -83,11 +127,11 @@ namespace UIElements {
 				return;
 			}
 			if (parent.has<HBox>()) {
-				ParentToHorizontalBox(childWidget, parent);
+				ParentToHorizontalBox(child, parentWidget);
 				return;
 			}
 			if (parent.has<VBox>()) {
-				ParentToVerticalBox(childWidget, parent);
+				ParentToVerticalBox(child, parentWidget);
 				return;
 			}
 			if (parent.has<Border>() || parent.has<Button>()) {
