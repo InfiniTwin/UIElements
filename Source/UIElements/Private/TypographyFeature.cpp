@@ -34,7 +34,9 @@ namespace UIElements {
 
 	void TypographyFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
-		world.component<TextFont>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<TextFont>().member<FString>(VALUE);
+		world.component<IconFont>().member<FString>(VALUE);
+
 		world.component<FontFace>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontSize>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontInfo>().add(flecs::OnInstantiate, flecs::Inherit);
@@ -42,25 +44,43 @@ namespace UIElements {
 		world.component<Locale>().member<FString>(VALUE);
 		world.component<LocalizedText>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Override);
 
+		world.component<Icon>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+
 		world.component<TextBlock>().add(flecs::OnInstantiate, flecs::Inherit);
 	};
 
 	void TypographyFeature::CreateQueries(flecs::world& world) {
+		world.set(TextQuery{
+			world.query_builder<const FontInfo, const FontFace, const FontSize>(COMPONENT(TextQuery))
+			.with<LocalizedText>()
+			.with(flecs::Prefab).cached().build() });
+
 		world.set(LocalizedTextQuery{
 			world.query_builder<const LocalizedText, const Widget>(COMPONENT(LocalizedTextQuery))
 			.cached().build() });
 
-		world.set(TextPrefabQuery{
-			world.query_builder<const FontInfo, const FontFace, const FontSize>(COMPONENT(TextPrefabQuery))
+		world.set(IconQuery{
+			world.query_builder<const FontInfo, const FontFace, const FontSize>(COMPONENT(TextQuery))
+			.with<Icon>()
 			.with(flecs::Prefab).cached().build() });
 	};
 
 	void TypographyFeature::CreateObservers(flecs::world& world) {
-		world.observer<const TextFont>("SetPrefabFontInfo")
+		world.observer<const TextFont>("SetTextPrefabFontInfo")
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const TextFont& tf) {
-			world.get<TextPrefabQuery>()->Value
+			world.get<TextQuery>()->Value
+				.each([&world, &tf](flecs::entity tp, FontInfo, const FontFace& ff, const FontSize& fs) {
+				SetFontInfo(tp, tf.Value, ff.Value, fs.Value);
+					});
+				});
+
+		world.observer<const TextFont>("SetIconPrefabFontInfo")
+			.term_at(0).singleton()
+			.event(flecs::OnSet)
+			.each([&world](const TextFont& tf) {
+			world.get<IconQuery>()->Value
 				.each([&world, &tf](flecs::entity tp, FontInfo, const FontFace& ff, const FontSize& fs) {
 				SetFontInfo(tp, tf.Value, ff.Value, fs.Value);
 					});
@@ -78,6 +98,12 @@ namespace UIElements {
 				if (i.has<TextBlock>())
 					SetTextBlockFontInfo(widget, fi.Value); });
 				});
+
+		world.observer<const Widget, const LocalizedText>("LocalizeTextOnCreation")
+			.event(flecs::OnSet)
+			.each([&world](flecs::entity e, const Widget& w, const LocalizedText& l) {
+			if (e.has<TextBlock>())
+				LocalizeTextBlock(world, w.Value, l.Value); });
 
 		world.observer<const Locale>("LocalizeAllText")
 			.term_at(0).singleton()
@@ -97,14 +123,13 @@ namespace UIElements {
 	};
 
 	void TypographyFeature::CreateSystems(flecs::world& world) {
-		world.system("AddTextBlockWidget")
+		world.system("SetupTextBlockWidget")
 			.without<Widget>()
 			.with<TextBlock>()
-			.each([&world](flecs::entity e) {
+			.each([](flecs::entity e) {
 			auto widget = SNew(STextBlock);
 			SetTextBlockColor(widget, e.get<Color>()->Value);
 			SetTextBlockFontInfo(widget, e.get<FontInfo>()->Value);
-			LocalizeTextBlock(world, widget, e.get<LocalizedText>()->Value);
 			e.set(Widget{ widget }); });
 	}
 }

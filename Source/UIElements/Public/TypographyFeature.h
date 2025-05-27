@@ -13,20 +13,23 @@ namespace UIElements {
 	constexpr const TCHAR KeyValueDelimiter[] = TEXT("=");
 
 	struct TextFont { FString Value; };
+	struct IconFont { FString Value; };
+
 	struct FontFace { FString Value; };
 	struct FontSize { int Value; };
 	struct FontInfo { FSlateFontInfo Value; };
 
-	struct TextBlock {};
-
-	struct Icon { FString Value; };
-	struct IconFont { FSlateFontInfo Value; };
-
 	struct Locale { FString Value; };
 	struct LocalizedText { FString Value; };
 
+	struct Icon { FString Value; };
+
+	struct TextBlock {};
+
+	struct TextQuery { flecs::query<const FontInfo, const FontFace, const FontSize> Value; };
 	struct LocalizedTextQuery { flecs::query<const LocalizedText, const Widget> Value; };
-	struct TextPrefabQuery { flecs::query<const FontInfo, const FontFace, const FontSize> Value; };
+
+	struct IconQuery { flecs::query<const FontInfo, const FontFace, const FontSize> Value; };
 
 	struct TypographyFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);

@@ -63,13 +63,13 @@ namespace UIElements {
 
 		world.component<Parented>().add(flecs::CanToggle);
 
-		world.component<Box>();
-		world.component<HBox>();
-		world.component<VBox>();
+		world.component<Box>().add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<HBox>().add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<VBox>().add(flecs::OnInstantiate, flecs::Inherit);
 
-		world.component<HAlign>().member<EHorizontalAlignment>(VALUE);
-		world.component<VAlign>().member<EVerticalAlignment>(VALUE);
-		world.component<Padding>().member<std::vector<float>>(VALUE);
+		world.component<HAlign>().member<EHorizontalAlignment>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<VAlign>().member<EVerticalAlignment>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Padding>().member<std::vector<float>>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<StyleSynced>().add(flecs::CanToggle);
 	}
