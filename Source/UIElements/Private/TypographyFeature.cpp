@@ -37,7 +37,7 @@ namespace UIElements {
 		world.component<TextFont>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontFace>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontSize>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<FontInfo>().member<FSlateFontInfo>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<FontInfo>().add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Locale>().member<FString>(VALUE);
 		world.component<LocalizedText>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Override);

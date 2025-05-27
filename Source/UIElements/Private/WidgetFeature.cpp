@@ -4,11 +4,11 @@
 #include "WidgetFeature.h"
 #include "flecs.h"
 #include "ECS.h"
+#include "OpaqueTypes.h"
 #include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
 #include "Logging/StructuredLog.h"
-#include <numeric>
 
 namespace UIElements {
 	void WidgetFeature::RegisterOpaqueTypes(flecs::world& world) {
@@ -49,6 +49,9 @@ namespace UIElements {
 						*data = VAlign_Fill;
 					}
 				});
+	
+		using namespace ECS;
+		world.component<std::vector<float>>().opaque(ECS::VectorReflection<float>);
 	}
 
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
@@ -66,6 +69,7 @@ namespace UIElements {
 
 		world.component<HAlign>().member<EHorizontalAlignment>(VALUE);
 		world.component<VAlign>().member<EVerticalAlignment>(VALUE);
+		world.component<Padding>().member<std::vector<float>>(VALUE);
 
 		world.component<StyleSynced>().add(flecs::CanToggle);
 	}

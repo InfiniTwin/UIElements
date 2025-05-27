@@ -23,8 +23,10 @@ namespace UIElements {
 	struct Box {};
 	struct HBox {};
 	struct VBox {};
+
 	struct HAlign { EHorizontalAlignment Value; };
 	struct VAlign { EVerticalAlignment Value; };
+	struct Padding { std::vector<float> Value; }; // [Left, Top, Right, Bottom]
 
 	struct Border {};
 	struct RoundBorder {};
@@ -41,9 +43,12 @@ namespace UIElements {
 	template<typename SlotType>
 	void CreateSlot(SlotType& slot, const flecs::entity child)
 	{
+		std::vector<float> padding = child.get<Padding>()->Value;
+		
 		slot
 			.HAlign(child.get<HAlign>()->Value)
 			.VAlign(child.get<VAlign>()->Value)
+			.Padding(padding[0], padding[1], padding[2], padding[3])
 			[child.get<Widget>()->Value.ToSharedRef()];
 	}
 
