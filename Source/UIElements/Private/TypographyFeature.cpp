@@ -51,7 +51,8 @@ namespace UIElements {
 
 	void TypographyFeature::CreateQueries(flecs::world& world) {
 		world.set(TextQuery{
-			world.query_builder<const FontInfo, const FontFace, const FontSize>(COMPONENT(TextQuery))
+			world.query_builder<const FontFace, const FontSize>(COMPONENT(TextQuery))
+			.with<FontInfo>()
 			.with<LocalizedText>()
 			.with(flecs::Prefab).cached().build() });
 
@@ -60,7 +61,8 @@ namespace UIElements {
 			.cached().build() });
 
 		world.set(IconQuery{
-			world.query_builder<const FontInfo, const FontFace, const FontSize>(COMPONENT(TextQuery))
+			world.query_builder<const FontFace, const FontSize>(COMPONENT(IconQuery))
+			.with<FontInfo>()
 			.with<Icon>()
 			.with(flecs::Prefab).cached().build() });
 	};
@@ -69,21 +71,47 @@ namespace UIElements {
 		world.observer<const TextFont>("SetTextPrefabFontInfo")
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
-			.each([&world](const TextFont& tf) {
+			.each([&world](const TextFont& f) {
 			world.get<TextQuery>()->Value
-				.each([&world, &tf](flecs::entity tp, FontInfo, const FontFace& ff, const FontSize& fs) {
-				SetFontInfo(tp, tf.Value, ff.Value, fs.Value);
+				.each([&f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
+				SetFontInfo(p, f.Value, ff.Value, fs.Value);
 					});
 				});
 
-		world.observer<const TextFont>("SetIconPrefabFontInfo")
+		world.observer<const IconFont>("SetIconPrefabFontInfo")
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
-			.each([&world](const TextFont& tf) {
+			.each([&world](const IconFont& f) {
 			world.get<IconQuery>()->Value
-				.each([&world, &tf](flecs::entity tp, FontInfo, const FontFace& ff, const FontSize& fs) {
-				SetFontInfo(tp, tf.Value, ff.Value, fs.Value);
+				.each([&f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
+				SetFontInfo(p, f.Value, ff.Value, fs.Value);
 					});
+				});
+
+		world.observer<const Widget, const LocalizedText>("LocalizeTextOnCreation")
+			.event(flecs::OnSet)
+			.each([&world](flecs::entity e, const Widget& w, const LocalizedText& l) {
+			FString text = GetLocalizedText(world.get<Locale>()->Value, l.Value);
+			if (e.has<TextBlock>())
+				SetTextBlockText(w.Value, text); });
+
+		world.observer<const Locale>("LocalizeAllText")
+			.term_at(0).singleton()
+			.event(flecs::OnSet)
+			.each([&world](const Locale& l) {
+			auto tableNames = Assets::GetFolders(Assets::GetAssetPath("", LocalizationFolder));
+			TMap<FString, TMap<FString, FString>> tables;
+			for (const FString& tableName : tableNames)
+				tables.Add(tableName, LoadTable(GetTablePath(tableName, l.Value)));
+			world.get<LocalizedTextQuery>()->Value
+				.each([&](flecs::entity e, const LocalizedText& lt, const Widget& w) {
+				if (const auto* table = tables.Find(GetTable(lt.Value)); table)
+					if (const auto* result = table->Find(GetKey(lt.Value)))
+					{
+						TSharedPtr<SWidget> widget = e.get_mut<Widget>()->Value;
+						if (e.has<TextBlock>())
+							SetTextBlockText(widget, *result);
+					} });
 				});
 
 		world.observer<const FontInfo>("SetInstanceFontInfo")
@@ -99,27 +127,10 @@ namespace UIElements {
 					SetTextBlockFontInfo(widget, fi.Value); });
 				});
 
-		world.observer<const Widget, const LocalizedText>("LocalizeTextOnCreation")
+		world.observer<const Widget, const Icon>("SetIcon")
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity e, const Widget& w, const LocalizedText& l) {
-			if (e.has<TextBlock>())
-				LocalizeTextBlock(world, w.Value, l.Value); });
-
-		world.observer<const Locale>("LocalizeAllText")
-			.term_at(0).singleton()
-			.event(flecs::OnSet)
-			.each([&world](const Locale& l) {
-			auto tableNames = Assets::GetFolders(Assets::GetAssetPath("", LocalizationFolder));
-			TMap<FString, TMap<FString, FString>> tables;
-			for (const FString& tableName : tableNames)
-				tables.Add(tableName, LoadTable(GetTablePath(tableName, l.Value)));
-			world.get<LocalizedTextQuery>()->Value
-				.each([&](flecs::entity e, const LocalizedText& lt, const Widget& w) {
-				if (const auto* table = tables.Find(GetTable(lt.Value)); table)
-					if (const auto* result = table->Find(GetKey(lt.Value)))
-						if (e.has<TextBlock>())
-							StaticCastSharedPtr<STextBlock>(e.get_mut<Widget>()->Value)->SetText(FText::FromString(*result));
-					}); });
+			.each([&world](flecs::entity e, const Widget& w, const Icon& i) {
+			SetTextBlockText(w.Value, i.Value); });
 	};
 
 	void TypographyFeature::CreateSystems(flecs::world& world) {

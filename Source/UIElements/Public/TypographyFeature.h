@@ -26,10 +26,10 @@ namespace UIElements {
 
 	struct TextBlock {};
 
-	struct TextQuery { flecs::query<const FontInfo, const FontFace, const FontSize> Value; };
+	struct TextQuery { flecs::query<const FontFace, const FontSize> Value; };
 	struct LocalizedTextQuery { flecs::query<const LocalizedText, const Widget> Value; };
 
-	struct IconQuery { flecs::query<const FontInfo, const FontFace, const FontSize> Value; };
+	struct IconQuery { flecs::query<const FontFace, const FontSize> Value; };
 
 	struct TypographyFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
@@ -90,11 +90,11 @@ namespace UIElements {
 		StaticCastSharedPtr<STextBlock>(widget)->SetFont(fontInfo);
 	}
 
-	static inline FText GetLocalizedText(const flecs::world& world, const FString& localizedText) {
-		return FText::FromString(*LoadTable(GetTablePath(localizedText, world.get<Locale>()->Value)).Find(GetKey(localizedText)));
+	static inline FString GetLocalizedText(const FString& locale, const FString& localizedText) {
+		return *LoadTable(GetTablePath(localizedText, locale)).Find(GetKey(localizedText));
 	}
 
-	static inline void LocalizeTextBlock(const flecs::world& world, const TSharedPtr<SWidget>& widget, const FString& localizedText) {
-		StaticCastSharedPtr<STextBlock>(widget)->SetText(GetLocalizedText(world, localizedText));
+	static inline void SetTextBlockText(const TSharedPtr<SWidget>& widget, const FString& text) {
+		StaticCastSharedPtr<STextBlock>(widget)->SetText(FText::FromString(text));
 	}
 }

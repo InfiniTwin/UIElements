@@ -44,12 +44,12 @@ namespace UIElements {
 	void CreateSlot(SlotType& slot, const flecs::entity child)
 	{
 		std::vector<float> padding = child.get<Padding>()->Value;
-		
+
 		slot
 			.HAlign(child.get<HAlign>()->Value)
 			.VAlign(child.get<VAlign>()->Value)
 			.Padding(padding[0], padding[1], padding[2], padding[3])
-			[child.get<Widget>()->Value.ToSharedRef()];
+			.AttachWidget(child.get<Widget>()->Value.ToSharedRef());
 	}
 
 	static inline void ParentToBox(const TSharedRef<SWidget> childWidget, const flecs::entity parent) {
@@ -63,6 +63,7 @@ namespace UIElements {
 
 	static inline void ParentToHorizontalBox(const flecs::entity child, const TSharedRef<SWidget> parentWidget) {
 		auto slot = StaticCastSharedRef<SHorizontalBox>(parentWidget)->AddSlot();
+		auto ip = child.path();
 		CreateSlot(slot, child);
 	}
 
