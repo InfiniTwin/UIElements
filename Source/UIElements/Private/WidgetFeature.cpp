@@ -4,11 +4,9 @@
 #include "WidgetFeature.h"
 #include "flecs.h"
 #include "ECS.h"
-#include "OpaqueTypes.h"
 #include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
-#include "Logging/StructuredLog.h"
 
 namespace UIElements {
 	void WidgetFeature::RegisterOpaqueTypes(flecs::world& world) {
@@ -49,16 +47,15 @@ namespace UIElements {
 						*data = VAlign_Fill;
 					}
 				});
-	
-		using namespace ECS;
-		world.component<std::vector<float>>().opaque(ECS::VectorReflection<float>);
 	}
 
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<Viewport>();
 
+		world.component<UIWidget>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Widget>().on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
+
 		world.component<CompoundWidget>();
 
 		world.component<Parented>().add(flecs::CanToggle);
@@ -74,37 +71,31 @@ namespace UIElements {
 		world.component<StyleSynced>().add(flecs::CanToggle);
 	}
 
+	void WidgetFeature::CreateObservers(flecs::world& world) {
+		world.observer<UIWidget>("AddWidget")
+			.event(flecs::OnAdd)
+			.each([](flecs::entity e, UIWidget) {
+			if (e.has<CompoundWidget>())
+				e.set(Widget{ SNew(CompoundWidgetInstance) });
+			else if (e.has<Box>())
+				e.set(Widget{ SNew(SBox) });
+			else if (e.has<HBox>())
+				e.set(Widget{ SNew(SHorizontalBox) });
+			else if (e.has<VBox>())
+				e.set(Widget{ SNew(SVerticalBox) });
+			else if (e.has<Border>())
+				e.set(Widget{ SNew(SBorder) });
+			else if (e.has<Button>())
+				e.set(Widget{ SNew(SButton) });			
+			else if (e.has<TextBlock>())
+				AddTextBlockWidget(e);
+
+			e.add<Parented>().disable<Parented>();
+				});
+	}
+
+
 	void WidgetFeature::CreateSystems(flecs::world& world) {
-		world.system("AddCompoundWidgetWidget")
-			.without<Widget>()
-			.with<CompoundWidget>()
-			.each([](flecs::entity e) { e.set(Widget{ SNew(CompoundWidgetInstance) }); });
-
-		world.system("AddBoxWidget")
-			.without<Widget>()
-			.with<Box>()
-			.each([](flecs::entity e) { e.set(Widget{ SNew(SBox) }); });
-
-		world.system("AddHorizontalBoxWidget")
-			.without<Widget>()
-			.with<HBox>()
-			.each([](flecs::entity e) { e.set(Widget{ SNew(SHorizontalBox) }); });
-
-		world.system("AddVerticalBoxWidget")
-			.without<Widget>()
-			.with<VBox>()
-			.each([](flecs::entity e) { e.set(Widget{ SNew(SVerticalBox) }); });
-
-		world.system("AddBorderWidget")
-			.without<Widget>()
-			.with<Border>()
-			.each([](flecs::entity e) { e.set(Widget{ SNew(SBorder) }); });
-
-		world.system("AddParented")
-			.with<Widget>()
-			.without<Parented>()
-			.each([](flecs::entity e) { e.add<Parented>().disable<Parented>(); });
-
 		world.system<const Widget>("ParentWidget")
 			.with(flecs::ChildOf).second(flecs::Wildcard)
 			.with<Parented>().id_flags(flecs::TOGGLE).without<Parented>()
@@ -112,35 +103,28 @@ namespace UIElements {
 			flecs::entity parent = child.parent();
 			TSharedRef<SWidget> childWidget = w.Value.ToSharedRef();
 			child.enable<Parented>();
+			auto cp = child.path();
+			auto pp = parent.path();
 			if (parent.has<Viewport>())
 			{
 				GEngine->GameViewport->AddViewportWidgetContent(childWidget);
 				return;
 			}
+
 			if (!parent.has<Widget>())
 				return;
 			TSharedRef<SWidget> parentWidget = parent.get_mut<Widget>()->Value.ToSharedRef();
+
 			if (parent.has<CompoundWidget>())
-			{
-				StaticCastSharedRef<CompoundWidgetInstance>(parentWidget)
-					->Slot().AttachWidget(childWidget);
-				return;
-			}
-			if (parent.has<Box>()) {
-				ParentToBox(childWidget, parent);
-				return;
-			}
-			if (parent.has<HBox>()) {
+				ParentToCompoundWidget(childWidget, parentWidget);
+			else if (parent.has<Box>())
+				ParentToBox(childWidget, parentWidget);
+			else if (parent.has<HBox>())
 				ParentToHorizontalBox(child, parentWidget);
-				return;
-			}
-			if (parent.has<VBox>()) {
+			else if (parent.has<VBox>())
 				ParentToVerticalBox(child, parentWidget);
-				return;
-			}
-			if (parent.has<Border>() || parent.has<Button>()) {
-				ParentToBorder(childWidget, parent);
-			}
+			else if (parent.has<Border>() || parent.has<Button>())
+				ParentToBorder(childWidget, parentWidget);
 				});
 	}
 }

@@ -4,7 +4,6 @@
 #include "TypographyFeature.h"
 #include "ECS.h"
 #include "ColorFeature.h"
-#include "Logging/StructuredLog.h"
 
 namespace UIElements {
 	void TypographyFeature::RegisterOpaqueTypes(flecs::world& world) {
@@ -91,6 +90,8 @@ namespace UIElements {
 		world.observer<const Widget, const LocalizedText>("LocalizeTextOnCreation")
 			.event(flecs::OnSet)
 			.each([&world](flecs::entity e, const Widget& w, const LocalizedText& l) {
+			if (l.Value.IsEmpty())
+				return;
 			FString text = GetLocalizedText(world.get<Locale>()->Value, l.Value);
 			if (e.has<TextBlock>())
 				SetTextBlockText(w.Value, text); });
@@ -134,13 +135,13 @@ namespace UIElements {
 	};
 
 	void TypographyFeature::CreateSystems(flecs::world& world) {
-		world.system("SetupTextBlockWidget")
-			.without<Widget>()
-			.with<TextBlock>()
-			.each([](flecs::entity e) {
-			auto widget = SNew(STextBlock);
-			SetTextBlockColor(widget, e.get<Color>()->Value);
-			SetTextBlockFontInfo(widget, e.get<FontInfo>()->Value);
-			e.set(Widget{ widget }); });
+		//world.system("SetupTextBlockWidget")
+		//	.without<Widget>()
+		//	.with<TextBlock>()
+		//	.each([](flecs::entity e) {
+		//	auto widget = SNew(STextBlock);
+		//	SetTextBlockColor(widget, e.get<Color>()->Value);
+		//	SetTextBlockFontInfo(widget, e.get<FontInfo>()->Value);
+		//	e.set(Widget{ widget }); });
 	}
 }

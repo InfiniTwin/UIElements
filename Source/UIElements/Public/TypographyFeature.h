@@ -6,6 +6,7 @@
 #include "Assets.h"
 #include "Containers/UnrealString.h"
 #include "WidgetFeature.h"
+#include "ColorFeature.h"
 
 namespace UIElements {
 	inline constexpr TCHAR LocalizationFolder[] = TEXT("Localization");
@@ -96,5 +97,12 @@ namespace UIElements {
 
 	static inline void SetTextBlockText(const TSharedPtr<SWidget>& widget, const FString& text) {
 		StaticCastSharedPtr<STextBlock>(widget)->SetText(FText::FromString(text));
+	}
+
+	static inline void AddTextBlockWidget(flecs::entity entity) {
+		TSharedRef<STextBlock> widget = SNew(STextBlock);
+		SetTextBlockColor(widget, entity.get<Color>()->Value);
+		SetTextBlockFontInfo(widget, entity.get<FontInfo>()->Value);
+		entity.set(Widget{ widget });
 	}
 }
