@@ -37,7 +37,6 @@ namespace UIElements {
 		static void RegisterComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
 		static void CreateObservers(flecs::world& world);
-		static void CreateSystems(flecs::world& world);
 	};
 
 	inline FString GetTable(const FString& tableKey) {

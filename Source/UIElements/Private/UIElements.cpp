@@ -46,7 +46,6 @@ namespace UIElements {
 		TypographyFeature::CreateObservers(world);
 
 		WidgetFeature::CreateSystems(world);
-		TypographyFeature::CreateSystems(world);
 		ButtonFeature::CreateSystems(world);
 	}
 }

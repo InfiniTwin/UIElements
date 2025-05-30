@@ -67,7 +67,8 @@ namespace UIElements {
 
 		world.component<HAlign>().member<EHorizontalAlignment>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<VAlign>().member<EVerticalAlignment>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<Padding>().member<std::vector<float>>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Padding>().member<std::vector<float>>(VALUE)
+			.add(flecs::OnInstantiate, flecs::Inherit).add(flecs::Exclusive);
 
 		world.component<StyleSynced>().add(flecs::CanToggle);
 
@@ -105,11 +106,10 @@ namespace UIElements {
 			.with<Parented>().id_flags(flecs::TOGGLE).without<Parented>()
 			.each([](flecs::entity child, const Widget& w, Order) {
 			flecs::entity parent = child.parent();
-			TSharedRef<SWidget> childWidget = w.Value.ToSharedRef();
 			child.enable<Parented>();
 			if (parent.has<Viewport>())
 			{
-				GEngine->GameViewport->AddViewportWidgetContent(childWidget);
+				GEngine->GameViewport->AddViewportWidgetContent(w.Value.ToSharedRef());
 				return;
 			}
 
@@ -118,15 +118,15 @@ namespace UIElements {
 			TSharedRef<SWidget> parentWidget = parent.get_mut<Widget>()->Value.ToSharedRef();
 
 			if (parent.has<CompoundWidget>())
-				ParentToCompoundWidget(childWidget, parentWidget);
+				AttachToCompoundWidget(w.Value.ToSharedRef(), parentWidget);
 			else if (parent.has<Box>())
-				ParentToBox(childWidget, parentWidget);
+				AttachToBox(child, parentWidget);
 			else if (parent.has<HBox>())
-				ParentToHorizontalBox(child, parentWidget);
+				AttachToHorizontalBox(child, parentWidget);
 			else if (parent.has<VBox>())
-				ParentToVerticalBox(child, parentWidget);
+				AttachToVerticalBox(child, parentWidget);
 			else if (parent.has<Border>() || parent.has<Button>())
-				ParentToBorder(childWidget, parentWidget);
+				AttachToBorder(child, parentWidget);
 				});
 	}
 }

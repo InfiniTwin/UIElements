@@ -133,15 +133,4 @@ namespace UIElements {
 			.each([&world](flecs::entity e, const Widget& w, const Icon& i) {
 			SetTextBlockText(w.Value, i.Value); });
 	};
-
-	void TypographyFeature::CreateSystems(flecs::world& world) {
-		//world.system("SetupTextBlockWidget")
-		//	.without<Widget>()
-		//	.with<TextBlock>()
-		//	.each([](flecs::entity e) {
-		//	auto widget = SNew(STextBlock);
-		//	SetTextBlockColor(widget, e.get<Color>()->Value);
-		//	SetTextBlockFontInfo(widget, e.get<FontInfo>()->Value);
-		//	e.set(Widget{ widget }); });
-	}
 }

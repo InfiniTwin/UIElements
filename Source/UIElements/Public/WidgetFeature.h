@@ -44,43 +44,48 @@ namespace UIElements {
 		static void CreateSystems(flecs::world& world);
 	};
 
-	template<typename SlotType>
-	void CreateSlot(SlotType& slot, const flecs::entity child)
-	{
-		std::vector<float> padding = child.get<Padding>()->Value;
+	static inline FMargin GetMargin(const std::vector<float> padding) {
+		return FMargin(padding[0], padding[1], padding[2], padding[3]);
+	}
 
+	template<typename SlotType>
+	void AttachSlot(SlotType& slot, const flecs::entity child)
+	{
 		slot
-			.HAlign(child.get<HAlign>()->Value)
 			.VAlign(child.get<VAlign>()->Value)
-			.Padding(padding[0], padding[1], padding[2], padding[3])
+			.HAlign(child.get<HAlign>()->Value)
+			.Padding(GetMargin(child.get<Padding>()->Value))
 			.AttachWidget(child.get<Widget>()->Value.ToSharedRef());
 	}
 
-	static inline void ParentToCompoundWidget(const TSharedRef<SWidget> child, const TSharedRef<SWidget> parent) {
+	static inline void AttachToCompoundWidget(const TSharedRef<SWidget> child, const TSharedRef<SWidget> parent) {
 		StaticCastSharedRef<CompoundWidgetInstance>(parent)->Slot().AttachWidget(child);
 	}
 
-	static inline void ParentToBox(const TSharedRef<SWidget> child, const TSharedRef<SWidget> parent) {
+	static inline void AttachToBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
 		TSharedRef<SBox> box = StaticCastSharedRef<SBox>(parent);
-		box->SetHAlign(HAlign_Left);
-		box->SetVAlign(VAlign_Top);
+		box->SetVAlign(child.get<VAlign>()->Value);
+		box->SetHAlign(child.get<HAlign>()->Value);
 		box->SetWidthOverride(FOptionalSize());
 		box->SetHeightOverride(FOptionalSize());
-		box->SetContent(child);
+		box->SetPadding(GetMargin(child.get<Padding>()->Value));
+		box->SetContent(child.get<Widget>()->Value.ToSharedRef());
 	}
 
-	static inline void ParentToHorizontalBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
+	static inline void AttachToHorizontalBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
 		auto slot = StaticCastSharedRef<SHorizontalBox>(parent)->AddSlot();
-		CreateSlot(slot, child);
+		slot.AutoWidth();
+		AttachSlot(slot, child);
 	}
 
-	static inline void ParentToVerticalBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
+	static inline void AttachToVerticalBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
 		auto slot = StaticCastSharedRef<SVerticalBox>(parent)->AddSlot();
-		CreateSlot(slot, child);
+		slot.AutoHeight();
+		AttachSlot(slot, child);
 	}
 
-	static inline void ParentToBorder(const TSharedRef<SWidget> child, const TSharedRef<SWidget> parent) {
-		StaticCastSharedRef<SBorder>(parent)->SetContent(child);
+	static inline void AttachToBorder(const flecs::entity child, const TSharedRef<SWidget> parent) {
+		StaticCastSharedRef<SBorder>(parent)->SetContent(child.get<Widget>()->Value.ToSharedRef());
 	}
 
 	int SortOrder(flecs::entity_t e1, const Order* o1, flecs::entity_t e2, const Order* o2) {
