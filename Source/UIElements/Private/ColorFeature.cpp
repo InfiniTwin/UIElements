@@ -168,7 +168,7 @@ namespace UIElements {
 	void UIElements::SetPrefabColor(flecs::world& world, const FString name, const FLinearColor c) {
 		auto colorName = TEXT("Color") + name;
 		FTCHARToUTF8 cn(*colorName);
-		world.get<ColorPrefabQuery>()->Value.run([&world, &cn, &c](flecs::iter& it) {
+		world.get<ColorPrefabQuery>()->Value.run([&cn, &c](flecs::iter& it) {
 			while (it.next())
 				for (auto i : it)
 				{

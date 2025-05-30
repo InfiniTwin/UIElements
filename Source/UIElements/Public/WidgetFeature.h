@@ -35,6 +35,8 @@ namespace UIElements {
 	struct Parented {};
 	struct StyleSynced {};
 
+	struct Order { int Value; };
+
 	struct WidgetFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);
@@ -79,5 +81,11 @@ namespace UIElements {
 
 	static inline void ParentToBorder(const TSharedRef<SWidget> child, const TSharedRef<SWidget> parent) {
 		StaticCastSharedRef<SBorder>(parent)->SetContent(child);
+	}
+
+	int SortOrder(flecs::entity_t e1, const Order* o1, flecs::entity_t e2, const Order* o2) {
+		(void)e1;
+		(void)e2;
+		return (o1->Value > o2->Value) - (o1->Value < o2->Value);
 	}
 }

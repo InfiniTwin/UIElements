@@ -7,6 +7,7 @@
 #include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
+#include "OpaqueTypes.h"
 
 namespace UIElements {
 	void WidgetFeature::RegisterOpaqueTypes(flecs::world& world) {
@@ -69,6 +70,8 @@ namespace UIElements {
 		world.component<Padding>().member<std::vector<float>>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<StyleSynced>().add(flecs::CanToggle);
+
+		world.component<Order>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 	}
 
 	void WidgetFeature::CreateObservers(flecs::world& world) {
@@ -86,7 +89,7 @@ namespace UIElements {
 			else if (e.has<Border>())
 				e.set(Widget{ SNew(SBorder) });
 			else if (e.has<Button>())
-				e.set(Widget{ SNew(SButton) });			
+				e.set(Widget{ SNew(SButton) });
 			else if (e.has<TextBlock>())
 				AddTextBlockWidget(e);
 
@@ -94,17 +97,16 @@ namespace UIElements {
 				});
 	}
 
-
 	void WidgetFeature::CreateSystems(flecs::world& world) {
-		world.system<const Widget>("ParentWidget")
+		using namespace ECS;
+		world.system<const Widget, const Order>("ParentWidget")
 			.with(flecs::ChildOf).second(flecs::Wildcard)
+			.order_by(SortOrder)
 			.with<Parented>().id_flags(flecs::TOGGLE).without<Parented>()
-			.each([](flecs::entity child, const Widget& w) {
+			.each([](flecs::entity child, const Widget& w, Order) {
 			flecs::entity parent = child.parent();
 			TSharedRef<SWidget> childWidget = w.Value.ToSharedRef();
 			child.enable<Parented>();
-			auto cp = child.path();
-			auto pp = parent.path();
 			if (parent.has<Viewport>())
 			{
 				GEngine->GameViewport->AddViewportWidgetContent(childWidget);
