@@ -3,6 +3,9 @@
 #pragma once
 
 #include "flecs.h"
+#include "WidgetFeature.h"
+#include "UIFeature.h"
+#include "ButtonFeature.h"
 
 namespace UIElements {
 	struct ToggleFeature {

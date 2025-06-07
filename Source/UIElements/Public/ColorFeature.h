@@ -7,6 +7,13 @@
 #include "utils/utils.h"
 
 namespace UIElements {
+	struct ColorFeature {
+		static void RegisterOpaqueTypes(flecs::world& world);
+		static void RegisterComponents(flecs::world& world);
+		static void CreateQueries(flecs::world& world);
+		static void CreateObservers(flecs::world& world);
+	};
+
 	struct Color { FLinearColor Value; };
 
 	using namespace material_color_utilities;
@@ -23,13 +30,6 @@ namespace UIElements {
 	};
 
 	struct ColorPrefabQuery { flecs::query<Color> Value; };
-
-	struct ColorFeature {
-		static void RegisterOpaqueTypes(flecs::world& world);
-		static void RegisterComponents(flecs::world& world);
-		static void CreateQueries(flecs::world& world);
-		static void CreateObservers(flecs::world& world);
-	};
 
 	void SetPrefabColor(flecs::world& world, const FString name, const FLinearColor color);
 

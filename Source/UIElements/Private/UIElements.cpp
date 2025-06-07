@@ -24,11 +24,18 @@ void FUIElementsModule::ShutdownModule() {
 IMPLEMENT_MODULE(FUIElementsModule, UIElements)
 
 namespace UIElements {
-	void Register(flecs::world& world) {
+	FString& Scope() {
+		static FString scope = TEXT("");
+		return scope;
+	}
+
+	void Register(flecs::world& world, const FString scope) {
+		Scope() = scope;
 		UIFeature::RegisterOpaqueTypes(world);
 		WidgetFeature::RegisterOpaqueTypes(world);
 		ColorFeature::RegisterOpaqueTypes(world);
 		TypographyFeature::RegisterOpaqueTypes(world);
+		ButtonFeature::RegisterOpaqueTypes(world);
 
 		UIFeature::RegisterComponents(world);
 		WidgetFeature::RegisterComponents(world);

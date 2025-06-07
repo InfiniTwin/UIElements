@@ -9,6 +9,13 @@
 #include "ColorFeature.h"
 
 namespace UIElements {
+	struct TypographyFeature {
+		static void RegisterOpaqueTypes(flecs::world& world);
+		static void RegisterComponents(flecs::world& world);
+		static void CreateQueries(flecs::world& world);
+		static void CreateObservers(flecs::world& world);
+	};
+
 	inline constexpr TCHAR LocalizationFolder[] = TEXT("Localization");
 	constexpr const char* TableKeyDelimiter = "::";
 	constexpr const TCHAR KeyValueDelimiter[] = TEXT("=");
@@ -31,13 +38,6 @@ namespace UIElements {
 	struct LocalizedTextQuery { flecs::query<const LocalizedText, const Widget> Value; };
 
 	struct IconQuery { flecs::query<const FontFace, const FontSize> Value; };
-
-	struct TypographyFeature {
-		static void RegisterOpaqueTypes(flecs::world& world);
-		static void RegisterComponents(flecs::world& world);
-		static void CreateQueries(flecs::world& world);
-		static void CreateObservers(flecs::world& world);
-	};
 
 	inline FString GetTable(const FString& tableKey) {
 		FString tableKeyString(tableKey);

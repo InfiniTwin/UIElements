@@ -3,8 +3,16 @@
 #pragma once
 
 #include "flecs.h"
+#include "UIFeature.h"
 
 namespace UIElements {
+	struct WidgetFeature {
+		static void RegisterOpaqueTypes(flecs::world& world);
+		static void RegisterComponents(flecs::world& world);
+		static void CreateObservers(flecs::world& world);
+		static void CreateSystems(flecs::world& world);
+	};
+
 	struct Viewport {};
 
 	struct UIWidget {};
@@ -30,19 +38,12 @@ namespace UIElements {
 	struct Padding { std::vector<float> Value; }; // [Left, Top, Right, Bottom]
 
 	struct Border {};
-	struct RoundBorder {};
+	struct RoundedBoxBrush {};
 
 	struct Parented {};
 	struct StyleSynced {};
 
 	struct Order { int Value; };
-
-	struct WidgetFeature {
-		static void RegisterOpaqueTypes(flecs::world& world);
-		static void RegisterComponents(flecs::world& world);
-		static void CreateObservers(flecs::world& world);
-		static void CreateSystems(flecs::world& world);
-	};
 
 	static inline FMargin GetMargin(const std::vector<float> padding) {
 		return FMargin(padding[0], padding[1], padding[2], padding[3]);
@@ -75,6 +76,11 @@ namespace UIElements {
 	static inline void AttachToHorizontalBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
 		auto slot = StaticCastSharedRef<SHorizontalBox>(parent)->AddSlot();
 		slot.AutoWidth();
+		auto PATH_child = child.path();
+		auto VALIGN = child.has<VAlign>();
+		auto HALIGN = child.has<HAlign>();
+		auto PADDING = child.has<Padding>();
+		auto WIDGET = child.has<Widget>();
 		AttachSlot(slot, child);
 	}
 
@@ -84,8 +90,23 @@ namespace UIElements {
 		AttachSlot(slot, child);
 	}
 
+	static inline void AttachToCheckBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
+		auto checkBox = StaticCastSharedRef<SCheckBox>(parent);
+		checkBox->SetContent(child.get<Widget>()->Value.ToSharedRef());
+	}
+
 	static inline void AttachToBorder(const flecs::entity child, const TSharedRef<SWidget> parent) {
 		StaticCastSharedRef<SBorder>(parent)->SetContent(child.get<Widget>()->Value.ToSharedRef());
+		//button.oncli
+		////FSlateBrush normalBrush = FSlateRoundedBoxBrush(FLinearColor::White);
+		//FSlateBrush normalBrush;
+		//normalBrush.DrawAs = ESlateBrushDrawType::RoundedBox;
+
+		//const FButtonStyle style = FButtonStyle()
+		//	.SetNormal(normalBrush);
+
+
+		//button->SetButtonStyle(&style);
 	}
 
 	int SortOrder(flecs::entity_t e1, const Order* o1, flecs::entity_t e2, const Order* o2) {

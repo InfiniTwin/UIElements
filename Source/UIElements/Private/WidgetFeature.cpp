@@ -4,10 +4,11 @@
 #include "WidgetFeature.h"
 #include "flecs.h"
 #include "ECS.h"
+#include "OpaqueTypes.h"
 #include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
-#include "OpaqueTypes.h"
+#include "ToggleFeature.h"
 
 namespace UIElements {
 	void WidgetFeature::RegisterOpaqueTypes(flecs::world& world) {
@@ -67,8 +68,7 @@ namespace UIElements {
 
 		world.component<HAlign>().member<EHorizontalAlignment>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<VAlign>().member<EVerticalAlignment>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<Padding>().member<std::vector<float>>(VALUE)
-			.add(flecs::OnInstantiate, flecs::Inherit).add(flecs::Exclusive);
+		world.component<Padding>().member<std::vector<float>>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<StyleSynced>().add(flecs::CanToggle);
 
@@ -76,30 +76,32 @@ namespace UIElements {
 	}
 
 	void WidgetFeature::CreateObservers(flecs::world& world) {
-		world.observer<UIWidget>("AddWidget")
+		world.observer<>("AddWidget")
+			.with<UIWidget>()
 			.event(flecs::OnAdd)
-			.each([](flecs::entity e, UIWidget) {
-			if (e.has<CompoundWidget>())
-				e.set(Widget{ SNew(CompoundWidgetInstance) });
-			else if (e.has<Box>())
-				e.set(Widget{ SNew(SBox) });
-			else if (e.has<HBox>())
-				e.set(Widget{ SNew(SHorizontalBox) });
-			else if (e.has<VBox>())
-				e.set(Widget{ SNew(SVerticalBox) });
-			else if (e.has<Border>())
-				e.set(Widget{ SNew(SBorder) });
-			else if (e.has<Button>())
-				e.set(Widget{ SNew(SButton) });
-			else if (e.has<TextBlock>())
-				AddTextBlockWidget(e);
+			.each([](flecs::entity entity) {
+			if (entity.has<CompoundWidget>())
+				entity.set(Widget{ SNew(CompoundWidgetInstance) });
+			else if (entity.has<Box>())
+				entity.set(Widget{ SNew(SBox) });
+			else if (entity.has<HBox>())
+				entity.set(Widget{ SNew(SHorizontalBox) });
+			else if (entity.has<VBox>())
+				entity.set(Widget{ SNew(SVerticalBox) });
+			else if (entity.has<Border>())
+				entity.set(Widget{ SNew(SBorder) });
+			else if (entity.has<Button>())
+				AddButtonWidget(entity);
+			else if (entity.has<Toggle>())
+				entity.set(Widget{ SNew(SCheckBox) });
+			else if (entity.has<TextBlock>())
+				AddTextBlockWidget(entity);
 
-			e.add<Parented>().disable<Parented>();
+			entity.add<Parented>().disable<Parented>();
 				});
 	}
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
-		using namespace ECS;
 		world.system<const Widget, const Order>("ParentWidget")
 			.with(flecs::ChildOf).second(flecs::Wildcard)
 			.order_by(SortOrder)
@@ -127,6 +129,8 @@ namespace UIElements {
 				AttachToVerticalBox(child, parentWidget);
 			else if (parent.has<Border>() || parent.has<Button>())
 				AttachToBorder(child, parentWidget);
+			else if (parent.has<Toggle>())
+				AttachToCheckBox(child, parentWidget);
 				});
 	}
 }
