@@ -31,7 +31,7 @@ namespace UIElements {
 
 	void Register(flecs::world& world, const FString scope) {
 		Scope() = scope;
-		UIFeature::RegisterOpaqueTypes(world);
+
 		WidgetFeature::RegisterOpaqueTypes(world);
 		ColorFeature::RegisterOpaqueTypes(world);
 		TypographyFeature::RegisterOpaqueTypes(world);

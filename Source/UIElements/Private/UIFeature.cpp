@@ -1,20 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "UIFeature.h"
 #include "flecs.h"
 #include "ECS.h"
-#include "OpaqueTypes.h"
 #include "UIElements.h"
 #include "Engine/UserInterfaceSettings.h"
 #include "Logging/LogMacros.h"
 
 namespace UIElements {
-	void UIFeature::RegisterOpaqueTypes(flecs::world& world) {
-		using namespace ECS;
-		world.component<std::vector<float>>().opaque(ECS::VectorReflection<float>);
-	}
-
 	void UIFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<LoadMode>().add(flecs::Exclusive);

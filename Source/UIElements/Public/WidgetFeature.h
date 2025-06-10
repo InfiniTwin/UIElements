@@ -15,8 +15,8 @@ namespace UIElements {
 
 	struct Viewport {};
 
-	struct UIWidget {};
-	struct Widget { TSharedPtr<SWidget> Value; };
+	struct Widget {};
+	struct WidgetInstance { TSharedPtr<SWidget> Value; };
 
 	struct CompoundWidgetInstance : public SCompoundWidget {
 	public:
@@ -35,28 +35,25 @@ namespace UIElements {
 
 	struct HAlign { EHorizontalAlignment Value; };
 	struct VAlign { EVerticalAlignment Value; };
-	struct Padding { std::vector<float> Value; }; // [Left, Top, Right, Bottom]
+	struct Padding { float Left, Top, Right, Bottom; };
 
 	struct Border {};
 	struct RoundedBoxBrush {};
 
-	struct Parented {};
+	struct Attached {};
 	struct StyleSynced {};
 
 	struct Order { int Value; };
-
-	static inline FMargin GetMargin(const std::vector<float> padding) {
-		return FMargin(padding[0], padding[1], padding[2], padding[3]);
-	}
-
+	
 	template<typename SlotType>
 	void AttachSlot(SlotType& slot, const flecs::entity child)
 	{
+		auto padding = child.get<Padding>();
 		slot
 			.VAlign(child.get<VAlign>()->Value)
 			.HAlign(child.get<HAlign>()->Value)
-			.Padding(GetMargin(child.get<Padding>()->Value))
-			.AttachWidget(child.get<Widget>()->Value.ToSharedRef());
+			.Padding(padding->Left, padding->Top, padding->Right, padding->Bottom)
+			.AttachWidget(child.get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
 	static inline void AttachToCompoundWidget(const TSharedRef<SWidget> child, const TSharedRef<SWidget> parent) {
@@ -69,8 +66,9 @@ namespace UIElements {
 		box->SetHAlign(child.get<HAlign>()->Value);
 		box->SetWidthOverride(FOptionalSize());
 		box->SetHeightOverride(FOptionalSize());
-		box->SetPadding(GetMargin(child.get<Padding>()->Value));
-		box->SetContent(child.get<Widget>()->Value.ToSharedRef());
+		auto padding = child.get<Padding>();
+		box->SetPadding(FMargin(padding->Left, padding->Top, padding->Right, padding->Bottom));
+		box->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
 	static inline void AttachToHorizontalBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
@@ -80,7 +78,7 @@ namespace UIElements {
 		auto VALIGN = child.has<VAlign>();
 		auto HALIGN = child.has<HAlign>();
 		auto PADDING = child.has<Padding>();
-		auto WIDGET = child.has<Widget>();
+		auto WIDGET = child.has<WidgetInstance>();
 		AttachSlot(slot, child);
 	}
 
@@ -92,11 +90,11 @@ namespace UIElements {
 
 	static inline void AttachToCheckBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
 		auto checkBox = StaticCastSharedRef<SCheckBox>(parent);
-		checkBox->SetContent(child.get<Widget>()->Value.ToSharedRef());
+		checkBox->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
 	static inline void AttachToBorder(const flecs::entity child, const TSharedRef<SWidget> parent) {
-		StaticCastSharedRef<SBorder>(parent)->SetContent(child.get<Widget>()->Value.ToSharedRef());
+		StaticCastSharedRef<SBorder>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
 		//button.oncli
 		////FSlateBrush normalBrush = FSlateRoundedBoxBrush(FLinearColor::White);
 		//FSlateBrush normalBrush;

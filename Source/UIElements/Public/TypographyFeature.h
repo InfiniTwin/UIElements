@@ -30,12 +30,12 @@ namespace UIElements {
 	struct Locale { FString Value; };
 	struct LocalizedText { FString Value; };
 
-	struct Icon { FString Value; };
+	struct Code { FString Value; };
 
 	struct TextBlock {};
 
 	struct TextQuery { flecs::query<const FontFace, const FontSize> Value; };
-	struct LocalizedTextQuery { flecs::query<const LocalizedText, const Widget> Value; };
+	struct LocalizedTextQuery { flecs::query<const LocalizedText, const WidgetInstance> Value; };
 
 	struct IconQuery { flecs::query<const FontFace, const FontSize> Value; };
 
@@ -102,6 +102,6 @@ namespace UIElements {
 		TSharedRef<STextBlock> widget = SNew(STextBlock);
 		SetTextBlockColor(widget, entity.get<Color>()->Value);
 		SetTextBlockFontInfo(widget, entity.get<FontInfo>()->Value);
-		entity.set(Widget{ widget });
+		entity.set(WidgetInstance{ widget });
 	}
 }

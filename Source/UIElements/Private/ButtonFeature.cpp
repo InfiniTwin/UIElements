@@ -32,7 +32,7 @@ namespace UIElements {
 	void ButtonFeature::CreateSystems(flecs::world& world) {
 		world.system("AddButtonWidget")
 			.with<Button>()
-			.without<Widget>()
+			.without<WidgetInstance>()
 			.each([](flecs::entity e) { /*e.set(Widget{ SNew(SButton) });*/ });
 			//.each([](flecs::entity e) {
 			//TSharedPtr<SButton> button = SNew(SButton);

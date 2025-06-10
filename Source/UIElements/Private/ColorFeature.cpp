@@ -157,9 +157,9 @@ namespace UIElements {
 			ECS::GetInstances(world, p, instances);
 			for (flecs::entity i : instances)
 			{
-				if (!i.has<Widget>())
+				if (!i.has<WidgetInstance>())
 					continue;
-				TSharedPtr<SWidget> widget = i.get_mut<Widget>()->Value;
+				TSharedPtr<SWidget> widget = i.get_mut<WidgetInstance>()->Value;
 				if (i.has<TextBlock>())
 					SetTextBlockColor(widget, c.Value);
 			}});

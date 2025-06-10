@@ -29,7 +29,7 @@ namespace UIElements {
 	}
 
 	static inline void AddButtonWidget(flecs::entity entity) {
-		entity.set(Widget{ SNew(SButton)
+		entity.set(WidgetInstance{ SNew(SButton)
 			.OnHovered_Lambda(([entity]() { entity.add(Hovered); }))
 			.OnUnhovered_Lambda(([entity]() { entity.add(Normal); }))
 			.OnClicked_Lambda(([entity]() { entity.add(Clicked); return FReply::Handled(); }))

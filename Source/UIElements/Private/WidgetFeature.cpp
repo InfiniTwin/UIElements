@@ -4,7 +4,6 @@
 #include "WidgetFeature.h"
 #include "flecs.h"
 #include "ECS.h"
-#include "OpaqueTypes.h"
 #include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
@@ -55,12 +54,12 @@ namespace UIElements {
 		using namespace ECS;
 		world.component<Viewport>();
 
-		world.component<UIWidget>().add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<Widget>().on_remove([](flecs::entity e, Widget& w) {w.Value.Reset(); });
+		world.component<Widget>().add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<WidgetInstance>().on_remove([](flecs::entity e, WidgetInstance& w) {w.Value.Reset(); });
 
 		world.component<CompoundWidget>();
 
-		world.component<Parented>().add(flecs::CanToggle);
+		world.component<Attached>().add(flecs::CanToggle);
 
 		world.component<Box>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HBox>().add(flecs::OnInstantiate, flecs::Inherit);
@@ -68,7 +67,12 @@ namespace UIElements {
 
 		world.component<HAlign>().member<EHorizontalAlignment>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<VAlign>().member<EVerticalAlignment>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<Padding>().member<std::vector<float>>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Padding>()
+			.member<float>(MEMBER(Padding::Left))
+			.member<float>(MEMBER(Padding::Topp))
+			.member<float>(MEMBER(Padding::Right))
+			.member<float>(MEMBER(Padding::Bottom))
+			.add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<StyleSynced>().add(flecs::CanToggle);
 
@@ -77,47 +81,47 @@ namespace UIElements {
 
 	void WidgetFeature::CreateObservers(flecs::world& world) {
 		world.observer<>("AddWidget")
-			.with<UIWidget>()
+			.with<Widget>()
 			.event(flecs::OnAdd)
 			.each([](flecs::entity entity) {
 			if (entity.has<CompoundWidget>())
-				entity.set(Widget{ SNew(CompoundWidgetInstance) });
+				entity.set(WidgetInstance{ SNew(CompoundWidgetInstance) });
 			else if (entity.has<Box>())
-				entity.set(Widget{ SNew(SBox) });
+				entity.set(WidgetInstance{ SNew(SBox) });
 			else if (entity.has<HBox>())
-				entity.set(Widget{ SNew(SHorizontalBox) });
+				entity.set(WidgetInstance{ SNew(SHorizontalBox) });
 			else if (entity.has<VBox>())
-				entity.set(Widget{ SNew(SVerticalBox) });
+				entity.set(WidgetInstance{ SNew(SVerticalBox) });
 			else if (entity.has<Border>())
-				entity.set(Widget{ SNew(SBorder) });
+				entity.set(WidgetInstance{ SNew(SBorder) });
 			else if (entity.has<Button>())
 				AddButtonWidget(entity);
 			else if (entity.has<Toggle>())
-				entity.set(Widget{ SNew(SCheckBox) });
+				entity.set(WidgetInstance{ SNew(SCheckBox) });
 			else if (entity.has<TextBlock>())
 				AddTextBlockWidget(entity);
 
-			entity.add<Parented>().disable<Parented>();
+			entity.add<Attached>().disable<Attached>();
 				});
 	}
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
-		world.system<const Widget, const Order>("ParentWidget")
+		world.system<const WidgetInstance, const Order>("AttachWidget")
 			.with(flecs::ChildOf).second(flecs::Wildcard)
 			.order_by(SortOrder)
-			.with<Parented>().id_flags(flecs::TOGGLE).without<Parented>()
-			.each([](flecs::entity child, const Widget& w, Order) {
+			.with<Attached>().id_flags(flecs::TOGGLE).without<Attached>()
+			.each([](flecs::entity child, const WidgetInstance& w, Order) {
 			flecs::entity parent = child.parent();
-			child.enable<Parented>();
+			child.enable<Attached>();
 			if (parent.has<Viewport>())
 			{
 				GEngine->GameViewport->AddViewportWidgetContent(w.Value.ToSharedRef());
 				return;
 			}
 
-			if (!parent.has<Widget>())
+			if (!parent.has<WidgetInstance>())
 				return;
-			TSharedRef<SWidget> parentWidget = parent.get_mut<Widget>()->Value.ToSharedRef();
+			TSharedRef<SWidget> parentWidget = parent.get_mut<WidgetInstance>()->Value.ToSharedRef();
 
 			if (parent.has<CompoundWidget>())
 				AttachToCompoundWidget(w.Value.ToSharedRef(), parentWidget);
