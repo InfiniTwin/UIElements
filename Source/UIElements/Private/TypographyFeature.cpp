@@ -6,31 +6,6 @@
 #include "ColorFeature.h"
 
 namespace UI {
-	void TypographyFeature::RegisterOpaqueTypes(flecs::world& world) {
-		// FString <=> flecs::String
-		world.component<FString>()
-			.opaque(flecs::String)
-			.serialize([](const flecs::serializer* s, const FString* data) {
-			const char* str = TCHAR_TO_UTF8(**data);
-			return s->value(flecs::String, &str);
-				})
-			.assign_string([](FString* data, const char* value) {
-			*data = UTF8_TO_TCHAR(value);
-				});
-
-		// FText <=> flecs::String
-		world.component<FText>()
-			.opaque(flecs::String)
-			.serialize([](const flecs::serializer* s, const FText* data) {
-			FString temp = data->ToString();
-			const char* str = TCHAR_TO_UTF8(*temp);
-			return s->value(flecs::String, &str);
-				})
-			.assign_string([](FText* data, const char* value) {
-			*data = FText::FromString(UTF8_TO_TCHAR(value));
-				});
-	}
-
 	void TypographyFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<TextFont>().member<FString>(VALUE);

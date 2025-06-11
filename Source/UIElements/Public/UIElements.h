@@ -17,5 +17,5 @@ public:
 namespace UI {
 	UIELEMENTS_API FString& Scope();
 
-	UIELEMENTS_API void Register(flecs::world& world, const FString scope);
+	UIELEMENTS_API void Register(flecs::world& world);
 }

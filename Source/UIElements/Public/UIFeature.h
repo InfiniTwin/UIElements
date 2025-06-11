@@ -12,10 +12,6 @@ namespace UI {
 		static void CreateObservers(flecs::world& world);
 	};
 
-	struct Action {};
-	struct Path { FString Value; };
-	struct Parent { FString Value; };
-
 	enum Event {
 		Normal,
 		Hovered,

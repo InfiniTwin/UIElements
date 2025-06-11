@@ -29,12 +29,10 @@ namespace UI {
 		return scope;
 	}
 
-	void Register(flecs::world& world, const FString scope) {
-		Scope() = scope;
+	void Register(flecs::world& world) {
 
 		WidgetFeature::RegisterOpaqueTypes(world);
 		ColorFeature::RegisterOpaqueTypes(world);
-		TypographyFeature::RegisterOpaqueTypes(world);
 		ButtonFeature::RegisterOpaqueTypes(world);
 
 		UIFeature::RegisterComponents(world);

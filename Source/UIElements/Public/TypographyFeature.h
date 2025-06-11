@@ -10,7 +10,6 @@
 
 namespace UI {
 	struct TypographyFeature {
-		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
 		static void CreateObservers(flecs::world& world);

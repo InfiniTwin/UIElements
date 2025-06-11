@@ -3,6 +3,7 @@
 #include "UIFeature.h"
 #include "flecs.h"
 #include "ECS.h"
+#include "ActionFeature.h"
 #include "UIElements.h"
 #include "Engine/UserInterfaceSettings.h"
 #include "Logging/LogMacros.h"
@@ -10,15 +11,9 @@
 namespace UI {
 	void UIFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
-		world.component<LoadMode>().add(flecs::Exclusive);
+		world.component<UIScale>().member<float>(VALUE);
 
 		world.component<Event>().add(flecs::Exclusive);
-
-		world.component<Action>().add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<Path>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<Parent>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-
-		world.component<UIScale>().member<float>(VALUE);
 	}
 
 	void UIFeature::CreateObservers(flecs::world& world) {
@@ -36,7 +31,7 @@ namespace UI {
 			auto event = it.pair(0);
 			//UE_LOG(LogTemp, Warning, TEXT(">>> UNDO %s"), *Name);
 			it.entity(t).children([&world, &event](flecs::entity action) {
-				if (action.has<Action>() && action.has(event)) {
+				if (action.has<ECS::Action>() && action.has(event)) {
 					FString Name = UTF8_TO_TCHAR(event.second().name().c_str());
 					UE_LOG(LogTemp, Warning, TEXT(">>> UNDO %s"), *Name);
 					//	using namespace ECS;
@@ -52,7 +47,7 @@ namespace UI {
 			.each([&world](flecs::iter& it, size_t t) {
 			auto event = it.pair(0);
 			it.entity(t).children([&world, &event](flecs::entity action) {
-				if (action.has<Action>() && action.has(event)) {
+				if (action.has<ECS::Action>() && action.has(event)) {
 					FString Name = UTF8_TO_TCHAR(event.second().name().c_str());
 					UE_LOG(LogTemp, Warning, TEXT(">>> DO %s"), *Name);
 					//	using namespace ECS;
@@ -63,13 +58,13 @@ namespace UI {
 				});
 
 		world.observer<>("SetActionParent")
-			.with<Action>()
-			.with<Path>()
+			.with<ECS::Action>()
+			.with<ECS::Path>()
 			.event(flecs::OnSet)
 			.each([](flecs::entity entity) {
-			if (entity.has<Parent>()) {
+			if (entity.has<ECS::Parent>()) {
 				FString parentPath = UTF8_TO_TCHAR(entity.parent().path().c_str());
-				FString parent = entity.get<Parent>()->Value;
+				FString parent = entity.get<ECS::Parent>()->Value;
 				if (!parent.IsEmpty())
 					parentPath += TEXT(".") + parent;
 				using namespace ECS;
