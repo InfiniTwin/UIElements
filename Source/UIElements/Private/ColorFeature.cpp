@@ -9,7 +9,7 @@
 #include "dynamiccolor/material_dynamic_colors.h"
 #include "palettes/tones.h"
 
-namespace UIElements {
+namespace UI {
 	void ColorFeature::RegisterOpaqueTypes(flecs::world& world) {
 		// MCU Variant <=> int
 		using namespace material_color_utilities;
@@ -76,8 +76,8 @@ namespace UIElements {
 	}
 
 	void ColorFeature::CreateQueries(flecs::world& world) {
-		world.set(ColorPrefabQuery{
-			world.query_builder<Color>(COMPONENT(ColorPrefabQuery)).with(flecs::Prefab)
+		world.component<QueryColorPrefab>().set(QueryColorPrefab{
+			world.query_builder<Color>(COMPONENT(QueryColorPrefab)).with(flecs::Prefab)
 			.cached().build() });
 	};
 
@@ -165,10 +165,10 @@ namespace UIElements {
 			}});
 	}
 
-	void UIElements::SetPrefabColor(flecs::world& world, const FString name, const FLinearColor c) {
+	void UI::SetPrefabColor(flecs::world& world, const FString name, const FLinearColor c) {
 		auto colorName = TEXT("Color") + name;
 		FTCHARToUTF8 cn(*colorName);
-		world.get<ColorPrefabQuery>()->Value.run([&cn, &c](flecs::iter& it) {
+		world.get<QueryColorPrefab>()->Value.run([&cn, &c](flecs::iter& it) {
 			while (it.next())
 				for (auto i : it)
 				{

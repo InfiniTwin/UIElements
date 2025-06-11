@@ -9,7 +9,7 @@
 #include "ButtonFeature.h"
 #include "ToggleFeature.h"
 
-namespace UIElements {
+namespace UI {
 	void WidgetFeature::RegisterOpaqueTypes(flecs::world& world) {
 		// EHorizontalAlignment <=> int
 		world.component<EHorizontalAlignment>()
@@ -92,8 +92,6 @@ namespace UIElements {
 				entity.set(WidgetInstance{ SNew(SHorizontalBox) });
 			else if (entity.has<VBox>())
 				entity.set(WidgetInstance{ SNew(SVerticalBox) });
-			else if (entity.has<Border>())
-				entity.set(WidgetInstance{ SNew(SBorder) });
 			else if (entity.has<Button>())
 				AddButtonWidget(entity);
 			else if (entity.has<Toggle>())
@@ -131,8 +129,8 @@ namespace UIElements {
 				AttachToHorizontalBox(child, parentWidget);
 			else if (parent.has<VBox>())
 				AttachToVerticalBox(child, parentWidget);
-			else if (parent.has<Border>() || parent.has<Button>())
-				AttachToBorder(child, parentWidget);
+			else if (parent.has<Button>())
+				AttachToButton(child, parentWidget);
 			else if (parent.has<Toggle>())
 				AttachToCheckBox(child, parentWidget);
 				});

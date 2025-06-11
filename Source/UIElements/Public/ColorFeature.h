@@ -6,7 +6,7 @@
 #include "dynamiccolor/variant.h"
 #include "utils/utils.h"
 
-namespace UIElements {
+namespace UI {
 	struct ColorFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);
@@ -29,7 +29,7 @@ namespace UIElements {
 		Argb Error;
 	};
 
-	struct ColorPrefabQuery { flecs::query<Color> Value; };
+	struct QueryColorPrefab { flecs::query<Color> Value; };
 
 	void SetPrefabColor(flecs::world& world, const FString name, const FLinearColor color);
 

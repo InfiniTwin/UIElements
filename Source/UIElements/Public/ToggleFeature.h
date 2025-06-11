@@ -7,7 +7,7 @@
 #include "UIFeature.h"
 #include "ButtonFeature.h"
 
-namespace UIElements {
+namespace UI {
 	struct ToggleFeature {
 		static void RegisterComponents(flecs::world& world);
 	};

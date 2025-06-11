@@ -8,7 +8,7 @@
 #include "WidgetFeature.h"
 #include "ColorFeature.h"
 
-namespace UIElements {
+namespace UI {
 	struct TypographyFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);
@@ -34,10 +34,10 @@ namespace UIElements {
 
 	struct TextBlock {};
 
-	struct TextQuery { flecs::query<const FontFace, const FontSize> Value; };
-	struct LocalizedTextQuery { flecs::query<const LocalizedText, const WidgetInstance> Value; };
+	struct QueryText { flecs::query<const FontFace, const FontSize> Value; };
+	struct QueryLocalizedText { flecs::query<const LocalizedText, const WidgetInstance> Value; };
 
-	struct IconQuery { flecs::query<const FontFace, const FontSize> Value; };
+	struct QueryIcon { flecs::query<const FontFace, const FontSize> Value; };
 
 	inline FString GetTable(const FString& tableKey) {
 		FString tableKeyString(tableKey);

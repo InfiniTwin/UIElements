@@ -4,7 +4,7 @@
 
 #include "flecs.h"
 
-namespace UIElements {
+namespace UI {
 	struct UIScale { float Value; };
 
 	struct UIFeature {

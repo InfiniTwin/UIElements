@@ -14,7 +14,7 @@ public:
 	virtual void ShutdownModule() override;
 };
 
-namespace UIElements {
+namespace UI {
 	UIELEMENTS_API FString& Scope();
 
 	UIELEMENTS_API void Register(flecs::world& world, const FString scope);

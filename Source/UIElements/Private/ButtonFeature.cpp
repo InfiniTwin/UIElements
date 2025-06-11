@@ -3,7 +3,7 @@
 #include "ButtonFeature.h"
 #include "WidgetFeature.h"
 
-namespace UIElements {
+namespace UI {
 	void ButtonFeature::RegisterOpaqueTypes(flecs::world& world) {
 		// ESlateBrushDrawType <=> int
 		world.component<BrushType>()

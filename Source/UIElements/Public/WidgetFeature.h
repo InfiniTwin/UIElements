@@ -5,7 +5,7 @@
 #include "flecs.h"
 #include "UIFeature.h"
 
-namespace UIElements {
+namespace UI {
 	struct WidgetFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);
@@ -37,7 +37,6 @@ namespace UIElements {
 	struct VAlign { EVerticalAlignment Value; };
 	struct Padding { float Left, Top, Right, Bottom; };
 
-	struct Border {};
 	struct RoundedBoxBrush {};
 
 	struct Attached {};
@@ -93,8 +92,8 @@ namespace UIElements {
 		checkBox->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
-	static inline void AttachToBorder(const flecs::entity child, const TSharedRef<SWidget> parent) {
-		StaticCastSharedRef<SBorder>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
+	static inline void AttachToButton(const flecs::entity child, const TSharedRef<SWidget> parent) {
+		StaticCastSharedRef<SButton>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
 		//button.oncli
 		////FSlateBrush normalBrush = FSlateRoundedBoxBrush(FLinearColor::White);
 		//FSlateBrush normalBrush;

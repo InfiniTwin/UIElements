@@ -7,7 +7,7 @@
 #include "Engine/UserInterfaceSettings.h"
 #include "Logging/LogMacros.h"
 
-namespace UIElements {
+namespace UI {
 	void UIFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<LoadMode>().add(flecs::Exclusive);
@@ -41,7 +41,7 @@ namespace UIElements {
 					UE_LOG(LogTemp, Warning, TEXT(">>> UNDO %s"), *Name);
 					//	using namespace ECS;
 					//	FString parent = action.has<Parent>() ? action.get<Parent>()->Value : "";
-					//	FromJsonAsset(world, action.get<Path>()->Value, UIElements::Scope(), parent, *action.get<LoadMode>());
+					//	FromJsonAsset(world, action.get<Path>()->Value, UI::Scope(), parent, *action.get<LoadMode>());
 				}
 				});
 				});
@@ -57,7 +57,7 @@ namespace UIElements {
 					UE_LOG(LogTemp, Warning, TEXT(">>> DO %s"), *Name);
 					//	using namespace ECS;
 					//	FString parent = action.has<Parent>() ? action.get<Parent>()->Value : "";
-					//	FromJsonAsset(world, action.get<Path>()->Value, UIElements::Scope(), parent, *action.get<LoadMode>());
+					//	FromJsonAsset(world, action.get<Path>()->Value, UI::Scope(), parent, *action.get<LoadMode>());
 				}
 				});
 				});

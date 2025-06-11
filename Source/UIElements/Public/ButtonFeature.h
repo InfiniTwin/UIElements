@@ -6,7 +6,7 @@
 #include "WidgetFeature.h"
 #include "UIFeature.h"
 
-namespace UIElements {
+namespace UI {
 	struct ButtonFeature {
 		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);

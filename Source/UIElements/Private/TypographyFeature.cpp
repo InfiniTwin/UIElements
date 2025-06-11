@@ -5,7 +5,7 @@
 #include "ECS.h"
 #include "ColorFeature.h"
 
-namespace UIElements {
+namespace UI {
 	void TypographyFeature::RegisterOpaqueTypes(flecs::world& world) {
 		// FString <=> flecs::String
 		world.component<FString>()
@@ -49,18 +49,21 @@ namespace UIElements {
 	};
 
 	void TypographyFeature::CreateQueries(flecs::world& world) {
-		world.set(TextQuery{
-			world.query_builder<const FontFace, const FontSize>(COMPONENT(TextQuery))
+		world.component<QueryText>();
+		world.set(QueryText{
+			world.query_builder<const FontFace, const FontSize>(COMPONENT(QueryText))
 			.with<FontInfo>()
 			.with<LocalizedText>()
 			.with(flecs::Prefab).cached().build() });
 
-		world.set(LocalizedTextQuery{
-			world.query_builder<const LocalizedText, const WidgetInstance>(COMPONENT(LocalizedTextQuery))
+		world.component<QueryLocalizedText>();
+		world.set(QueryLocalizedText{
+			world.query_builder<const LocalizedText, const WidgetInstance>(COMPONENT(QueryLocalizedText))
 			.cached().build() });
 
-		world.set(IconQuery{
-			world.query_builder<const FontFace, const FontSize>(COMPONENT(IconQuery))
+		world.component<QueryIcon>();
+		world.set(QueryIcon{
+			world.query_builder<const FontFace, const FontSize>(COMPONENT(QueryIcon))
 			.with<FontInfo>()
 			.with<Code>()
 			.with(flecs::Prefab).cached().build() });
@@ -71,7 +74,7 @@ namespace UIElements {
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const TextFont& f) {
-			world.get<TextQuery>()->Value
+			world.get<QueryText>()->Value
 				.each([&f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
 				SetFontInfo(p, f.Value, ff.Value, fs.Value);
 					});
@@ -81,7 +84,7 @@ namespace UIElements {
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const IconFont& f) {
-			world.get<IconQuery>()->Value
+			world.get<QueryIcon>()->Value
 				.each([&f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
 				SetFontInfo(p, f.Value, ff.Value, fs.Value);
 					});
@@ -128,7 +131,7 @@ namespace UIElements {
 			TMap<FString, TMap<FString, FString>> tables;
 			for (const FString& tableName : tableNames)
 				tables.Add(tableName, LoadTable(GetTablePath(tableName, locale.Value)));
-			world.get<LocalizedTextQuery>()->Value
+			world.get<QueryLocalizedText>()->Value
 				.each([&](flecs::entity e, const LocalizedText& lt, const WidgetInstance& w) {
 				if (const auto* table = tables.Find(GetTable(lt.Value)); table)
 					if (const auto* result = table->Find(GetKey(lt.Value)))

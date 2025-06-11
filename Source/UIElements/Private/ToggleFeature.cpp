@@ -3,7 +3,7 @@
 
 #include "ToggleFeature.h"
 
-namespace UIElements {
+namespace UI {
 	void ToggleFeature::RegisterComponents(flecs::world& world) {
 		world.component<Toggle>();
 	};
