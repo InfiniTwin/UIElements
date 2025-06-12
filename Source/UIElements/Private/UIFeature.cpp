@@ -6,7 +6,6 @@
 #include "ActionFeature.h"
 #include "UIElements.h"
 #include "Engine/UserInterfaceSettings.h"
-#include "Logging/LogMacros.h"
 
 namespace UI {
 	void UIFeature::RegisterComponents(flecs::world& world) {
@@ -24,37 +23,24 @@ namespace UI {
 			GetMutableDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())
 				->ApplicationScale = scale.Value; });
 
-		world.observer<>("UndoActions")
-			.with<Event>().second(flecs::Wildcard)
-			.event(flecs::OnRemove)
-			.each([&world](flecs::iter& it, size_t t) {
-			auto event = it.pair(0);
-			//UE_LOG(LogTemp, Warning, TEXT(">>> UNDO %s"), *Name);
-			it.entity(t).children([&world, &event](flecs::entity action) {
-				if (action.has<ECS::Action>() && action.has(event)) {
-					FString Name = UTF8_TO_TCHAR(event.second().name().c_str());
-					UE_LOG(LogTemp, Warning, TEXT(">>> UNDO %s"), *Name);
-					//	using namespace ECS;
-					//	FString parent = action.has<Parent>() ? action.get<Parent>()->Value : "";
-					//	FromJsonAsset(world, action.get<Path>()->Value, UI::Scope(), parent, *action.get<LoadMode>());
-				}
-				});
-				});
-
-		world.observer<>("DoActions")
+		world.observer<>("TriggerUIAction")
 			.with<Event>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
 			.each([&world](flecs::iter& it, size_t t) {
 			auto event = it.pair(0);
 			it.entity(t).children([&world, &event](flecs::entity action) {
-				if (action.has<ECS::Action>() && action.has(event)) {
-					FString Name = UTF8_TO_TCHAR(event.second().name().c_str());
-					UE_LOG(LogTemp, Warning, TEXT(">>> DO %s"), *Name);
-					//	using namespace ECS;
-					//	FString parent = action.has<Parent>() ? action.get<Parent>()->Value : "";
-					//	FromJsonAsset(world, action.get<Path>()->Value, UI::Scope(), parent, *action.get<LoadMode>());
-				}
+				if (action.has<ECS::Action>() && action.has(event))
+					action.enable<ECS::Action>(); });
 				});
+
+		world.observer<>("TriggerUIInverseAction")
+			.with<Event>().second(flecs::Wildcard)
+			.event(flecs::OnRemove)
+			.each([&world](flecs::iter& it, size_t t) {
+			auto event = it.pair(0);
+			it.entity(t).children([&world, &event](flecs::entity action) {
+				if (action.has<ECS::Invert>() && action.has(event))
+					action.enable<ECS::Invert>(); });
 				});
 
 		world.observer<>("SetActionParent")

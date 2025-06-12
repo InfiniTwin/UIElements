@@ -111,8 +111,7 @@ namespace UI {
 			.each([](flecs::entity child, const WidgetInstance& w, Order) {
 			flecs::entity parent = child.parent();
 			child.enable<Attached>();
-			if (parent.has<Viewport>())
-			{
+			if (parent.has<Viewport>()) {
 				GEngine->GameViewport->AddViewportWidgetContent(w.Value.ToSharedRef());
 				return;
 			}
