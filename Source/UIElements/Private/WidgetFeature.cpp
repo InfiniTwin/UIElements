@@ -80,7 +80,7 @@ namespace UI {
 	}
 
 	void WidgetFeature::CreateObservers(flecs::world& world) {
-		world.observer<>("AddWidget")
+		world.observer<>("AddWidgetInstance")
 			.with<Widget>()
 			.event(flecs::OnAdd)
 			.each([](flecs::entity entity) {
