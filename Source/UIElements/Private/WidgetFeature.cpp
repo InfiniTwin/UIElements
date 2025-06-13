@@ -87,13 +87,15 @@ namespace UI {
 			if (entity.has<CompoundWidget>())
 				entity.set(WidgetInstance{ SNew(CompoundWidgetInstance) });
 			else if (entity.has<Box>())
-				entity.set(WidgetInstance{ SNew(SBox) });
+				entity.set(WidgetInstance{ SNew(SBox).Padding(0)});
 			else if (entity.has<HBox>())
 				entity.set(WidgetInstance{ SNew(SHorizontalBox) });
 			else if (entity.has<VBox>())
 				entity.set(WidgetInstance{ SNew(SVerticalBox) });
 			else if (entity.has<Button>())
 				AddButtonWidget(entity);
+			else if (entity.has<Border>())
+				AddBorderWidget(entity);
 			else if (entity.has<Toggle>())
 				entity.set(WidgetInstance{ SNew(SCheckBox) });
 			else if (entity.has<TextBlock>())
@@ -128,8 +130,8 @@ namespace UI {
 				AttachToHorizontalBox(child, parentWidget);
 			else if (parent.has<VBox>())
 				AttachToVerticalBox(child, parentWidget);
-			else if (parent.has<Button>())
-				AttachToButton(child, parentWidget);
+			else if (parent.has<Button>() || parent.has<Border>())
+				AttachToBorder(child, parentWidget);
 			else if (parent.has<Toggle>())
 				AttachToCheckBox(child, parentWidget);
 				});

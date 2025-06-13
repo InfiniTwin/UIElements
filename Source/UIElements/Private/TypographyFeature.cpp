@@ -18,7 +18,7 @@ namespace UI {
 		world.component<Locale>().member<FString>(VALUE);
 		world.component<LocalizedText>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Override);
 
-		world.component<Code>().member<FString>(VALUE);
+		world.component<Icon>().member<FString>(VALUE);
 
 		world.component<TextBlock>();
 	};
@@ -40,7 +40,7 @@ namespace UI {
 		world.set(QueryIcon{
 			world.query_builder<const FontFace, const FontSize>(COMPONENT(QueryIcon))
 			.with<FontInfo>()
-			.with<Code>()
+			.with<Icon>()
 			.with(flecs::Prefab).cached().build() });
 	};
 
@@ -81,9 +81,9 @@ namespace UI {
 			}
 				});
 
-		world.observer<const WidgetInstance, const Code>("SetIcon")
+		world.observer<const WidgetInstance, const Icon>("SetIcon")
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity e, const WidgetInstance& w, const Code& code) {
+			.each([&world](flecs::entity e, const WidgetInstance& w, const Icon& code) {
 			int32 codePoint = FParse::HexNumber(*code.Value);
 			FString unicodeChar;
 			unicodeChar.AppendChar(static_cast<TCHAR>(codePoint));

@@ -1,13 +1,14 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ColorFeature.h"
-#include "WidgetFeature.h"
-#include "TypographyFeature.h"
-#include "UIUtils.h"
 #include "ECS.h"
+#include "UIUtils.h"
 #include "dynamiccolor/dynamic_scheme.h"
 #include "dynamiccolor/material_dynamic_colors.h"
 #include "palettes/tones.h"
+#include "WidgetFeature.h"
+#include "TypographyFeature.h"
+#include "ButtonFeature.h"
 
 namespace UI {
 	void ColorFeature::RegisterOpaqueTypes(flecs::world& world) {
@@ -85,19 +86,19 @@ namespace UI {
 		world.observer<const UIScheme>("SetPrefabColor")
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
-			.each([&world](const UIScheme& s) {
+			.each([&world](const UIScheme& scheme) {
 			using namespace material_color_utilities;
 			auto ds = DynamicScheme(
-				Hct(s.Primary),
-				s.Variant,
-				s.Contrast,
-				s.DarkMode,
-				TonalPalette(s.Primary),
-				TonalPalette(s.Secondary),
-				TonalPalette(s.Tertiary),
-				TonalPalette(s.Neutral),
-				TonalPalette(s.NeutralVariant),
-				TonalPalette(s.Error));
+				Hct(scheme.Primary),
+				scheme.Variant,
+				scheme.Contrast,
+				scheme.DarkMode,
+				TonalPalette(scheme.Primary),
+				TonalPalette(scheme.Secondary),
+				TonalPalette(scheme.Tertiary),
+				TonalPalette(scheme.Neutral),
+				TonalPalette(scheme.NeutralVariant),
+				TonalPalette(scheme.Error));
 
 			SetPrefabColor(world, "Background", MaterialDynamicColors::Background().GetLinear(ds));
 			SetPrefabColor(world, "OnBackground", MaterialDynamicColors::OnBackground().GetLinear(ds));
@@ -149,20 +150,23 @@ namespace UI {
 			SetPrefabColor(world, "OnTertiaryFixed", MaterialDynamicColors::OnTertiaryFixed().GetLinear(ds));
 			SetPrefabColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds)); });
 
-		world.observer<const Color>("SetInstanceColor")
+		world.observer<const Color>("SetInstanceWidgetColor")
 			.with(flecs::Prefab)
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity p, const Color& c) {
+			.each([&world](flecs::entity prefab, const Color& color) {
 			TArray<flecs::entity> instances;
-			ECS::GetInstances(world, p, instances);
-			for (flecs::entity i : instances)
-			{
-				if (!i.has<WidgetInstance>())
-					continue;
-				TSharedPtr<SWidget> widget = i.get_mut<WidgetInstance>()->Value;
-				if (i.has<TextBlock>())
-					SetTextBlockColor(widget, c.Value);
-			}});
+			ECS::GetInstances(world, prefab, instances);
+			for (flecs::entity instance : instances)
+				SetWidgetColor(world, instance, color.Value);
+				}
+			);
+
+		world.observer<const Color>("SetWidgetColor")
+			.event(flecs::OnSet)
+			.each([&world](flecs::entity entity, const Color& color) {
+			SetWidgetColor(world, entity, color.Value);
+				}
+			);
 	}
 
 	void UI::SetPrefabColor(flecs::world& world, const FString name, const FLinearColor c) {
@@ -180,5 +184,16 @@ namespace UI {
 					}
 				}
 			});
+	}
+
+	void SetWidgetColor(flecs::world& world, flecs::entity entity, const FLinearColor color) {
+		if (!entity.has<WidgetInstance>())
+			return;
+		TSharedPtr<SWidget> widget = entity.get_mut<WidgetInstance>()->Value;
+
+		if (entity.has<TextBlock>())
+			StaticCastSharedPtr<STextBlock>(widget)->SetColorAndOpacity(color);
+		else if (entity.has<Button>())
+			StaticCastSharedPtr<SButton>(widget)->SetColorAndOpacity(color);
 	}
 }

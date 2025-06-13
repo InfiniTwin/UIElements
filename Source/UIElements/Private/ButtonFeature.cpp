@@ -27,6 +27,7 @@ namespace UI {
 
 	void ButtonFeature::RegisterComponents(flecs::world& world) {
 		world.component<Button>();
+		world.component<Border>();
 	};
 
 	void ButtonFeature::CreateSystems(flecs::world& world) {

@@ -32,8 +32,5 @@ namespace UI {
 	struct QueryColorPrefab { flecs::query<Color> Value; };
 
 	void SetPrefabColor(flecs::world& world, const FString name, const FLinearColor color);
-
-	static inline void SetTextBlockColor(const TSharedPtr<SWidget>& widget, const FLinearColor& color){
-		StaticCastSharedPtr<STextBlock>(widget)->SetColorAndOpacity(color);
-	}
+	void SetWidgetColor(flecs::world& world, flecs::entity entity, const FLinearColor color);
 }

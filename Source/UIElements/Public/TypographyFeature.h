@@ -29,7 +29,7 @@ namespace UI {
 	struct Locale { FString Value; };
 	struct LocalizedText { FString Value; };
 
-	struct Code { FString Value; };
+	struct Icon { FString Value; };
 
 	struct TextBlock {};
 
@@ -99,7 +99,6 @@ namespace UI {
 
 	static inline void AddTextBlockWidget(flecs::entity entity) {
 		TSharedRef<STextBlock> widget = SNew(STextBlock);
-		SetTextBlockColor(widget, entity.get<Color>()->Value);
 		SetTextBlockFontInfo(widget, entity.get<FontInfo>()->Value);
 		entity.set(WidgetInstance{ widget });
 	}

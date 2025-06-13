@@ -92,8 +92,8 @@ namespace UI {
 		checkBox->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
-	static inline void AttachToButton(const flecs::entity child, const TSharedRef<SWidget> parent) {
-		StaticCastSharedRef<SButton>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
+	static inline void AttachToBorder(const flecs::entity child, const TSharedRef<SWidget> parent) {
+		StaticCastSharedRef<SBorder>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
 		//button.oncli
 		////FSlateBrush normalBrush = FSlateRoundedBoxBrush(FLinearColor::White);
 		//FSlateBrush normalBrush;

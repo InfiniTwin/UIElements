@@ -42,20 +42,5 @@ namespace UI {
 				if (action.has<ECS::Invert>() && action.has(event))
 					action.enable<ECS::Invert>(); });
 				});
-
-		world.observer<>("SetActionParent")
-			.with<ECS::Action>()
-			.with<ECS::Path>()
-			.event(flecs::OnSet)
-			.each([](flecs::entity entity) {
-			if (entity.has<ECS::Parent>()) {
-				FString parentPath = UTF8_TO_TCHAR(entity.parent().path().c_str());
-				FString parent = entity.get<ECS::Parent>()->Value;
-				if (!parent.IsEmpty())
-					parentPath += TEXT(".") + parent;
-				using namespace ECS;
-				entity.set<Parent>({ NormalizedPath(parentPath) });
-			}
-				});
 	}
 }
