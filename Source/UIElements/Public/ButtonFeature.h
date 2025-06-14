@@ -5,6 +5,7 @@
 #include "flecs.h"
 #include "WidgetFeature.h"
 #include "UIFeature.h"
+#include "TypographyFeature.h"
 
 namespace UI {
 	struct ButtonFeature {
@@ -29,19 +30,10 @@ namespace UI {
 	static inline void SetRoundedBoxBrush(FSlateRoundedBoxBrush& brush, const flecs::entity entity) {
 	}
 
-	static inline void AddButtonWidget(flecs::entity entity) {
-		const FButtonStyle RoundButton = FButtonStyle()
-			.SetNormal(FSlateRoundedBoxBrush(FLinearColor::White, 4))
-			.SetHovered(FSlateRoundedBoxBrush(FLinearColor::White, 4))
-			.SetPressed(FSlateRoundedBoxBrush(FLinearColor::White, 4))
-			.SetNormalPadding(FMargin(0))
-			.SetPressedPadding(FMargin(0));
-
+	static inline void AddButtonWidget(flecs::world world, flecs::entity entity) {
 		entity.set(WidgetInstance{ SNew(SButton)
-			//.ContentPadding(0)
+			.ButtonStyle(world.get<TextStyles>()->Value.Get(), "DummyButton")
 			//.ButtonStyle(FCoreStyle::Get(), "NoBorder")
-			//.ButtonColorAndOpacity(FLinearColor::White)
-			//.ForegroundColor(FLinearColor::White)
 			.OnHovered_Lambda(([entity]() { entity.add(Hovered); }))
 			.OnUnhovered_Lambda(([entity]() { entity.add(Normal); }))
 			.OnClicked_Lambda(([entity]() { entity.add(Clicked); return FReply::Handled(); }))
@@ -52,6 +44,8 @@ namespace UI {
 	}
 
 	static inline void AddBorderWidget(flecs::entity entity) {
-		entity.set(WidgetInstance{ SNew(SBorder) });
+		entity.set(WidgetInstance{ SNew(SBorder)
+			.Padding(0)
+			.BorderImage(FAppStyle::Get().GetBrush("WhiteBrush")) });
 	}
 }

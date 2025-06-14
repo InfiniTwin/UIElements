@@ -13,11 +13,14 @@ namespace UI {
 		static void RegisterComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
 		static void CreateObservers(flecs::world& world);
+		static void Initialize(flecs::world& world);
 	};
 
 	inline constexpr TCHAR LocalizationFolder[] = TEXT("Localization");
 	constexpr const char* TableKeyDelimiter = "::";
 	constexpr const TCHAR KeyValueDelimiter[] = TEXT("=");
+
+	struct TextStyles { TSharedPtr<FSlateStyleSet> Value; };
 
 	struct TextFont { FString Value; };
 	struct IconFont { FString Value; };
@@ -101,5 +104,8 @@ namespace UI {
 		TSharedRef<STextBlock> widget = SNew(STextBlock);
 		SetTextBlockFontInfo(widget, entity.get<FontInfo>()->Value);
 		entity.set(WidgetInstance{ widget });
+
+		//entity.set(WidgetInstance{ SNew(STextBlock)
+		//	.TextStyle(&world.get<TextStyles>()->Value.Get()->GetWidgetStyle<FTextBlockStyle>("IconFont")) });
 	}
 }

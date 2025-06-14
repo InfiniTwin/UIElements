@@ -60,14 +60,15 @@ namespace UI {
 	}
 
 	static inline void AttachToBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
-		TSharedRef<SBox> box = StaticCastSharedRef<SBox>(parent);
-		box->SetVAlign(child.get<VAlign>()->Value);
-		box->SetHAlign(child.get<HAlign>()->Value);
-		box->SetWidthOverride(FOptionalSize());
-		box->SetHeightOverride(FOptionalSize());
-		auto padding = child.get<Padding>();
-		box->SetPadding(FMargin(padding->Left, padding->Top, padding->Right, padding->Bottom));
-		box->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
+		//TSharedRef<SBox> box = StaticCastSharedRef<SBox>(parent);
+		//box->SetVAlign(child.get<VAlign>()->Value);
+		//box->SetHAlign(child.get<HAlign>()->Value);
+		//box->SetWidthOverride(FOptionalSize());
+		//box->SetHeightOverride(FOptionalSize());
+		//auto padding = child.get<Padding>();
+		//box->SetPadding(FMargin(padding->Left, padding->Top, padding->Right, padding->Bottom));
+		//box->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
+		StaticCastSharedRef<SBox>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
 	static inline void AttachToHorizontalBox(const flecs::entity child, const TSharedRef<SWidget> parent) {

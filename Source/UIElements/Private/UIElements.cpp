@@ -52,5 +52,7 @@ namespace UI {
 
 		WidgetFeature::CreateSystems(world);
 		ButtonFeature::CreateSystems(world);
+
+		TypographyFeature::Initialize(world);
 	}
 }

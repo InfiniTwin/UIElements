@@ -55,7 +55,8 @@ namespace UI {
 		world.component<Viewport>();
 
 		world.component<Widget>().add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<WidgetInstance>().on_remove([](flecs::entity e, WidgetInstance& w) {w.Value.Reset(); });
+		world.component<WidgetInstance>()
+			.on_remove([](flecs::entity e, WidgetInstance& w) {w.Value.Reset(); });
 
 		world.component<CompoundWidget>();
 
@@ -83,7 +84,7 @@ namespace UI {
 		world.observer<>("AddWidgetInstance")
 			.with<Widget>()
 			.event(flecs::OnAdd)
-			.each([](flecs::entity entity) {
+			.each([&world](flecs::entity entity) {
 			if (entity.has<CompoundWidget>())
 				entity.set(WidgetInstance{ SNew(CompoundWidgetInstance) });
 			else if (entity.has<Box>())
@@ -93,7 +94,7 @@ namespace UI {
 			else if (entity.has<VBox>())
 				entity.set(WidgetInstance{ SNew(SVerticalBox) });
 			else if (entity.has<Button>())
-				AddButtonWidget(entity);
+				AddButtonWidget(world, entity);
 			else if (entity.has<Border>())
 				AddBorderWidget(entity);
 			else if (entity.has<Toggle>())
@@ -130,7 +131,7 @@ namespace UI {
 				AttachToHorizontalBox(child, parentWidget);
 			else if (parent.has<VBox>())
 				AttachToVerticalBox(child, parentWidget);
-			else if (parent.has<Button>() || parent.has<Border>())
+			else if (parent.has<Border>() || parent.has<Button>())
 				AttachToBorder(child, parentWidget);
 			else if (parent.has<Toggle>())
 				AttachToCheckBox(child, parentWidget);

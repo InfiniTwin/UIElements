@@ -193,7 +193,7 @@ namespace UI {
 
 		if (entity.has<TextBlock>())
 			StaticCastSharedPtr<STextBlock>(widget)->SetColorAndOpacity(color);
-		else if (entity.has<Button>())
-			StaticCastSharedPtr<SButton>(widget)->SetColorAndOpacity(color);
+		else if (entity.has<Border>())
+			StaticCastSharedPtr<SBorder>(widget)->SetBorderBackgroundColor(color);
 	}
 }

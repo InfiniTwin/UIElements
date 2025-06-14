@@ -4,10 +4,14 @@
 #include "TypographyFeature.h"
 #include "ECS.h"
 #include "ColorFeature.h"
+#include "Styling/SlateStyleRegistry.h"
+#include "Engine/UserInterfaceSettings.h"
 
 namespace UI {
 	void TypographyFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
+		world.component<TextStyles>();
+
 		world.component<TextFont>().member<FString>(VALUE);
 		world.component<IconFont>().member<FString>(VALUE);
 
@@ -60,7 +64,11 @@ namespace UI {
 			.event(flecs::OnSet)
 			.each([&world](const IconFont& f) {
 			world.get<QueryIcon>()->Value
-				.each([&f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
+				.each([&world, &f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
+				//const FString path = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + f.Value + TEXT("-") + ff.Value + TEXT(".ttf");
+				//const FTextBlockStyle iconFont = FTextBlockStyle().SetFont(FSlateFontInfo(path, fs.Value));
+				//world.get<TextStyles>()->Value.ToSharedRef()->Set(FName("IconFont"), iconFont);
+
 				SetFontInfo(p, f.Value, ff.Value, fs.Value);
 					});
 				});
@@ -117,4 +125,20 @@ namespace UI {
 					} });
 				});
 	};
+
+	void TypographyFeature::Initialize(flecs::world& world) {
+		world.set<TextStyles>({ MakeShareable(new FSlateStyleSet(COMPONENT(TextStyles))) });
+		if (FSlateStyleRegistry::FindSlateStyle(COMPONENT(TextStyles)))
+			FSlateStyleRegistry::UnRegisterSlateStyle(*world.get<TextStyles>()->Value.Get());
+		FSlateStyleRegistry::RegisterSlateStyle(*world.get<TextStyles>()->Value.Get());
+
+		const FButtonStyle RoundButton = FButtonStyle()
+			.SetNormal(FSlateRoundedBoxBrush(FLinearColor::White))
+			.SetHovered(FSlateRoundedBoxBrush(FLinearColor::White))
+			.SetPressed(FSlateRoundedBoxBrush(FLinearColor::White))
+			.SetNormalPadding(FMargin(0))
+			.SetPressedPadding(FMargin(0));
+
+		world.get<TextStyles>()->Value.ToSharedRef()->Set(FName("DummyButton"), RoundButton);
+	}
 }
