@@ -4,30 +4,9 @@
 #include "WidgetFeature.h"
 
 namespace UI {
-	void ButtonFeature::RegisterOpaqueTypes(flecs::world& world) {
-		// ESlateBrushDrawType <=> int
-		world.component<BrushType>()
-			.opaque(flecs::I32)
-			.serialize([](const flecs::serializer* s, const BrushType* data)
-				{
-					int value = static_cast<int>(data->Value);
-					return s->value(flecs::I32, &value);
-				})
-			.assign_int([](BrushType* data, int64_t value)
-				{
-					if (value >= static_cast<int64_t>(ESlateBrushDrawType::NoDrawType) &&
-						value <= static_cast<int64_t>(ESlateBrushDrawType::RoundedBox)) {
-						data->Value = static_cast<ESlateBrushDrawType::Type>(value);
-					}
-					else {
-						data->Value = ESlateBrushDrawType::NoDrawType;
-					}
-				});
-	};
-
 	void ButtonFeature::RegisterComponents(flecs::world& world) {
-		world.component<Button>();
-		world.component<Border>();
+		world.component<Border>().add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Button>().add(flecs::OnInstantiate, flecs::Inherit);
 	};
 
 	void ButtonFeature::CreateSystems(flecs::world& world) {

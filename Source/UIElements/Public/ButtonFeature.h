@@ -3,9 +3,9 @@
 #pragma once
 
 #include "flecs.h"
-#include "WidgetFeature.h"
 #include "UIFeature.h"
-#include "TypographyFeature.h"
+#include "WidgetFeature.h"
+#include "StyleFeature.h"
 
 namespace UI {
 	struct ButtonFeature {
@@ -14,25 +14,15 @@ namespace UI {
 		static void CreateSystems(flecs::world& world);
 	};
 
-	struct Button {};
 	struct Border {};
-
-	//struct BrushType { ESlateBrushDrawType Value; };
-
-	struct ButtonStyle {
-		FString NormalBrush;
-		FString HoveredBrush;
-		FString PressedBrush;
-	};
-	struct Brush {};
-	struct BrushType { ESlateBrushDrawType::Type Value; };
+	struct Button {};
 
 	static inline void SetRoundedBoxBrush(FSlateRoundedBoxBrush& brush, const flecs::entity entity) {
 	}
 
 	static inline void AddButtonWidget(flecs::world world, flecs::entity entity) {
 		entity.set(WidgetInstance{ SNew(SButton)
-			.ButtonStyle(world.get<TextStyles>()->Value.Get(), "DummyButton")
+			//.ButtonStyle(world.get<Styles>()->Value.Get(), "DummyButton")
 			//.ButtonStyle(FCoreStyle::Get(), "NoBorder")
 			.OnHovered_Lambda(([entity]() { entity.add(Hovered); }))
 			.OnUnhovered_Lambda(([entity]() { entity.add(Normal); }))

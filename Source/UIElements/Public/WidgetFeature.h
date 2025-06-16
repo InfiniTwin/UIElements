@@ -7,7 +7,6 @@
 
 namespace UI {
 	struct WidgetFeature {
-		static void RegisterOpaqueTypes(flecs::world& world);
 		static void RegisterComponents(flecs::world& world);
 		static void CreateObservers(flecs::world& world);
 		static void CreateSystems(flecs::world& world);
@@ -33,8 +32,8 @@ namespace UI {
 	struct HBox {};
 	struct VBox {};
 
-	struct HAlign { EHorizontalAlignment Value; };
-	struct VAlign { EVerticalAlignment Value; };
+	struct HAlign { int Value; };
+	struct VAlign { int Value; };
 	struct Padding { float Left, Top, Right, Bottom; };
 
 	struct RoundedBoxBrush {};
@@ -43,14 +42,14 @@ namespace UI {
 	struct StyleSynced {};
 
 	struct Order { int Value; };
-	
+
 	template<typename SlotType>
 	void AttachSlot(SlotType& slot, const flecs::entity child)
 	{
 		auto padding = child.get<Padding>();
 		slot
-			.VAlign(child.get<VAlign>()->Value)
-			.HAlign(child.get<HAlign>()->Value)
+			.VAlign(static_cast<EVerticalAlignment>(child.get<VAlign>()->Value))
+			.HAlign(static_cast<EHorizontalAlignment>(child.get<HAlign>()->Value))
 			.Padding(padding->Left, padding->Top, padding->Right, padding->Bottom)
 			.AttachWidget(child.get<WidgetInstance>()->Value.ToSharedRef());
 	}

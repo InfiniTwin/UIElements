@@ -169,7 +169,7 @@ namespace UI {
 			);
 	}
 
-	void UI::SetPrefabColor(flecs::world& world, const FString name, const FLinearColor c) {
+	void SetPrefabColor(flecs::world& world, const FString name, const FLinearColor c) {
 		auto colorName = TEXT("Color") + name;
 		FTCHARToUTF8 cn(*colorName);
 		world.get<QueryColorPrefab>()->Value.run([&cn, &c](flecs::iter& it) {

@@ -5,6 +5,7 @@
 #include "TypographyFeature.h"
 #include "WidgetFeature.h"
 #include "ColorFeature.h"
+#include "StyleFeature.h"
 #include "ButtonFeature.h"
 #include "ToggleFeature.h"
 
@@ -30,15 +31,13 @@ namespace UI {
 	}
 
 	void Register(flecs::world& world) {
-
-		WidgetFeature::RegisterOpaqueTypes(world);
 		ColorFeature::RegisterOpaqueTypes(world);
-		ButtonFeature::RegisterOpaqueTypes(world);
 
 		UIFeature::RegisterComponents(world);
 		WidgetFeature::RegisterComponents(world);
 		ColorFeature::RegisterComponents(world);
 		TypographyFeature::RegisterComponents(world);
+		StyleFeature::RegisterComponents(world);
 		ButtonFeature::RegisterComponents(world);
 		ToggleFeature::RegisterComponents(world);
 
@@ -49,10 +48,12 @@ namespace UI {
 		WidgetFeature::CreateObservers(world);
 		ColorFeature::CreateObservers(world);
 		TypographyFeature::CreateObservers(world);
+		StyleFeature::CreateObservers(world);
 
 		WidgetFeature::CreateSystems(world);
+		StyleFeature::CreateSystems(world);
 		ButtonFeature::CreateSystems(world);
 
-		TypographyFeature::Initialize(world);
+		StyleFeature::Initialize(world);
 	}
 }

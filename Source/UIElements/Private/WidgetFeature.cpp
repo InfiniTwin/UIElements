@@ -10,46 +10,6 @@
 #include "ToggleFeature.h"
 
 namespace UI {
-	void WidgetFeature::RegisterOpaqueTypes(flecs::world& world) {
-		// EHorizontalAlignment <=> int
-		world.component<EHorizontalAlignment>()
-			.opaque(flecs::I32)
-			.serialize([](const flecs::serializer* s, const EHorizontalAlignment* data)
-				{
-					int value = static_cast<int>(*data);
-					return s->value(flecs::I32, &value);
-				})
-			.assign_int([](EHorizontalAlignment* data, int64_t value)
-				{
-					if (value >= static_cast<int64_t>(HAlign_Fill) &&
-						value <= static_cast<int64_t>(HAlign_Right)) {
-						*data = static_cast<EHorizontalAlignment>(value);
-					}
-					else {
-						*data = HAlign_Fill;
-					}
-				});
-
-		// EVerticalAlignment <=> int
-		world.component<EVerticalAlignment>()
-			.opaque(flecs::I32)
-			.serialize([](const flecs::serializer* s, const EVerticalAlignment* data)
-				{
-					int value = static_cast<int>(*data);
-					return s->value(flecs::I32, &value);
-				})
-			.assign_int([](EVerticalAlignment* data, int64_t value)
-				{
-					if (value >= static_cast<int64_t>(VAlign_Fill) &&
-						value <= static_cast<int64_t>(VAlign_Bottom)) {
-						*data = static_cast<EVerticalAlignment>(value);
-					}
-					else {
-						*data = VAlign_Fill;
-					}
-				});
-	}
-
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<Viewport>();
@@ -66,8 +26,8 @@ namespace UI {
 		world.component<HBox>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<VBox>().add(flecs::OnInstantiate, flecs::Inherit);
 
-		world.component<HAlign>().member<EHorizontalAlignment>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<VAlign>().member<EVerticalAlignment>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<HAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<VAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Padding>()
 			.member<float>(MEMBER(Padding::Left))
 			.member<float>(MEMBER(Padding::Topp))

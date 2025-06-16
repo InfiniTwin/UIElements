@@ -20,8 +20,6 @@ namespace UI {
 	constexpr const char* TableKeyDelimiter = "::";
 	constexpr const TCHAR KeyValueDelimiter[] = TEXT("=");
 
-	struct TextStyles { TSharedPtr<FSlateStyleSet> Value; };
-
 	struct TextFont { FString Value; };
 	struct IconFont { FString Value; };
 
