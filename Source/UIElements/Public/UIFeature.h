@@ -20,4 +20,9 @@ namespace UI {
 		Released,
 		Clicked
 	};
+
+	enum State {
+		None,
+		Selected
+	};
 }

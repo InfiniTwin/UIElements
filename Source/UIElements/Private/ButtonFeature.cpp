@@ -10,26 +10,5 @@ namespace UI {
 	};
 
 	void ButtonFeature::CreateSystems(flecs::world& world) {
-		world.system("AddButtonWidget")
-			.with<Button>()
-			.without<WidgetInstance>()
-			.each([](flecs::entity e) { /*e.set(Widget{ SNew(SButton) });*/ });
-			//.each([](flecs::entity e) {
-			//TSharedPtr<SButton> button = SNew(SButton);
-			////button->SetHAlign(HAlign_Fill);
-			////button->SetVAlign(VAlign_Fill);
-			//
-			//static const FButtonStyle RoundButton = FButtonStyle()
-			//	.SetNormal(FSlateRoundedBoxBrush(FLinearColor::Red, 4))
-			//	.SetHovered(FSlateRoundedBoxBrush(FLinearColor::Blue, 4))
-			//	.SetPressed(FSlateRoundedBoxBrush(FLinearColor::Green, 4))
-			//	.SetNormalPadding(FMargin(0))
-			//	.SetPressedPadding(FMargin(0));
-			//button->SetButtonStyle(&RoundButton);
-
-			//e.set(Widget{ button });
-
-			////StaticCastSharedPtr<SButton>(e.get_mut<Widget>()->Value)->Set
-			//	});
 	}
 }

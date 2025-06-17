@@ -52,9 +52,6 @@ namespace UI {
 		StyleFeature::CreateObservers(world);
 
 		WidgetFeature::CreateSystems(world);
-		StyleFeature::CreateSystems(world);
 		ButtonFeature::CreateSystems(world);
-
-		StyleFeature::Initialize(world);
 	}
 }

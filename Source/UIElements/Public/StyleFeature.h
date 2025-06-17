@@ -14,12 +14,9 @@ namespace UI {
 		static void RegisterComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
 		static void CreateObservers(flecs::world& world);
-		static void CreateSystems(flecs::world& world);
-		static void Initialize(flecs::world& world);
 	};
 
-	struct StyleSets { TSharedPtr<FSlateStyleSet> Value; };
-	struct WidgetStyle { FButtonStyle Value; };
+	struct ButtonStyle { FButtonStyle Value; };
 
 	struct Brush { FSlateBrush Value; };
 	struct BrushType { int Value; };
@@ -28,7 +25,7 @@ namespace UI {
 	struct FixedRadius {};
 	struct Radii { float TopLeft, TopRight, BottomRight, BottomLeft; };
 
-	struct QueryButtonStylePrefab { flecs::query<WidgetStyle> Value; };
+	struct QueryButtonStylePrefab { flecs::query<ButtonStyle> Value; };
 
 	static inline FSlateBrush ToSlateBrush(flecs::entity brush) {
 		FSlateBrush slateBrush;
@@ -51,20 +48,22 @@ namespace UI {
 	static inline FButtonStyle AddButtonStyle(flecs::entity widgetStyle) {
 		auto buttonStyle = FButtonStyle();
 		widgetStyle.children([&buttonStyle](flecs::entity brush) {
-			if (brush.name().contains("Normal"))
-			{
-				buttonStyle.SetNormal(ToSlateBrush(brush));
-				auto padding = brush.get<Padding>();
-				buttonStyle.SetNormalPadding(FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom)));
-			}
 			if (brush.name().contains("Hovered"))
 				buttonStyle.SetHovered(ToSlateBrush(brush));
-			if (brush.name().contains("Pressed")) {
-				buttonStyle.SetPressed(ToSlateBrush(brush));
+			else {
 				auto padding = brush.get<Padding>();
-				buttonStyle.SetPressedPadding(FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom)));
+				auto margin = FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom));
+				if (brush.name().contains("Normal"))
+				{
+					buttonStyle.SetNormal(ToSlateBrush(brush));
+					buttonStyle.SetNormalPadding(margin);
+				}
+				if (brush.name().contains("Pressed")) {
+					buttonStyle.SetPressed(ToSlateBrush(brush));
+					buttonStyle.SetPressedPadding(margin);
+				}
 			}
-					});
+			});
 		return buttonStyle;
 	}
 }
