@@ -9,6 +9,7 @@
 #include "WidgetFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
+#include "StyleFeature.h"
 
 namespace UI {
 	void ColorFeature::RegisterOpaqueTypes(flecs::world& world) {
@@ -77,7 +78,8 @@ namespace UI {
 	}
 
 	void ColorFeature::CreateQueries(flecs::world& world) {
-		world.component<QueryColorPrefab>().set(QueryColorPrefab{
+		world.component<QueryColorPrefab>();
+		world.set(QueryColorPrefab{
 			world.query_builder<Color>(COMPONENT(QueryColorPrefab)).with(flecs::Prefab)
 			.cached().build() });
 	};
@@ -195,5 +197,10 @@ namespace UI {
 			StaticCastSharedPtr<STextBlock>(widget)->SetColorAndOpacity(color);
 		else if (entity.has<Border>())
 			StaticCastSharedPtr<SBorder>(widget)->SetBorderBackgroundColor(color);
+
+		//world.get<QueryButtonStylePrefab>()->Value
+		//	.each([](flecs::entity prefab, WidgetStyle& style) {
+		//	style.Value = AddButtonStyle(prefab);
+		//		});
 	}
 }

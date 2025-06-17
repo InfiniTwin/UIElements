@@ -87,7 +87,7 @@ namespace UI {
 
 		world.observer<const WidgetInstance, const Icon>("SetIcon")
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity e, const WidgetInstance& w, const Icon& code) {
+			.each([](flecs::entity e, const WidgetInstance& w, const Icon& code) {
 			int32 codePoint = FParse::HexNumber(*code.Value);
 			FString unicodeChar;
 			unicodeChar.AppendChar(static_cast<TCHAR>(codePoint));
@@ -111,7 +111,7 @@ namespace UI {
 			for (const FString& tableName : tableNames)
 				tables.Add(tableName, LoadTable(GetTablePath(tableName, locale.Value)));
 			world.get<QueryLocalizedText>()->Value
-				.each([&](flecs::entity e, const LocalizedText& lt, const WidgetInstance& w) {
+				.each([&tables](flecs::entity e, const LocalizedText& lt, const WidgetInstance& w) {
 				if (const auto* table = tables.Find(GetTable(lt.Value)); table)
 					if (const auto* result = table->Find(GetKey(lt.Value)))
 					{

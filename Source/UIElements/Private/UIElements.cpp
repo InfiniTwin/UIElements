@@ -43,6 +43,7 @@ namespace UI {
 
 		ColorFeature::CreateQueries(world);
 		TypographyFeature::CreateQueries(world);
+		StyleFeature::CreateQueries(world);
 
 		UIFeature::CreateObservers(world);
 		WidgetFeature::CreateObservers(world);

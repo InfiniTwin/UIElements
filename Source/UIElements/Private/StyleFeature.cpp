@@ -29,6 +29,16 @@ namespace UI {
 			.add(flecs::OnInstantiate, flecs::Inherit);
 	}
 
+	void StyleFeature::CreateQueries(flecs::world& world) {
+		world.component<QueryButtonStylePrefab>();
+		world.set(QueryButtonStylePrefab{
+			world.query_builder<WidgetStyle>(COMPONENT(QueryButtonStylePrefab))
+			.with<Button>()
+			.without<Widget>()
+			.with(flecs::Prefab)
+			.cached().build() });
+	};
+
 	void StyleFeature::CreateObservers(flecs::world& world) {
 		// Create widget style from prefab
 			// For each child if child.name().contains "Normal"
@@ -41,35 +51,54 @@ namespace UI {
 				// Option 1: Try by reference so that ui elements auto update their styles
 				// Option 2: loop all StyleName and reset
 
-		world.observer<>("CreateWidgetStyle")
-			.with<WidgetStyle>()
-			.without<Widget>()
-			.with(flecs::Prefab)
+		world.observer<const UIScheme>("UpdateButtonStyles")
+			.term_at(0).singleton()
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity prefab) {
-			if (prefab.has<Button>()) {
-				prefab.get_mut<WidgetStyle>()->Value = AddButtonStyle(prefab);
+			.each([&world](const UIScheme& scheme) {
+			world.get<QueryButtonStylePrefab>()->Value
+				.each([&world](flecs::entity prefab, WidgetStyle& style) {
+				style.Value = AddButtonStyle(prefab);
+				auto pp = prefab.path();
 
-				world.each(world.pair(flecs::IsA, prefab), [](flecs::entity instance) {
-					auto path = instance.path();
+				TArray<flecs::entity> instances;
+				ECS::GetInstances(world, prefab, instances);
+				for (flecs::entity instance : instances)
+				{
+					auto ip = instance.path();
+					StaticCastSharedPtr<SButton>(instance.get_mut<WidgetInstance>()->Value)->SetButtonStyle(&style.Value);
+				}
 					});
-			}
 				});
 
-		world.observer<>("SetWidgetStyle")
-			.with<WidgetStyle>()
-			.with<Widget>()
-			.with(flecs::Prefab)
-			.event(flecs::OnSet)
-			.each([&world](flecs::entity prefab) {
-			if (prefab.has<Button>()) {
-				//prefab.get_mut<WidgetStyle>()->Value = AddButtonStyle(prefab);
+		//world.observer<>("CreateWidgetStyle")
+		//	.with<WidgetStyle>()
+		//	.without<Widget>()
+		//	.with(flecs::Prefab)
+		//	.event(flecs::OnSet)
+		//	.each([&world](flecs::entity prefab) {
+		//	if (prefab.has<Button>()) {
+		//		prefab.get_mut<WidgetStyle>()->Value = AddButtonStyle(prefab);
 
-				world.each(world.pair(flecs::IsA, prefab), [](flecs::entity instance) {
-					auto path = instance.path();
-					});
-			}
-				});
+		//		world.each(world.pair(flecs::IsA, prefab), [](flecs::entity instance) {
+		//			auto path = instance.path();
+		//			});
+		//	}
+		//		});
+
+		//world.observer<>("SetWidgetStyle")
+		//	.with<WidgetStyle>()
+		//	.with<Widget>()
+		//	.with(flecs::Prefab)
+		//	.event(flecs::OnSet)
+		//	.each([&world](flecs::entity prefab) {
+		//	if (prefab.has<Button>()) {
+		//		//prefab.get_mut<WidgetStyle>()->Value = AddButtonStyle(prefab);
+
+		//		world.each(world.pair(flecs::IsA, prefab), [](flecs::entity instance) {
+		//			auto path = instance.path();
+		//			});
+		//	}
+		//		});
 	}
 
 	void StyleFeature::CreateSystems(flecs::world& world) {
