@@ -58,15 +58,19 @@ namespace UI {
 			world.get<QueryButtonStylePrefab>()->Value
 				.each([&world](flecs::entity prefab, WidgetStyle& style) {
 				style.Value = AddButtonStyle(prefab);
-				auto pp = prefab.path();
 
-				TArray<flecs::entity> instances;
-				ECS::GetInstances(world, prefab, instances);
-				for (flecs::entity instance : instances)
-				{
-					auto ip = instance.path();
-					StaticCastSharedPtr<SButton>(instance.get_mut<WidgetInstance>()->Value)->SetButtonStyle(&style.Value);
-				}
+				//TArray<flecs::entity> instances;
+				//ECS::GetInstances(world, prefab, instances);
+				//for (flecs::entity instance : instances)
+				//{
+				//	auto ip = instance.path();
+				//	StaticCastSharedPtr<SButton>(instance.get_mut<WidgetInstance>()->Value)->SetButtonStyle(&style.Value);
+				//}
+
+				//auto style = MakeShared<FButtonStyle>();
+				//*style = AddButtonStyle(prefab);
+				//prefab.get_mut<WidgetStyle>()->Value = style;
+				//prefab.get_mut<WidgetStyle>()->Value = AddButtonStyle(prefab);
 					});
 				});
 

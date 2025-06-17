@@ -23,6 +23,7 @@ namespace UI {
 		entity.set(WidgetInstance{ SNew(SButton)
 			//.ButtonStyle(world.get<Styles>()->Value.Get(), "DummyButton")
 			//.ButtonStyle(FCoreStyle::Get(), "NoBorder")
+			.ButtonStyle(&entity.get<WidgetStyle>()->Value)
 			.OnHovered_Lambda(([entity]() { entity.add(Hovered); }))
 			.OnUnhovered_Lambda(([entity]() { entity.add(Normal); }))
 			.OnClicked_Lambda(([entity]() { entity.add(Clicked); return FReply::Handled(); }))
