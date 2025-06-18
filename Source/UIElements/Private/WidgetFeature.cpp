@@ -7,7 +7,6 @@
 #include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
-#include "ToggleFeature.h"
 
 namespace UI {
 	void WidgetFeature::RegisterComponents(flecs::world& world) {

@@ -12,8 +12,6 @@
 namespace UI {
 	void StyleFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
-		world.component<ButtonStyle>().add(flecs::OnInstantiate, flecs::Inherit);
-
 		world.component<Brush>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<BrushType>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
@@ -25,27 +23,5 @@ namespace UI {
 			.member<float>(MEMBER(Radii::BottomRight))
 			.member<float>(MEMBER(Radii::BottomLeft))
 			.add(flecs::OnInstantiate, flecs::Inherit);
-	}
-
-	void StyleFeature::CreateQueries(flecs::world& world) {
-		world.component<QueryButtonStylePrefab>();
-		world.set(QueryButtonStylePrefab{
-			world.query_builder<ButtonStyle>(COMPONENT(QueryButtonStylePrefab))
-			.with<Button>()
-			.without<Widget>()
-			.with(flecs::Prefab)
-			.cached().build() });
-	};
-
-	void StyleFeature::CreateObservers(flecs::world& world) {
-		world.observer<const UIScheme>("UpdateButtonStyles")
-			.term_at(0).singleton()
-			.event(flecs::OnSet)
-			.each([&world](const UIScheme& scheme) {
-			world.get<QueryButtonStylePrefab>()->Value
-				.each([&world](flecs::entity prefab, ButtonStyle& style) {
-				style.Value = AddButtonStyle(prefab);
-					});
-				});
 	}
 }

@@ -61,10 +61,6 @@ namespace UI {
 			.each([&world](const IconFont& f) {
 			world.get<QueryIcon>()->Value
 				.each([&world, &f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
-				//const FString path = FPaths::ProjectContentDir() / TEXT("Slate/Fonts/") + f.Value + TEXT("-") + ff.Value + TEXT(".ttf");
-				//const FTextBlockStyle iconFont = FTextBlockStyle().SetFont(FSlateFontInfo(path, fs.Value));
-				//world.get<TextStyles>()->Value.ToSharedRef()->Set(FName("IconFont"), iconFont);
-
 				SetFontInfo(p, f.Value, ff.Value, fs.Value);
 					});
 				});

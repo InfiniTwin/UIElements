@@ -102,8 +102,5 @@ namespace UI {
 		TSharedRef<STextBlock> widget = SNew(STextBlock);
 		SetTextBlockFontInfo(widget, entity.get<FontInfo>()->Value);
 		entity.set(WidgetInstance{ widget });
-
-		//entity.set(WidgetInstance{ SNew(STextBlock)
-		//	.TextStyle(&world.get<TextStyles>()->Value.Get()->GetWidgetStyle<FTextBlockStyle>("IconFont")) });
 	}
 }
