@@ -5,11 +5,12 @@
 
 namespace UI {
 	void ButtonFeature::RegisterComponents(flecs::world& world) {
-		world.component<Border>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Button>().add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<Toggle>();
-
+		world.component<Toggle>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<ButtonStyle>().add(flecs::OnInstantiate, flecs::Inherit);
+
+		world.component<CheckBox>().add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<CheckBoxStyle>().add(flecs::OnInstantiate, flecs::Inherit);
 	};
 
 	void ButtonFeature::CreateQueries(flecs::world& world) {
@@ -20,17 +21,30 @@ namespace UI {
 			.without<Widget>()
 			.with(flecs::Prefab)
 			.cached().build() });
+
+		world.component<QueryCheckBoxStylePrefab>();
+		world.set(QueryCheckBoxStylePrefab{
+			world.query_builder<CheckBoxStyle>(COMPONENT(QueryCheckBoxStylePrefab))
+			.with<CheckBox>()
+			.without<Widget>()
+			.with(flecs::Prefab)
+			.cached().build() });
 	};
 
 	void ButtonFeature::CreateObservers(flecs::world& world) {
-		world.observer<const UIScheme>("UpdateButtonStyle")
-			.term_at(0).singleton()
-			.event(flecs::OnSet)
-			.each([&world](const UIScheme& scheme) {
-			world.get<QueryButtonStylePrefab>()->Value
-				.each([&world](flecs::entity prefab, ButtonStyle& style) {
-				style.Value = GetButtonStyle(prefab);
-					});
-				});
+		//world.observer<const UIScheme>("UpdateButtonStyles")
+		//	.term_at(0).singleton()
+		//	.event(flecs::OnSet)
+		//	.each([&world](const UIScheme& scheme) {
+		//	world.get<QueryButtonStylePrefab>()->Value
+		//		.each([](flecs::entity prefab, ButtonStyle& style) {
+		//		SetButtonStyle(prefab);
+		//			});
+
+		//	world.get<QueryCheckBoxStylePrefab>()->Value
+		//		.each([](flecs::entity prefab, CheckBoxStyle& style) {
+		//		SetCheckBoxStyle(prefab);
+		//			});
+		//		});
 	}
 }

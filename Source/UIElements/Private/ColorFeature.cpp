@@ -150,7 +150,18 @@ namespace UI {
 			SetPrefabColor(world, "TertiaryFixed", MaterialDynamicColors::TertiaryFixed().GetLinear(ds));
 			SetPrefabColor(world, "TertiaryFixedDim", MaterialDynamicColors::TertiaryFixedDim().GetLinear(ds));
 			SetPrefabColor(world, "OnTertiaryFixed", MaterialDynamicColors::OnTertiaryFixed().GetLinear(ds));
-			SetPrefabColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds)); });
+			SetPrefabColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds)); 
+				
+			world.get<QueryButtonStylePrefab>()->Value
+				.each([](flecs::entity prefab, ButtonStyle& style) {
+				SetButtonStyle(prefab);
+					});
+
+			world.get<QueryCheckBoxStylePrefab>()->Value
+				.each([](flecs::entity prefab, CheckBoxStyle& style) {
+				SetCheckBoxStyle(prefab);
+					});
+				});
 
 		world.observer<const Color>("SetInstanceWidgetColor")
 			.with(flecs::Prefab)
@@ -195,12 +206,5 @@ namespace UI {
 
 		if (entity.has<TextBlock>())
 			StaticCastSharedPtr<STextBlock>(widget)->SetColorAndOpacity(color);
-		else if (entity.has<Border>())
-			StaticCastSharedPtr<SBorder>(widget)->SetBorderBackgroundColor(color);
-
-		//world.get<QueryButtonStylePrefab>()->Value
-		//	.each([](flecs::entity prefab, WidgetStyle& style) {
-		//	style.Value = AddButtonStyle(prefab);
-		//		});
 	}
 }

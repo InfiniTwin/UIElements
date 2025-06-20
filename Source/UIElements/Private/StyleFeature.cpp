@@ -2,12 +2,6 @@
 
 #include "StyleFeature.h"
 #include "flecs.h"
-#include "ECS.h"
-#include "UIFeature.h"
-#include "TypographyFeature.h"
-#include "ButtonFeature.h"
-#include "Styling/SlateStyleRegistry.h"
-#include "Engine/UserInterfaceSettings.h"
 
 namespace UI {
 	void StyleFeature::RegisterComponents(flecs::world& world) {

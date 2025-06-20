@@ -47,17 +47,15 @@ namespace UI {
 			if (entity.has<CompoundWidget>())
 				entity.set(WidgetInstance{ SNew(CompoundWidgetInstance) });
 			else if (entity.has<Box>())
-				entity.set(WidgetInstance{ SNew(SBox).Padding(0)});
+				entity.set(WidgetInstance{ SNew(SBox).Padding(0) });
 			else if (entity.has<HBox>())
 				entity.set(WidgetInstance{ SNew(SHorizontalBox) });
 			else if (entity.has<VBox>())
 				entity.set(WidgetInstance{ SNew(SVerticalBox) });
 			else if (entity.has<Button>())
 				AddButtonWidget(world, entity);
-			else if (entity.has<Border>())
-				AddBorderWidget(entity);
-			else if (entity.has<Toggle>())
-				entity.set(WidgetInstance{ SNew(SCheckBox) });
+			else if (entity.has<CheckBox>())
+				AddCheckBoxWidget(world, entity);
 			else if (entity.has<TextBlock>())
 				AddTextBlockWidget(entity);
 
@@ -85,15 +83,15 @@ namespace UI {
 			if (parent.has<CompoundWidget>())
 				AttachToCompoundWidget(w.Value.ToSharedRef(), parentWidget);
 			else if (parent.has<Box>())
-				AttachToBox(child, parentWidget);
+				SetContent<SBox>(parentWidget, child);
 			else if (parent.has<HBox>())
 				AttachToHorizontalBox(child, parentWidget);
 			else if (parent.has<VBox>())
 				AttachToVerticalBox(child, parentWidget);
-			else if (parent.has<Border>() || parent.has<Button>())
-				AttachToBorder(child, parentWidget);
-			else if (parent.has<Toggle>())
-				AttachToCheckBox(child, parentWidget);
+			else if (parent.has<Button>())
+				SetContent<SButton>(parentWidget, child);
+			else if (parent.has<CheckBox>())
+				SetContent<SCheckBox>(parentWidget, child);
 				});
 	}
 }

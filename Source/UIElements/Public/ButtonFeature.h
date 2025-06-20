@@ -14,44 +14,83 @@ namespace UI {
 		static void CreateObservers(flecs::world& world);
 	};
 
-	struct Border {};
 	struct Button {};
+	struct CheckBox {};
 	struct Toggle {};
 
 	struct ButtonStyle { FButtonStyle Value; };
+	struct CheckBoxStyle { FCheckBoxStyle Value; };
 
 	struct QueryButtonStylePrefab { flecs::query<ButtonStyle> Value; };
+	struct QueryCheckBoxStylePrefab { flecs::query<CheckBoxStyle> Value; };
 
 	static inline void AddButtonWidget(flecs::world world, flecs::entity entity) {
-		entity.set(WidgetInstance{ SNew(SButton).ButtonStyle(&entity.get<ButtonStyle>()->Value)
+		entity.set(WidgetInstance{ SNew(SButton)
+			.ButtonStyle(&entity.get<ButtonStyle>()->Value)
 			.OnClicked_Lambda(([entity]() { entity.add(Clicked); return FReply::Handled(); })) });
 	}
 
-	static inline void AddBorderWidget(flecs::entity entity) {
-		entity.set(WidgetInstance{ SNew(SBorder)
-			.Padding(0)
-			.BorderImage(FAppStyle::Get().GetBrush("WhiteBrush")) });
+	static inline void AddCheckBoxWidget(flecs::world world, flecs::entity entity) {
+		entity.set(WidgetInstance{ SNew(SCheckBox)
+			.Style(&entity.get<CheckBoxStyle>()->Value) });
 	}
 
-	static inline FButtonStyle GetButtonStyle(flecs::entity widgetStyle) {
-		auto buttonStyle = FButtonStyle();
-		widgetStyle.children([&buttonStyle](flecs::entity brush) {
+	static inline void SetButtonStyle(flecs::entity entity) {
+		auto style = FButtonStyle();
+		entity.children([&style](flecs::entity brush) {
 			if (brush.name().contains("Hovered"))
-				buttonStyle.SetHovered(GetBrush(brush));
+				style.SetHovered(GetBrush(brush));
 			else {
-				auto padding = brush.get<Padding>();
-				auto margin = FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom));
+				auto margin = ToMargin(brush.get<Padding>());
 				if (brush.name().contains("Normal"))
 				{
-					buttonStyle.SetNormal(GetBrush(brush));
-					buttonStyle.SetNormalPadding(margin);
+					style.SetNormal(GetBrush(brush));
+					style.SetNormalPadding(margin);
 				}
-				if (brush.name().contains("Pressed")) {
-					buttonStyle.SetPressed(GetBrush(brush));
-					buttonStyle.SetPressedPadding(margin);
+				else if (brush.name().contains("Pressed")) {
+					style.SetPressed(GetBrush(brush));
+					style.SetPressedPadding(margin);
 				}
 			}
 			});
-		return buttonStyle;
+		entity.get_mut<ButtonStyle>()->Value = style;
+	}
+
+	static inline void SetCheckBoxStyle(flecs::entity entity) {
+		auto fbs = FTextBlockStyle();
+		auto style = FCheckBoxStyle();
+		style.CheckBoxType = static_cast<ESlateCheckBoxType::Type>(entity.has<Toggle>());
+		style.SetPadding(ToMargin(entity.get<Padding>()));
+
+		entity.children([&style](flecs::entity brush) {
+			if (brush.name().contains("BrushNormalOFF"))
+				style.SetUncheckedImage(GetBrush(brush));
+			else if (brush.name().contains("BrushNormalON"))
+				style.SetCheckedImage(GetBrush(brush));
+
+			else if (brush.name().contains("BrushHoveredOFF"))
+				style.SetUncheckedHoveredImage(GetBrush(brush));
+			else if (brush.name().contains("BrushHoveredON"))
+				style.SetCheckedHoveredImage(GetBrush(brush));
+
+
+			else if (brush.name().contains("BrushPressedOFF"))
+				style.SetUncheckedPressedImage(GetBrush(brush));
+			else if (brush.name().contains("BrushPressedON"))
+				style.SetCheckedPressedImage(GetBrush(brush));
+
+			else if (brush.name().contains("ForegroundNormal"))
+				style.SetForegroundColor(brush.get<Color>()->Value);
+			else if (brush.name().contains("ForegroundHovered")) {
+				FLinearColor color = brush.get<Color>()->Value;
+				style.SetCheckedForegroundColor(color);
+				style.SetHoveredForegroundColor(color);
+				style.SetCheckedHoveredForegroundColor(color);
+				style.SetPressedForegroundColor(color);
+				style.SetCheckedPressedForegroundColor(color);
+			}
+			}
+		);
+		entity.get_mut<CheckBoxStyle>()->Value = style;
 	}
 }

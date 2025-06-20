@@ -43,6 +43,11 @@ namespace UI {
 
 	struct Order { int Value; };
 
+	template<typename TWidget>
+	static inline void SetContent(const TSharedRef<SWidget>& parent, const flecs::entity& child) {
+		StaticCastSharedRef<TWidget>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
+	}
+
 	template<typename SlotType>
 	void AttachSlot(SlotType& slot, const flecs::entity child)
 	{
@@ -58,26 +63,9 @@ namespace UI {
 		StaticCastSharedRef<CompoundWidgetInstance>(parent)->Slot().AttachWidget(child);
 	}
 
-	static inline void AttachToBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
-		//TSharedRef<SBox> box = StaticCastSharedRef<SBox>(parent);
-		//box->SetVAlign(child.get<VAlign>()->Value);
-		//box->SetHAlign(child.get<HAlign>()->Value);
-		//box->SetWidthOverride(FOptionalSize());
-		//box->SetHeightOverride(FOptionalSize());
-		//auto padding = child.get<Padding>();
-		//box->SetPadding(FMargin(padding->Left, padding->Top, padding->Right, padding->Bottom));
-		//box->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
-		StaticCastSharedRef<SBox>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
-	}
-
 	static inline void AttachToHorizontalBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
 		auto slot = StaticCastSharedRef<SHorizontalBox>(parent)->AddSlot();
 		slot.AutoWidth();
-		auto PATH_child = child.path();
-		auto VALIGN = child.has<VAlign>();
-		auto HALIGN = child.has<HAlign>();
-		auto PADDING = child.has<Padding>();
-		auto WIDGET = child.has<WidgetInstance>();
 		AttachSlot(slot, child);
 	}
 
@@ -87,23 +75,8 @@ namespace UI {
 		AttachSlot(slot, child);
 	}
 
-	static inline void AttachToCheckBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
-		auto checkBox = StaticCastSharedRef<SCheckBox>(parent);
-		checkBox->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
-	}
-
-	static inline void AttachToBorder(const flecs::entity child, const TSharedRef<SWidget> parent) {
-		StaticCastSharedRef<SBorder>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
-		//button.oncli
-		////FSlateBrush normalBrush = FSlateRoundedBoxBrush(FLinearColor::White);
-		//FSlateBrush normalBrush;
-		//normalBrush.DrawAs = ESlateBrushDrawType::RoundedBox;
-
-		//const FButtonStyle style = FButtonStyle()
-		//	.SetNormal(normalBrush);
-
-
-		//button->SetButtonStyle(&style);
+	static inline FMargin ToMargin(const Padding* padding) {
+		return FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom));
 	}
 
 	int SortOrder(flecs::entity_t e1, const Order* o1, flecs::entity_t e2, const Order* o2) {

@@ -5,7 +5,6 @@
 #include "flecs.h"
 #include "ECS.h"
 #include "ColorFeature.h"
-#include "WidgetFeature.h"
 
 namespace UI {
 	struct StyleFeature {
@@ -26,12 +25,15 @@ namespace UI {
 		if (slateBrush.GetDrawType() == ESlateBrushDrawType::Type::RoundedBox) {
 			if (auto outline = ECS::FirstChild(brush)) {
 				slateBrush.OutlineSettings.Color = outline.get<Color>()->Value;
-				slateBrush.OutlineSettings.RoundingType = outline.has<FixedRadius>() ?
-					ESlateBrushRoundingType::FixedRadius : ESlateBrushRoundingType::HalfHeightRadius;
+				if (!outline.has<FixedRadius>())
+					slateBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::HalfHeightRadius;
+				else {
+					slateBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+					auto radii = outline.get<Radii>();
+					slateBrush.OutlineSettings.CornerRadii = FVector4(
+						radii->TopLeft, radii->TopRight, radii->BottomRight, radii->BottomLeft);
+				}
 				slateBrush.OutlineSettings.Width = outline.get<Width>()->Value;
-				auto radii = outline.get<Radii>();
-				slateBrush.OutlineSettings.CornerRadii = FVector4(
-					radii->TopLeft, radii->TopRight, radii->BottomRight, radii->BottomLeft);
 			}
 		}
 		return slateBrush;
