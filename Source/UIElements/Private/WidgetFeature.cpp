@@ -17,9 +17,10 @@ namespace UI {
 		world.component<WidgetInstance>()
 			.on_remove([](flecs::entity e, WidgetInstance& w) {w.Value.Reset(); });
 
+		world.component<ConstraintCanvas>();
 		world.component<CompoundWidget>();
 
-		world.component<Attached>().add(flecs::CanToggle);
+		world.component<Menu>().add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Box>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HBox>().add(flecs::OnInstantiate, flecs::Inherit);
@@ -34,8 +35,7 @@ namespace UI {
 			.member<float>(MEMBER(Padding::Bottom))
 			.add(flecs::OnInstantiate, flecs::Inherit);
 
-		world.component<StyleSynced>().add(flecs::CanToggle);
-
+		world.component<Attached>().add(flecs::CanToggle);
 		world.component<Order>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 	}
 
@@ -44,10 +44,12 @@ namespace UI {
 			.with<Widget>()
 			.event(flecs::OnAdd)
 			.each([&world](flecs::entity entity) {
-			if (entity.has<CompoundWidget>())
+			if (entity.has<ConstraintCanvas>())
+				entity.set(WidgetInstance{ SNew(SConstraintCanvas) });
+			else if (entity.has<CompoundWidget>())
 				entity.set(WidgetInstance{ SNew(CompoundWidgetInstance) });
 			else if (entity.has<Box>())
-				entity.set(WidgetInstance{ SNew(SBox).Padding(0) });
+				entity.set(WidgetInstance{ SNew(SBox).Padding(0).WidthOverride(FOptionalSize()).HeightOverride(FOptionalSize()) });
 			else if (entity.has<HBox>())
 				entity.set(WidgetInstance{ SNew(SHorizontalBox) });
 			else if (entity.has<VBox>())
@@ -58,6 +60,9 @@ namespace UI {
 				AddCheckBoxWidget(world, entity);
 			else if (entity.has<TextBlock>())
 				AddTextBlockWidget(entity);
+			else if (entity.has<Menu>()) {
+				entity.set(WidgetInstance{ SNew(SMenuAnchor) });
+			}
 
 			entity.add<Attached>().disable<Attached>();
 				});
@@ -80,18 +85,23 @@ namespace UI {
 				return;
 			TSharedRef<SWidget> parentWidget = parent.get_mut<WidgetInstance>()->Value.ToSharedRef();
 
+			if (parent.has<ConstraintCanvas>())
+				AttachToConstraintCanvas(parentWidget, child);
 			if (parent.has<CompoundWidget>())
 				AttachToCompoundWidget(w.Value.ToSharedRef(), parentWidget);
 			else if (parent.has<Box>())
 				SetContent<SBox>(parentWidget, child);
 			else if (parent.has<HBox>())
-				AttachToHorizontalBox(child, parentWidget);
+				AttachToHorizontalBox(parentWidget, child);
 			else if (parent.has<VBox>())
-				AttachToVerticalBox(child, parentWidget);
+				AttachToVerticalBox(parentWidget, child);
 			else if (parent.has<Button>())
 				SetContent<SButton>(parentWidget, child);
 			else if (parent.has<CheckBox>())
 				SetContent<SCheckBox>(parentWidget, child);
+			else if (parent.has<Menu>()) {
+
+			}
 				});
 	}
 }

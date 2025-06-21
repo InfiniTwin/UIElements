@@ -4,6 +4,7 @@
 
 #include "flecs.h"
 #include "UIFeature.h"
+#include "Widgets/Layout/SConstraintCanvas.h"
 
 namespace UI {
 	struct WidgetFeature {
@@ -17,6 +18,8 @@ namespace UI {
 	struct Widget {};
 	struct WidgetInstance { TSharedPtr<SWidget> Value; };
 
+	struct ConstraintCanvas {};
+
 	struct CompoundWidgetInstance : public SCompoundWidget {
 	public:
 		SLATE_BEGIN_ARGS(CompoundWidgetInstance) {}
@@ -28,6 +31,8 @@ namespace UI {
 	};
 	struct CompoundWidget {};
 
+	struct Menu {};
+
 	struct Box {};
 	struct HBox {};
 	struct VBox {};
@@ -36,16 +41,43 @@ namespace UI {
 	struct VAlign { int Value; };
 	struct Padding { float Left, Top, Right, Bottom; };
 
-	struct RoundedBoxBrush {};
-
 	struct Attached {};
-	struct StyleSynced {};
-
 	struct Order { int Value; };
 
 	template<typename TWidget>
 	static inline void SetContent(const TSharedRef<SWidget>& parent, const flecs::entity& child) {
 		StaticCastSharedRef<TWidget>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
+	}
+
+	static inline FMargin ToMargin(const Padding* padding) {
+		return FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom));
+	}
+
+	static inline std::tuple<FAnchors, FVector2D> ToAnchorsAlignment(const flecs::entity& child)
+	{
+		EVerticalAlignment vAlign = static_cast<EVerticalAlignment>(child.get<VAlign>()->Value);
+		EHorizontalAlignment hAlign = static_cast<EHorizontalAlignment>(child.get<HAlign>()->Value);
+
+		FAnchors anchors;
+		FVector2D alignment;
+
+		switch (hAlign)
+		{
+		case HAlign_Left:   anchors.Minimum.X = anchors.Maximum.X = 0.f; alignment.X = 0.f; break;
+		case HAlign_Center: anchors.Minimum.X = anchors.Maximum.X = 0.5f; alignment.X = 0.5f; break;
+		case HAlign_Right:  anchors.Minimum.X = anchors.Maximum.X = 1.f; alignment.X = 1.f; break;
+		default:            anchors.Minimum.X = anchors.Maximum.X = 0.f; alignment.X = 0.f; break;
+		}
+
+		switch (vAlign)
+		{
+		case VAlign_Top:    anchors.Minimum.Y = anchors.Maximum.Y = 0.f; alignment.Y = 0.f; break;
+		case VAlign_Center: anchors.Minimum.Y = anchors.Maximum.Y = 0.5f; alignment.Y = 0.5f; break;
+		case VAlign_Bottom: anchors.Minimum.Y = anchors.Maximum.Y = 1.f; alignment.Y = 1.f; break;
+		default:            anchors.Minimum.Y = anchors.Maximum.Y = 0.f; alignment.Y = 0.f; break;
+		}
+
+		return { anchors, alignment };
 	}
 
 	template<typename SlotType>
@@ -63,20 +95,32 @@ namespace UI {
 		StaticCastSharedRef<CompoundWidgetInstance>(parent)->Slot().AttachWidget(child);
 	}
 
-	static inline void AttachToHorizontalBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
+	static inline void AttachToConstraintCanvas(const TSharedRef<SWidget> parent, const flecs::entity child) {
+		auto [anchors, alignment] = ToAnchorsAlignment(child);
+		StaticCastSharedRef<SConstraintCanvas>(parent)->AddSlot()
+			.AutoSize(true)
+			.Anchors(anchors)
+			.Alignment(alignment)
+			.Offset(ToMargin(child.get<Padding>()))
+			.AttachWidget(child.get<WidgetInstance>()->Value.ToSharedRef());
+	}
+
+	static inline void AttachToBox(const TSharedRef<SWidget> parent, const flecs::entity child) {
 		auto slot = StaticCastSharedRef<SHorizontalBox>(parent)->AddSlot();
 		slot.AutoWidth();
 		AttachSlot(slot, child);
 	}
 
-	static inline void AttachToVerticalBox(const flecs::entity child, const TSharedRef<SWidget> parent) {
-		auto slot = StaticCastSharedRef<SVerticalBox>(parent)->AddSlot();
-		slot.AutoHeight();
+	static inline void AttachToHorizontalBox(const TSharedRef<SWidget> parent, const flecs::entity child) {
+		auto slot = StaticCastSharedRef<SHorizontalBox>(parent)->AddSlot();
+		slot.AutoWidth();
 		AttachSlot(slot, child);
 	}
 
-	static inline FMargin ToMargin(const Padding* padding) {
-		return FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom));
+	static inline void AttachToVerticalBox(const TSharedRef<SWidget> parent, const flecs::entity child) {
+		auto slot = StaticCastSharedRef<SVerticalBox>(parent)->AddSlot();
+		slot.AutoHeight();
+		AttachSlot(slot, child);
 	}
 
 	int SortOrder(flecs::entity_t e1, const Order* o1, flecs::entity_t e2, const Order* o2) {
