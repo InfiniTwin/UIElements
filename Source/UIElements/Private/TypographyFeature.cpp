@@ -3,7 +3,6 @@
 
 #include "TypographyFeature.h"
 #include "ECS.h"
-#include "ColorFeature.h"
 
 namespace UI {
 	void TypographyFeature::RegisterComponents(flecs::world& world) {

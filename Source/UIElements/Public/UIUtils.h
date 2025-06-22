@@ -1,51 +1,47 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "utils/utils.h"
-#include <string>
-#include <sstream>
-#include <iomanip>
 
 using namespace material_color_utilities;
+
 struct UIUtils {
 public:
-	static inline std::string HexFromArgb(Argb argb) {
-		std::stringstream ss;
-		ss << "0x" << std::setw(8) << std::setfill('0') << std::hex << argb;
-		return ss.str();
+
+	static inline FString HexFromArgb(Argb argb) {
+		return FString::Printf(TEXT("0x%08x"), argb);
 	}
 
-	static inline material_color_utilities::Argb ArgbFromHex(const std::string& hex) {
-		if ((hex.length() == 9 && hex[0] == '#') || (hex.length() == 10 && hex.substr(0, 2) == "0x")) {
-			return static_cast<Argb>(std::stoul(hex.substr(hex[0] == '#' ? 1 : 2), nullptr, 16));
-		}
+	static inline Argb ArgbFromHex(const FString& Hex) {
+		const FString CleanHex = SanitizeHex(Hex);
+		if (CleanHex.Len() == 8)
+			return static_cast<Argb>(FParse::HexNumber(*CleanHex));
 		return 0xffffffff;
 	}
 
-	static inline std::string HexFromLinearColor(const FLinearColor& color)
-	{
-		FColor srgb = color.ToFColor(true);
-		std::stringstream ss;
-		ss << "0x"
-			<< std::hex << std::setw(2) << std::setfill('0') << (int)srgb.A
-			<< std::setw(2) << (int)srgb.R
-			<< std::setw(2) << (int)srgb.G
-			<< std::setw(2) << (int)srgb.B;
-		return ss.str();
+	static inline FString HexFromLinearColor(const FLinearColor& Color) {
+		FColor sRGB = Color.ToFColor(true);
+		return FString::Printf(TEXT("0x%02x%02x%02x%02x"), sRGB.A, sRGB.R, sRGB.G, sRGB.B);
 	}
 
-	static inline FLinearColor LinearColorFromHex(const std::string& hex)
-	{
-		uint32_t argb = 0xffffffff;
-		if ((hex.length() == 9 && hex[0] == '#') || (hex.length() == 10 && hex.substr(0, 2) == "0x"))
-			argb = static_cast<uint32_t>(std::stoul(hex.substr(hex[0] == '#' ? 1 : 2), nullptr, 16));
+	static inline FLinearColor LinearColorFromHex(const FString& Hex) {
+		const FString CleanHex = SanitizeHex(Hex);
+		if (CleanHex.Len() == 8) {
+			uint32 ARGB = FParse::HexNumber(*CleanHex);
+			uint8 A = (ARGB >> 24) & 0xFF;
+			uint8 R = (ARGB >> 16) & 0xFF;
+			uint8 G = (ARGB >> 8) & 0xFF;
+			uint8 B = (ARGB) & 0xFF;
+			return FLinearColor(FColor(R, G, B, A));
+		}
+		return FLinearColor::White;
+	}
 
-		uint8 A = (argb >> 24) & 0xFF;
-		uint8 R = (argb >> 16) & 0xFF;
-		uint8 G = (argb >> 8) & 0xFF;
-		uint8 B = (argb) & 0xFF;
-
-		return FLinearColor(FColor(R, G, B, A));
+private:
+	static inline FString SanitizeHex(const FString& Hex) {
+		if (Hex.StartsWith(TEXT("#")))
+			return Hex.RightChop(1);
+		if (Hex.StartsWith(TEXT("0x")))
+			return Hex.RightChop(2);
+		return Hex;
 	}
 };

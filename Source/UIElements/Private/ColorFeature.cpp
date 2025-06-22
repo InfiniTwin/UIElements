@@ -9,7 +9,6 @@
 #include "WidgetFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
-#include "StyleFeature.h"
 
 namespace UI {
 	void ColorFeature::RegisterOpaqueTypes(flecs::world& world) {
@@ -32,33 +31,33 @@ namespace UI {
 			}
 				});
 
-		// Argb <=> Hex
+		// Argb <=> Hex (as string)
 		world.component<Argb>()
 			.opaque(flecs::String)
-			.serialize([](const flecs::serializer* s, const Argb* data)
-				{
-					std::string hex = UIUtils::HexFromArgb(*data);
-					const char* str = hex.c_str();
-					return s->value(flecs::String, &str);
-				})
-			.assign_string([](Argb* data, const char* value)
-				{
-					*data = UIUtils::ArgbFromHex(value);
-				});
+			.serialize([](const flecs::serializer* s, const Argb* data) {
+			FString HexStr = UIUtils::HexFromArgb(*data);
+			std::string Utf8 = TCHAR_TO_UTF8(*HexStr);
+			const char* CStr = Utf8.c_str();
+			return s->value(flecs::String, &CStr);
+		})
+			.assign_string([](Argb* data, const char* value) {
+			FString Hex = UTF8_TO_TCHAR(value);
+			*data = UIUtils::ArgbFromHex(Hex);
+		});
 
-		// FLinearColor <=> Hex
+		// FLinearColor <=> Hex (as string)
 		world.component<FLinearColor>()
 			.opaque(flecs::String)
-			.serialize([](const flecs::serializer* s, const FLinearColor* data)
-				{
-					std::string hex = UIUtils::HexFromLinearColor(*data);
-					const char* str = hex.c_str();
-					return s->value(flecs::String, &str);
-				})
-			.assign_string([](FLinearColor* data, const char* value)
-				{
-					*data = UIUtils::LinearColorFromHex(value);
-				});
+			.serialize([](const flecs::serializer* s, const FLinearColor* data) {
+			FString HexStr = UIUtils::HexFromLinearColor(*data);
+			std::string Utf8 = TCHAR_TO_UTF8(*HexStr);
+			const char* CStr = Utf8.c_str();
+			return s->value(flecs::String, &CStr);
+		})
+			.assign_string([](FLinearColor* data, const char* value) {
+			FString Hex = UTF8_TO_TCHAR(value);
+			*data = UIUtils::LinearColorFromHex(Hex);
+		});
 	}
 
 	void ColorFeature::RegisterComponents(flecs::world& world) {

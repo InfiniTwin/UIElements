@@ -6,7 +6,6 @@
 #include "Assets.h"
 #include "Containers/UnrealString.h"
 #include "WidgetFeature.h"
-#include "ColorFeature.h"
 
 namespace UI {
 	struct TypographyFeature {

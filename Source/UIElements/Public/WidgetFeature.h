@@ -3,7 +3,6 @@
 #pragma once
 
 #include "flecs.h"
-#include "UIFeature.h"
 #include "Widgets/Layout/SConstraintCanvas.h"
 
 namespace UI {
@@ -53,7 +52,7 @@ namespace UI {
 		return FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom));
 	}
 
-	static inline std::tuple<FAnchors, FVector2D> ToAnchorsAlignment(const flecs::entity& child)
+	static inline TPair<FAnchors, FVector2D> ToAnchorsAndAlignment(const flecs::entity& child)
 	{
 		EVerticalAlignment vAlign = static_cast<EVerticalAlignment>(child.get<VAlign>()->Value);
 		EHorizontalAlignment hAlign = static_cast<EHorizontalAlignment>(child.get<HAlign>()->Value);
@@ -96,7 +95,7 @@ namespace UI {
 	}
 
 	static inline void AttachToConstraintCanvas(const TSharedRef<SWidget> parent, const flecs::entity child) {
-		auto [anchors, alignment] = ToAnchorsAlignment(child);
+		auto [anchors, alignment] = ToAnchorsAndAlignment(child);
 		StaticCastSharedRef<SConstraintCanvas>(parent)->AddSlot()
 			.AutoSize(true)
 			.Anchors(anchors)
