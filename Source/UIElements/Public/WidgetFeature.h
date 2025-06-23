@@ -3,7 +3,9 @@
 #pragma once
 
 #include "flecs.h"
+#include "ECS.h"
 #include "Widgets/Layout/SConstraintCanvas.h"
+#include "Widgets/Input/SMenuAnchor.h"
 
 namespace UI {
 	struct WidgetFeature {
@@ -32,6 +34,9 @@ namespace UI {
 
 	struct Menu {};
 
+	struct Attached {};
+	struct Order { int Value; };
+
 	struct Box {};
 	struct HBox {};
 	struct VBox {};
@@ -40,13 +45,9 @@ namespace UI {
 	struct VAlign { int Value; };
 	struct Padding { float Left, Top, Right, Bottom; };
 
-	struct Attached {};
-	struct Order { int Value; };
+	struct Open {};
 
-	template<typename TWidget>
-	static inline void SetContent(const TSharedRef<SWidget>& parent, const flecs::entity& child) {
-		StaticCastSharedRef<TWidget>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
-	}
+	struct MenuPlacement { int Value; };
 
 	static inline FMargin ToMargin(const Padding* padding) {
 		return FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom));
@@ -79,6 +80,123 @@ namespace UI {
 		return { anchors, alignment };
 	}
 
+	static inline void AddMenuWidget(const flecs::entity entity) {
+		entity.set(WidgetInstance{ SNew(SMenuAnchor)
+			.Placement(static_cast<EMenuPlacement>(entity.get<MenuPlacement>()->Value))
+			.OnGetMenuContent(FOnGetContent::CreateLambda([entity]() {
+				return ECS::FirstChild(entity).get<WidgetInstance>()->Value.ToSharedRef();
+				}))
+			[entity.parent().get<WidgetInstance>()->Value.ToSharedRef()]
+			});
+
+		//// Cache references first
+		//TSharedRef<SMenuAnchor> MenuAnchor = SNew(SMenuAnchor)
+		//	.Placement(static_cast<EMenuPlacement>(entity.get<MenuPlacement>()->Value))
+		//	.OnGetMenuContent(FOnGetContent::CreateLambda([&entity]() {
+		//	return ECS::FirstChild(entity).get<WidgetInstance>()->Value.ToSharedRef();
+		//		}));
+
+		//TSharedRef<SWidget> ToggleWidget = entity.parent().get<WidgetInstance>()->Value.ToSharedRef();
+
+		//// Cast ToggleWidget to SCheckBox (make sure it's valid!)
+		//TSharedPtr<SCheckBox> ToggleCheckBox = StaticCastSharedRef<SCheckBox>(ToggleWidget);
+
+		//MenuAnchor->SetOnMenuOpenChanged(FOnIsOpenChanged::CreateLambda([ToggleCheckBox](bool bIsOpen) {
+		//	if (ToggleCheckBox.IsValid()) {
+		//		ToggleCheckBox->SetIsChecked(bIsOpen ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+		//	}
+		//	}));
+
+		//ToggleCheckBox->SetOnCheckStateChanged(FOnCheckStateChanged::CreateLambda([MenuAnchor](ECheckBoxState NewState) {
+		//	const bool bShouldOpen = (NewState == ECheckBoxState::Checked);
+		//	if (MenuAnchor.IsValid()) {
+		//		MenuAnchor->SetIsOpen(bShouldOpen, false);
+		//	}
+		//	}));
+
+		//// Now set the WidgetInstance on the entity
+		//entity.set(WidgetInstance{ MenuAnchor });
+
+		//TSharedPtr<SMenuAnchor> MenuAnchor;
+		//TSharedPtr<SCheckBox> ToggleCheckBox;
+
+		//bool bToggleMenuOpen = false; // This acts like A_CHECK
+
+		//SAssignNew(MenuAnchor, SMenuAnchor)
+		//	.Placement(MenuPlacement_ComboBox)
+		//	.OnGetMenuContent(FOnGetContent::CreateLambda([]()
+		//		{
+		//			return SNew(SVerticalBox)
+		//				+ SVerticalBox::Slot().AutoHeight()
+		//				[
+		//					SNew(STextBlock).Text(FText::FromString("Menu Item 1"))
+		//				]
+		//				+ SVerticalBox::Slot().AutoHeight()
+		//				[
+		//					SNew(STextBlock).Text(FText::FromString("Menu Item 2"))
+		//				];
+		//		}))
+		//	.OnMenuOpenChanged_Lambda([&](bool bIsOpen)
+		//		{
+		//			bToggleMenuOpen = bIsOpen;
+
+		//			// Optionally update checkbox manually if needed
+		//			if (ToggleCheckBox.IsValid())
+		//			{
+		//				ToggleCheckBox->SetIsChecked(bIsOpen ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+		//			}
+		//		})
+		//	[
+		//		SAssignNew(ToggleCheckBox, SCheckBox)
+		//			.IsChecked_Lambda([&]()
+		//				{
+		//					return bToggleMenuOpen ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+		//				})
+		//			.OnCheckStateChanged_Lambda([&](ECheckBoxState NewState)
+		//				{
+		//					const bool bShouldOpen = (NewState == ECheckBoxState::Checked);
+		//					bToggleMenuOpen = bShouldOpen;
+
+		//					if (MenuAnchor.IsValid())
+		//					{
+		//						MenuAnchor->SetIsOpen(bShouldOpen, false);
+		//					}
+		//				})
+		//			[
+		//				SNew(STextBlock).Text(FText::FromString("Perspective"))
+		//			]
+		//	];
+
+
+		//// Define the shared pointer type for language options
+		//TArray<TSharedPtr<FString>> LanguageOptions;
+		//TSharedPtr<FString> SelectedLanguage;
+
+		//// Populate the list of languages (for example)
+		//LanguageOptions.Add(MakeShared<FString>(TEXT("English")));
+		//LanguageOptions.Add(MakeShared<FString>(TEXT("Deutsch")));
+		//LanguageOptions.Add(MakeShared<FString>(TEXT("Shqip")));
+
+		//// ComboBox widget
+		//SNew(SComboBox<TSharedPtr<FString>>)
+		//	.OptionsSource(&LanguageOptions)
+		//	.OnGenerateWidget_Lambda([](TSharedPtr<FString> InItem) {
+		//	return SNew(STextBlock).Text(FText::FromString(*InItem));
+		//		})
+		//	.OnSelectionChanged_Lambda([&](TSharedPtr<FString> NewSelection, ESelectInfo::Type) {
+		//	SelectedLanguage = NewSelection;
+		//	// Your logic to change language
+		//	UE_LOG(LogTemp, Log, TEXT("Language changed to: %s"), **NewSelection);
+		//		})
+		//	.InitiallySelectedItem(SelectedLanguage)
+		//	[
+		//		SNew(STextBlock)
+		//			.Text_Lambda([&]() {
+		//			return FText::FromString(SelectedLanguage.IsValid() ? *SelectedLanguage : TEXT("Select Language"));
+		//				})
+		//	];
+	}
+
 	template<typename SlotType>
 	void AttachSlot(SlotType& slot, const flecs::entity child)
 	{
@@ -88,6 +206,11 @@ namespace UI {
 			.HAlign(static_cast<EHorizontalAlignment>(child.get<HAlign>()->Value))
 			.Padding(padding->Left, padding->Top, padding->Right, padding->Bottom)
 			.AttachWidget(child.get<WidgetInstance>()->Value.ToSharedRef());
+	}
+
+	template<typename TWidget>
+	static inline void SetContent(const TSharedRef<SWidget>& parent, const flecs::entity& child) {
+		StaticCastSharedRef<TWidget>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
 	static inline void AttachToCompoundWidget(const TSharedRef<SWidget> child, const TSharedRef<SWidget> parent) {

@@ -32,7 +32,19 @@ namespace UI {
 
 	static inline void AddCheckBoxWidget(flecs::world world, flecs::entity entity) {
 		entity.set(WidgetInstance{ SNew(SCheckBox)
-			.Style(&entity.get<CheckBoxStyle>()->Value) });
+			.Style(&entity.get<CheckBoxStyle>()->Value)
+			.OnCheckStateChanged_Lambda([entity](ECheckBoxState state) {
+				switch (state) {
+				case ECheckBoxState::Unchecked:
+					entity.add(Unchecked);
+					break;
+				case ECheckBoxState::Checked:
+					entity.add(Checked);
+					break;
+				case ECheckBoxState::Undetermined:
+					entity.add(Undetermined);
+					break;
+				}}) });
 	}
 
 	static inline void SetButtonStyle(flecs::entity entity) {

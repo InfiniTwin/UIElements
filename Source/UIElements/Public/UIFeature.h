@@ -12,7 +12,7 @@ namespace UI {
 		static void CreateObservers(flecs::world& world);
 	};
 
-	enum Event {
+	enum ButtonState {
 		Normal,
 		Hovered,
 		Unhovered,
@@ -21,8 +21,9 @@ namespace UI {
 		Clicked
 	};
 
-	enum State {
-		None,
-		Selected
+	enum CheckBoxState {
+		Unchecked,
+		Checked,
+		Undetermined
 	};
 }

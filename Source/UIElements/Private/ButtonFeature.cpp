@@ -2,6 +2,7 @@
 
 #include "ButtonFeature.h"
 #include "WidgetFeature.h"
+#include "ActionFeature.h"
 
 namespace UI {
 	void ButtonFeature::RegisterComponents(flecs::world& world) {
@@ -32,6 +33,26 @@ namespace UI {
 	};
 
 	void ButtonFeature::CreateObservers(flecs::world& world) {
+		world.observer<>("TriggerCheckBoxAction")
+			.with<CheckBoxState>().second(flecs::Wildcard)
+			.event(flecs::OnSet)
+			.each([&world](flecs::iter& it, size_t t) {
+			auto event = it.pair(0);
+			it.entity(t).children([&world, &event](flecs::entity action) {
+				if (action.has<ECS::Action>() && action.has(event))
+					action.enable<ECS::Action>(); });
+				});
+
+		world.observer<>("TriggerCheckBoxInverseAction")
+			.with<CheckBoxState>().second(flecs::Wildcard)
+			.event(flecs::OnRemove)
+			.each([&world](flecs::iter& it, size_t t) {
+			auto event = it.pair(0);
+			it.entity(t).children([&world, &event](flecs::entity action) {
+				if (action.has<ECS::Invert>() && action.has(event))
+					action.enable<ECS::Invert>(); });
+				});
+
 		//world.observer<const UIScheme>("UpdateButtonStyles")
 		//	.term_at(0).singleton()
 		//	.event(flecs::OnSet)

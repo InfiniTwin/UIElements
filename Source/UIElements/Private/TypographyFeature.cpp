@@ -101,9 +101,8 @@ namespace UI {
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const Locale& locale) {
-			auto tableNames = Assets::GetFolders(Assets::GetAssetPath("", LocalizationFolder));
 			TMap<FString, TMap<FString, FString>> tables;
-			for (const FString& tableName : tableNames)
+			for (const FString& tableName : Assets::GetFolders(Assets::GetAssetPath("", LocalizationFolder)))
 				tables.Add(tableName, LoadTable(GetTablePath(tableName, locale.Value)));
 			world.get<QueryLocalizedText>()->Value
 				.each([&tables](flecs::entity e, const LocalizedText& lt, const WidgetInstance& w) {

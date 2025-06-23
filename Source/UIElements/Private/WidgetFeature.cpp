@@ -22,6 +22,9 @@ namespace UI {
 
 		world.component<Menu>().add(flecs::OnInstantiate, flecs::Inherit);
 
+		world.component<Attached>().add(flecs::CanToggle);
+		world.component<Order>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+
 		world.component<Box>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HBox>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<VBox>().add(flecs::OnInstantiate, flecs::Inherit);
@@ -35,8 +38,9 @@ namespace UI {
 			.member<float>(MEMBER(Padding::Bottom))
 			.add(flecs::OnInstantiate, flecs::Inherit);
 
-		world.component<Attached>().add(flecs::CanToggle);
-		world.component<Order>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Open>();
+
+		world.component<MenuPlacement>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 	}
 
 	void WidgetFeature::CreateObservers(flecs::world& world) {
@@ -61,7 +65,8 @@ namespace UI {
 			else if (entity.has<TextBlock>())
 				AddTextBlockWidget(entity);
 			else if (entity.has<Menu>()) {
-				entity.set(WidgetInstance{ SNew(SMenuAnchor) });
+				AddMenuWidget(entity);
+				return; // No need to attach
 			}
 
 			entity.add<Attached>().disable<Attached>();
@@ -99,9 +104,15 @@ namespace UI {
 				SetContent<SButton>(parentWidget, child);
 			else if (parent.has<CheckBox>())
 				SetContent<SCheckBox>(parentWidget, child);
-			else if (parent.has<Menu>()) {
+				});
 
-			}
+		world.observer<>("SwitchMenu")
+			.with<Open>()
+			.event(flecs::OnAdd)
+			.event(flecs::OnRemove)
+			.each([&world](flecs::entity entity) {
+				StaticCastSharedRef<SMenuAnchor>(entity.get<WidgetInstance>()->Value.ToSharedRef())
+					->SetIsOpen(entity.has<Open>());
 				});
 	}
 }
