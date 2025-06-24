@@ -107,6 +107,7 @@ namespace UI {
 				});
 
 		world.observer<>("SwitchMenu")
+			.with<Menu>()
 			.with<Open>()
 			.event(flecs::OnAdd)
 			.event(flecs::OnRemove)
