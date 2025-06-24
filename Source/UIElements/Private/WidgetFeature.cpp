@@ -64,10 +64,8 @@ namespace UI {
 				AddCheckBoxWidget(world, entity);
 			else if (entity.has<TextBlock>())
 				AddTextBlockWidget(entity);
-			else if (entity.has<Menu>()) {
+			else if (entity.has<Menu>())
 				AddMenuWidget(entity);
-				return; // No need to attach
-			}
 
 			entity.add<Attached>().disable<Attached>();
 				});
@@ -104,6 +102,8 @@ namespace UI {
 				SetContent<SButton>(parentWidget, child);
 			else if (parent.has<CheckBox>())
 				SetContent<SCheckBox>(parentWidget, child);
+			else if (parent.has<Menu>())
+				SetContent<SMenuAnchor>(parentWidget, child);
 				});
 
 		world.observer<>("SwitchMenu")
