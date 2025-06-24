@@ -21,9 +21,8 @@ namespace UI {
 		world.component<CompoundWidget>();
 
 		world.component<Menu>().add(flecs::OnInstantiate, flecs::Inherit);
-
-		world.component<Attached>().add(flecs::CanToggle);
-		world.component<Order>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<MenuPlacement>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);	
+		world.component<MenuContent>();
 
 		world.component<Box>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HBox>().add(flecs::OnInstantiate, flecs::Inherit);
@@ -40,7 +39,8 @@ namespace UI {
 
 		world.component<Open>();
 
-		world.component<MenuPlacement>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Attached>().add(flecs::CanToggle);
+		world.component<Order>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 	}
 
 	void WidgetFeature::CreateObservers(flecs::world& world) {
@@ -102,7 +102,7 @@ namespace UI {
 				SetContent<SButton>(parentWidget, child);
 			else if (parent.has<CheckBox>())
 				SetContent<SCheckBox>(parentWidget, child);
-			else if (parent.has<Menu>())
+			else if (parent.has<Menu>() && !child.has<MenuContent>())
 				SetContent<SMenuAnchor>(parentWidget, child);
 				});
 

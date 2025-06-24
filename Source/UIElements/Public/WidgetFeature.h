@@ -33,9 +33,8 @@ namespace UI {
 	struct CompoundWidget {};
 
 	struct Menu {};
-
-	struct Attached {};
-	struct Order { int Value; };
+	struct MenuPlacement { int Value; };
+	struct MenuContent {};
 
 	struct Box {};
 	struct HBox {};
@@ -47,7 +46,8 @@ namespace UI {
 
 	struct Open {};
 
-	struct MenuPlacement { int Value; };
+	struct Attached {};
+	struct Order { int Value; };
 
 	static inline FMargin ToMargin(const Padding* padding) {
 		return FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom));
@@ -80,13 +80,17 @@ namespace UI {
 		return { anchors, alignment };
 	}
 
-	static inline void AddMenuWidget(const flecs::entity entity) {
-		entity.set(WidgetInstance{ SNew(SMenuAnchor)
-			.Placement(static_cast<EMenuPlacement>(entity.get<MenuPlacement>()->Value))
-			.OnGetMenuContent(FOnGetContent::CreateLambda([entity]() {
-				return ECS::FirstChild(entity).get<WidgetInstance>()->Value.ToSharedRef();
-				}))
-			[entity.parent().get<WidgetInstance>()->Value.ToSharedRef()]
+	static inline void AddMenuWidget(const flecs::entity menu) {
+		menu.set(WidgetInstance{ SNew(SMenuAnchor)
+			.Placement(static_cast<EMenuPlacement>(menu.get<MenuPlacement>()->Value))
+			.OnGetMenuContent(FOnGetContent::CreateLambda([menu]() -> TSharedRef<SWidget> {
+				TSharedPtr<SWidget> content;
+				menu.children([&content](flecs::entity child) {
+					if (child.has<MenuContent>())
+						content = child.get<WidgetInstance>()->Value;
+				});
+				return content.ToSharedRef();
+			}))
 			});
 
 		//// Cache references first
