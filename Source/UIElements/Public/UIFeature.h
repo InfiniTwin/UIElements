@@ -12,6 +12,12 @@ namespace UI {
 		static void CreateObservers(flecs::world& world);
 	};
 
+	enum WidgetState {
+		None,
+		Opened,
+		Closed
+	};
+
 	enum ButtonState {
 		Normal,
 		Hovered,

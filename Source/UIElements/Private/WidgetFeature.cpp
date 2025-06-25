@@ -7,6 +7,7 @@
 #include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
+#include "Logging/StructuredLog.h"
 
 namespace UI {
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
@@ -21,7 +22,7 @@ namespace UI {
 		world.component<CompoundWidget>();
 
 		world.component<Menu>().add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<MenuPlacement>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);	
+		world.component<MenuPlacement>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<MenuContent>();
 
 		world.component<Box>().add(flecs::OnInstantiate, flecs::Inherit);
@@ -36,8 +37,6 @@ namespace UI {
 			.member<float>(MEMBER(Padding::Right))
 			.member<float>(MEMBER(Padding::Bottom))
 			.add(flecs::OnInstantiate, flecs::Inherit);
-
-		world.component<Open>();
 
 		world.component<Attached>().add(flecs::CanToggle);
 		world.component<Order>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
@@ -108,12 +107,12 @@ namespace UI {
 
 		world.observer<>("SwitchMenu")
 			.with<Menu>()
-			.with<Open>()
-			.event(flecs::OnAdd)
-			.event(flecs::OnRemove)
+			.with<WidgetState>().second(flecs::Wildcard)
+			.event(flecs::OnSet)
 			.each([&world](flecs::entity entity) {
-				StaticCastSharedRef<SMenuAnchor>(entity.get<WidgetInstance>()->Value.ToSharedRef())
-					->SetIsOpen(entity.has<Open>());
+			auto open = entity.has(WidgetState::Opened);
+			StaticCastSharedRef<SMenuAnchor>(entity.get<WidgetInstance>()->Value.ToSharedRef())
+				->SetIsOpen(entity.has(WidgetState::Opened));
 				});
 	}
 }

@@ -12,6 +12,7 @@ namespace UI {
 		using namespace ECS;
 		world.component<UIScale>().member<float>(VALUE);
 
+		world.component<WidgetState>().add(flecs::Exclusive);
 		world.component<ButtonState>().add(flecs::Exclusive);
 		world.component<CheckBoxState>().add(flecs::Exclusive);
 	}
@@ -24,7 +25,9 @@ namespace UI {
 			GetMutableDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())
 				->ApplicationScale = scale.Value; });
 
-		world.observer<>("TriggerButtonAction")
+		world.observer<>("TriggerWidgetAction")
+			.with<WidgetState>().second(flecs::Wildcard)
+			.or_()
 			.with<ButtonState>().second(flecs::Wildcard)
 			.or_()
 			.with<CheckBoxState>().second(flecs::Wildcard)
@@ -36,7 +39,9 @@ namespace UI {
 					action.enable<ECS::Action>(); });
 				});
 
-		world.observer<>("TriggerButtonInverseAction")
+		world.observer<>("TriggerWidgetInverseAction")
+			.with<WidgetState>().second(flecs::Wildcard)
+			.or_()
 			.with<ButtonState>().second(flecs::Wildcard)
 			.or_()
 			.with<CheckBoxState>().second(flecs::Wildcard)

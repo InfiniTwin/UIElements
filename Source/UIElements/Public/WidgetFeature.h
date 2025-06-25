@@ -44,8 +44,6 @@ namespace UI {
 	struct VAlign { int Value; };
 	struct Padding { float Left, Top, Right, Bottom; };
 
-	struct Open {};
-
 	struct Attached {};
 	struct Order { int Value; };
 
@@ -89,8 +87,8 @@ namespace UI {
 					if (child.has<MenuContent>())
 						content = child.get<WidgetInstance>()->Value;
 				});
-				return content.ToSharedRef();
-			}))
+				return content.ToSharedRef(); }))
+			.UseApplicationMenuStack(false)
 			});
 
 		//// Cache references first
