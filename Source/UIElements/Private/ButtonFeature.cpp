@@ -7,11 +7,13 @@
 namespace UI {
 	void ButtonFeature::RegisterComponents(flecs::world& world) {
 		world.component<Button>().add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<Toggle>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<ButtonStyle>().add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<CheckBox>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<CheckBoxStyle>().add(flecs::OnInstantiate, flecs::Inherit);
+		
+		world.component<Toggle>().add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Radio>().add(flecs::OnInstantiate, flecs::Inherit);
 	};
 
 	void ButtonFeature::CreateQueries(flecs::world& world) {
@@ -52,6 +54,17 @@ namespace UI {
 				if (action.has<ECS::Invert>() && action.has(event))
 					action.enable<ECS::Invert>(); });
 				});
+
+		world.observer<>("SwitchRadioButtons")
+			.with<Radio>()
+			.with<CheckBoxState>().second(CheckBoxState::Checked)
+			.event(flecs::OnSet)
+			.each([&world](flecs::entity entity) {
+			auto p = entity.path();
+			//auto open = entity.has(WidgetState::Opened);
+			//StaticCastSharedRef<SMenuAnchor>(entity.get<WidgetInstance>()->Value.ToSharedRef())
+			//	->SetIsOpen(entity.has(WidgetState::Opened));
+		});
 
 		//world.observer<const UIScheme>("UpdateButtonStyles")
 		//	.term_at(0).singleton()

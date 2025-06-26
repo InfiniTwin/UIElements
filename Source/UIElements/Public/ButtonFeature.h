@@ -17,6 +17,7 @@ namespace UI {
 	struct Button {};
 	struct CheckBox {};
 	struct Toggle {};
+	struct Radio {};
 
 	struct ButtonStyle { FButtonStyle Value; };
 	struct CheckBoxStyle { FCheckBoxStyle Value; };
