@@ -55,20 +55,23 @@ namespace UI {
 					action.enable<ECS::Invert>(); });
 				});
 
-		world.observer<>("ExclusiveRadioButtons")
+		world.observer<const WidgetInstance>("ExclusiveRadioButtons")
 			.with<Radio>()
 			.with(CheckBoxState::Checked)
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity entity) {
-			StaticCastSharedRef<SCheckBox>(entity.get<WidgetInstance>()->Value.ToSharedRef())
-				->SetVisibility(EVisibility::HitTestInvisible);
-			entity.parent().children([&](flecs::entity other) {
+			.each([&world](flecs::entity entity, const WidgetInstance& widget) {
+			auto checkBox = StaticCastSharedRef<SCheckBox>(widget.Value.ToSharedRef());
+			checkBox->SetIsChecked(ECheckBoxState::Checked);
+			checkBox->SetVisibility(EVisibility::HitTestInvisible);
+			// Uncheck others
+			entity.parent().children([&entity](flecs::entity other) {
 				if (other.has(CheckBoxState::Checked) && other.id() != entity.id()) {
 					auto checkBox = StaticCastSharedRef<SCheckBox>(other.get<WidgetInstance>()->Value.ToSharedRef());
 					checkBox->SetIsChecked(ECheckBoxState::Unchecked);
 					checkBox->SetVisibility(EVisibility::Visible);
 					other.add(CheckBoxState::Unchecked);
-				}});
+				}
+				});
 				});
 
 		//world.observer<const UIScheme>("UpdateButtonStyles")
