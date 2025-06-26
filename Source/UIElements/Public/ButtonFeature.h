@@ -54,17 +54,15 @@ namespace UI {
 				style.SetHovered(GetBrush(brush));
 			else {
 				auto margin = ToMargin(brush.get<Padding>());
-				if (brush.name().contains("Normal"))
-				{
+				if (brush.name().contains("Normal")) {
 					style.SetNormal(GetBrush(brush));
 					style.SetNormalPadding(margin);
-				}
-				else if (brush.name().contains("Pressed")) {
+				} else if (brush.name().contains("Pressed")) {
 					style.SetPressed(GetBrush(brush));
 					style.SetPressedPadding(margin);
 				}
 			}
-			});
+		});
 		entity.get_mut<ButtonStyle>()->Value = style;
 	}
 
@@ -101,8 +99,7 @@ namespace UI {
 				style.SetPressedForegroundColor(color);
 				style.SetCheckedPressedForegroundColor(color);
 			}
-			}
-		);
+		});
 		entity.get_mut<CheckBoxStyle>()->Value = style;
 	}
 }
