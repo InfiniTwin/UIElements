@@ -23,7 +23,7 @@ namespace UI {
 
 		world.component<Menu>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<MenuPlacement>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<MenuContent>();
+		world.component<MenuContent>().add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Box>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HBox>().add(flecs::OnInstantiate, flecs::Inherit);
