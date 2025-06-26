@@ -84,7 +84,6 @@ namespace UI {
 			else if (brush.name().contains("BrushHoveredON"))
 				style.SetCheckedHoveredImage(GetBrush(brush));
 
-
 			else if (brush.name().contains("BrushPressedOFF"))
 				style.SetUncheckedPressedImage(GetBrush(brush));
 			else if (brush.name().contains("BrushPressedON"))

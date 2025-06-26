@@ -11,7 +11,7 @@ namespace UI {
 
 		world.component<CheckBox>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<CheckBoxStyle>().add(flecs::OnInstantiate, flecs::Inherit);
-		
+
 		world.component<Toggle>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Radio>().add(flecs::OnInstantiate, flecs::Inherit);
 	};
@@ -36,7 +36,7 @@ namespace UI {
 
 	void ButtonFeature::CreateObservers(flecs::world& world) {
 		world.observer<>("TriggerCheckBoxAction")
-			.with<CheckBoxState>().second(flecs::Wildcard)
+			.with<CheckBoxState>(flecs::Wildcard)
 			.event(flecs::OnSet)
 			.each([&world](flecs::iter& it, size_t t) {
 			auto event = it.pair(0);
@@ -46,7 +46,7 @@ namespace UI {
 				});
 
 		world.observer<>("TriggerCheckBoxInverseAction")
-			.with<CheckBoxState>().second(flecs::Wildcard)
+			.with<CheckBoxState>(flecs::Wildcard)
 			.event(flecs::OnRemove)
 			.each([&world](flecs::iter& it, size_t t) {
 			auto event = it.pair(0);
@@ -55,16 +55,21 @@ namespace UI {
 					action.enable<ECS::Invert>(); });
 				});
 
-		world.observer<>("SwitchRadioButtons")
+		world.observer<>("ExclusiveRadioButtons")
 			.with<Radio>()
-			.with<CheckBoxState>().second(CheckBoxState::Checked)
+			.with(CheckBoxState::Checked)
 			.event(flecs::OnSet)
 			.each([&world](flecs::entity entity) {
-			auto p = entity.path();
-			//auto open = entity.has(WidgetState::Opened);
-			//StaticCastSharedRef<SMenuAnchor>(entity.get<WidgetInstance>()->Value.ToSharedRef())
-			//	->SetIsOpen(entity.has(WidgetState::Opened));
-		});
+			StaticCastSharedRef<SCheckBox>(entity.get<WidgetInstance>()->Value.ToSharedRef())
+				->SetVisibility(EVisibility::HitTestInvisible);
+			entity.parent().children([&](flecs::entity other) {
+				if (other.has(CheckBoxState::Checked) && other.id() != entity.id()) {
+					auto checkBox = StaticCastSharedRef<SCheckBox>(other.get<WidgetInstance>()->Value.ToSharedRef());
+					checkBox->SetIsChecked(ECheckBoxState::Unchecked);
+					checkBox->SetVisibility(EVisibility::Visible);
+					other.add(CheckBoxState::Unchecked);
+				}});
+				});
 
 		//world.observer<const UIScheme>("UpdateButtonStyles")
 		//	.term_at(0).singleton()
