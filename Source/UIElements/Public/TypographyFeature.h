@@ -27,14 +27,15 @@ namespace UI {
 	struct FontInfo { FSlateFontInfo Value; };
 
 	struct Locale { FString Value; };
-	struct LocalizedText { FString Value; };
+	struct Localized { FString Value; };
+	struct Text { FString Value; };
 
 	struct Icon { FString Value; };
 
 	struct TextBlock {};
 
 	struct QueryText { flecs::query<const FontFace, const FontSize> Value; };
-	struct QueryLocalizedText { flecs::query<const LocalizedText, const WidgetInstance> Value; };
+	struct QueryLocalizedText { flecs::query<const Text, const WidgetInstance> Value; };
 
 	struct QueryIcon { flecs::query<const FontFace, const FontSize> Value; };
 

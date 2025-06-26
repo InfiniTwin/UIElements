@@ -14,12 +14,13 @@ namespace UI {
 		world.component<FontSize>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontInfo>().add(flecs::OnInstantiate, flecs::Inherit);
 
-		world.component<Locale>().member<FString>(VALUE);
-		world.component<LocalizedText>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Override);
-
-		world.component<Icon>().member<FString>(VALUE);
-
 		world.component<TextBlock>();
+
+		world.component<Locale>().member<FString>(VALUE);
+		world.component<Localized>().add(flecs::OnInstantiate, flecs::Inherit);
+
+		world.component<Text>().member<FString>(VALUE);
+		world.component<Icon>().member<FString>(VALUE);
 	};
 
 	void TypographyFeature::CreateQueries(flecs::world& world) {
@@ -27,12 +28,13 @@ namespace UI {
 		world.set(QueryText{
 			world.query_builder<const FontFace, const FontSize>(COMPONENT(QueryText))
 			.with<FontInfo>()
-			.with<LocalizedText>()
+			.with<Text>()
 			.with(flecs::Prefab).cached().build() });
 
 		world.component<QueryLocalizedText>();
 		world.set(QueryLocalizedText{
-			world.query_builder<const LocalizedText, const WidgetInstance>(COMPONENT(QueryLocalizedText))
+			world.query_builder<const Text, const WidgetInstance>(COMPONENT(QueryLocalizedText))
+			.with<Localized>()
 			.cached().build() });
 
 		world.component<QueryIcon>();
@@ -51,8 +53,8 @@ namespace UI {
 			world.get<QueryText>()->Value
 				.each([&f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
 				SetFontInfo(p, f.Value, ff.Value, fs.Value);
-					});
-				});
+			});
+		});
 
 		world.observer<const IconFont>("SetIconPrefabFontInfo")
 			.term_at(0).singleton()
@@ -61,8 +63,8 @@ namespace UI {
 			world.get<QueryIcon>()->Value
 				.each([&world, &f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
 				SetFontInfo(p, f.Value, ff.Value, fs.Value);
-					});
-				});
+			});
+		});
 
 		world.observer<const FontInfo>("SetInstanceFontInfo")
 			.with(flecs::Prefab)
@@ -70,15 +72,14 @@ namespace UI {
 			.each([&world](flecs::entity prefab, const FontInfo& fi) {
 			TArray<flecs::entity> instances;
 			ECS::GetInstances(world, prefab, instances);
-			for (flecs::entity instance : instances)
-			{
+			for (flecs::entity instance : instances) {
 				if (!instance.has<WidgetInstance>())
 					return;
 				TSharedPtr<SWidget> widget = instance.get_mut<WidgetInstance>()->Value;
 				if (instance.has<TextBlock>())
 					SetTextBlockFontInfo(widget, fi.Value);
 			}
-				});
+		});
 
 		world.observer<const WidgetInstance, const Icon>("SetIcon")
 			.event(flecs::OnSet)
@@ -88,16 +89,18 @@ namespace UI {
 			unicodeChar.AppendChar(static_cast<TCHAR>(codePoint));
 			SetTextBlockText(w.Value, unicodeChar); });
 
-		world.observer<const WidgetInstance, const LocalizedText>("LocalizeText")
+		world.observer<const WidgetInstance, const Text>("SetText")
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity e, const WidgetInstance& w, const LocalizedText& lt) {
-			if (lt.Value.IsEmpty())
+			.each([&world](flecs::entity entity, const WidgetInstance& widget, const Text& text) {
+			FString string = text.Value;
+			if (string.IsEmpty())
 				return;
-			FString text = GetLocalizedText(world.get<Locale>()->Value, lt.Value);
-			if (e.has<TextBlock>())
-				SetTextBlockText(w.Value, text); });
+			if (entity.has<Localized>())
+				string = GetLocalizedText(world.get<Locale>()->Value, string);
+			if (entity.has<TextBlock>())
+				SetTextBlockText(widget.Value, string); });
 
-		world.observer<const Locale>("LocalizeAllText")
+		world.observer<const Locale>("LocalizeText")
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const Locale& locale) {
@@ -105,14 +108,13 @@ namespace UI {
 			for (const FString& tableName : Assets::GetFolders(Assets::GetAssetPath("", LocalizationFolder)))
 				tables.Add(tableName, LoadTable(GetTablePath(tableName, locale.Value)));
 			world.get<QueryLocalizedText>()->Value
-				.each([&tables](flecs::entity e, const LocalizedText& lt, const WidgetInstance& w) {
+				.each([&tables](flecs::entity e, const Text& lt, const WidgetInstance& w) {
 				if (const auto* table = tables.Find(GetTable(lt.Value)); table)
-					if (const auto* result = table->Find(GetKey(lt.Value)))
-					{
+					if (const auto* result = table->Find(GetKey(lt.Value))) {
 						TSharedPtr<SWidget> widget = e.get_mut<WidgetInstance>()->Value;
 						if (e.has<TextBlock>())
 							SetTextBlockText(widget, *result);
 					} });
-				});
+		});
 	};
 }
