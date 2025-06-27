@@ -9,6 +9,8 @@
 namespace UI {
 	struct StyleFeature {
 		static void RegisterComponents(flecs::world& world);
+		static void CreateQueries(flecs::world& world);
+		static void CreateObservers(flecs::world& world);
 	};
 
 	struct Brush { FSlateBrush Value; };
@@ -17,6 +19,8 @@ namespace UI {
 	struct Width { float Value; };
 	struct FixedRadius {};
 	struct Radii { float TopLeft, TopRight, BottomRight, BottomLeft; };
+
+	struct QueryBrushPrefab { flecs::query<Brush> Value; };
 
 	static inline FSlateBrush GetBrush(flecs::entity brush) {
 		FSlateBrush slateBrush;
@@ -37,5 +41,9 @@ namespace UI {
 			}
 		}
 		return slateBrush;
+	}
+
+	static inline void SetBrush(flecs::entity brush) {
+		brush.get_mut<Brush>()->Value = GetBrush(brush);
 	}
 }

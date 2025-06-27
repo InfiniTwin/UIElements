@@ -41,11 +41,13 @@ namespace UI {
 
 		ColorFeature::CreateQueries(world);
 		TypographyFeature::CreateQueries(world);
+		StyleFeature::CreateQueries(world);
 		ButtonFeature::CreateQueries(world);
 
 		UIFeature::CreateObservers(world);
 		WidgetFeature::CreateObservers(world);
 		ColorFeature::CreateObservers(world);
+		StyleFeature::CreateObservers(world);
 		TypographyFeature::CreateObservers(world);
 		ButtonFeature::CreateObservers(world);
 

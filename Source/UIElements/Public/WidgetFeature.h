@@ -78,12 +78,12 @@ namespace UI {
 	}
 
 	static inline void AddBorderWidget(const flecs::entity border) {
-		FSlateBrush brush;
+		flecs::entity brush;
 		border.children([&brush](flecs::entity child) {
 			if (child.has<Brush>())
-				brush = GetBrush(child);
+				brush = child;
 		});
-		border.set(WidgetInstance{ SNew(SBorder).BorderImage(&brush) });
+		border.set(WidgetInstance{ SNew(SBorder).BorderImage(&brush.get<Brush>()->Value) });
 	}
 
 	static inline void AddMenuWidget(const flecs::entity menu) {

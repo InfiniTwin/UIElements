@@ -51,6 +51,7 @@ namespace UI {
 	static inline void SetButtonStyle(flecs::entity entity) {
 		auto style = FButtonStyle();
 		entity.children([&style](flecs::entity brush) {
+			if (!brush.has<BrushType>()) return;
 			if (brush.name().contains("Hovered"))
 				style.SetHovered(GetBrush(brush));
 			else {
@@ -74,6 +75,7 @@ namespace UI {
 		style.SetPadding(ToMargin(entity.get<Padding>()));
 
 		entity.children([&style](flecs::entity brush) {
+			if (!brush.has<BrushType>()) return;
 			if (brush.name().contains("BrushNormalOFF"))
 				style.SetUncheckedImage(GetBrush(brush));
 			else if (brush.name().contains("BrushNormalON"))

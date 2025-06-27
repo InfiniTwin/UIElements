@@ -49,7 +49,7 @@ namespace UI {
 			.event(flecs::OnAdd)
 			.each([&world](flecs::entity widget) {
 			if (widget.has<Border>())
-				AddBorderWidget(widget);
+				widget.set(WidgetInstance{ SNew(SBorder) });
 			else if (widget.has<ConstraintCanvas>())
 				widget.set(WidgetInstance{ SNew(SConstraintCanvas) });
 			else if (widget.has<CompoundWidget>())

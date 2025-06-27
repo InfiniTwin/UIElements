@@ -150,15 +150,20 @@ namespace UI {
 			SetPrefabColor(world, "TertiaryFixedDim", MaterialDynamicColors::TertiaryFixedDim().GetLinear(ds));
 			SetPrefabColor(world, "OnTertiaryFixed", MaterialDynamicColors::OnTertiaryFixed().GetLinear(ds));
 			SetPrefabColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds)); 
-				
+
+			world.get<QueryBrushPrefab>()->Value
+				.each([](flecs::entity brush, Brush) {
+				SetBrush(brush);
+					});
+
 			world.get<QueryButtonStylePrefab>()->Value
-				.each([](flecs::entity prefab, ButtonStyle& style) {
-				SetButtonStyle(prefab);
+				.each([](flecs::entity style, ButtonStyle) {
+				SetButtonStyle(style);
 					});
 
 			world.get<QueryCheckBoxStylePrefab>()->Value
-				.each([](flecs::entity prefab, CheckBoxStyle& style) {
-				SetCheckBoxStyle(prefab);
+				.each([](flecs::entity style, CheckBoxStyle) {
+				SetCheckBoxStyle(style);
 					});
 				});
 
