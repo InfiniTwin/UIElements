@@ -7,7 +7,6 @@
 #include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
-#include "Logging/StructuredLog.h"
 
 namespace UI {
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
@@ -17,6 +16,8 @@ namespace UI {
 		world.component<Widget>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<WidgetInstance>()
 			.on_remove([](flecs::entity e, WidgetInstance& w) {w.Value.Reset(); });
+
+		world.component<Border>().add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<ConstraintCanvas>();
 		world.component<CompoundWidget>();
@@ -46,27 +47,29 @@ namespace UI {
 		world.observer<>("AddWidgetInstance")
 			.with<Widget>()
 			.event(flecs::OnAdd)
-			.each([&world](flecs::entity entity) {
-			if (entity.has<ConstraintCanvas>())
-				entity.set(WidgetInstance{ SNew(SConstraintCanvas) });
-			else if (entity.has<CompoundWidget>())
-				entity.set(WidgetInstance{ SNew(CompoundWidgetInstance) });
-			else if (entity.has<Box>())
-				entity.set(WidgetInstance{ SNew(SBox).Padding(0).WidthOverride(FOptionalSize()).HeightOverride(FOptionalSize()) });
-			else if (entity.has<HBox>())
-				entity.set(WidgetInstance{ SNew(SHorizontalBox) });
-			else if (entity.has<VBox>())
-				entity.set(WidgetInstance{ SNew(SVerticalBox) });
-			else if (entity.has<Button>())
-				AddButtonWidget(world, entity);
-			else if (entity.has<CheckBox>())
-				AddCheckBoxWidget(world, entity);
-			else if (entity.has<TextBlock>())
-				AddTextBlockWidget(entity);
-			else if (entity.has<Menu>())
-				AddMenuWidget(entity);
+			.each([&world](flecs::entity widget) {
+			if (widget.has<Border>())
+				AddBorderWidget(widget);
+			else if (widget.has<ConstraintCanvas>())
+				widget.set(WidgetInstance{ SNew(SConstraintCanvas) });
+			else if (widget.has<CompoundWidget>())
+				widget.set(WidgetInstance{ SNew(CompoundWidgetInstance) });
+			else if (widget.has<Box>())
+				widget.set(WidgetInstance{ SNew(SBox).Padding(0).WidthOverride(FOptionalSize()).HeightOverride(FOptionalSize()) });
+			else if (widget.has<HBox>())
+				widget.set(WidgetInstance{ SNew(SHorizontalBox) });
+			else if (widget.has<VBox>())
+				widget.set(WidgetInstance{ SNew(SVerticalBox) });
+			else if (widget.has<Button>())
+				AddButtonWidget(world, widget);
+			else if (widget.has<CheckBox>())
+				AddCheckBoxWidget(world, widget);
+			else if (widget.has<TextBlock>())
+				AddTextBlockWidget(widget);
+			else if (widget.has<Menu>())
+				AddMenuWidget(widget);
 
-			entity.add<Attached>().disable<Attached>();
+			widget.add<Attached>().disable<Attached>();
 				});
 	}
 
@@ -87,9 +90,11 @@ namespace UI {
 				return;
 			TSharedRef<SWidget> parentWidget = parent.get_mut<WidgetInstance>()->Value.ToSharedRef();
 
-			if (parent.has<ConstraintCanvas>())
+			if (parent.has<Border>())
+				SetContent<SBorder>(parentWidget, child);
+			else if (parent.has<ConstraintCanvas>())
 				AttachToConstraintCanvas(parentWidget, child);
-			if (parent.has<CompoundWidget>())
+			else if (parent.has<CompoundWidget>())
 				AttachToCompoundWidget(parentWidget, w.Value.ToSharedRef());
 			else if (parent.has<Box>())
 				SetContent<SBox>(parentWidget, child);

@@ -3,9 +3,9 @@
 #pragma once
 
 #include "flecs.h"
-#include "ECS.h"
 #include "Widgets/Layout/SConstraintCanvas.h"
 #include "Widgets/Input/SMenuAnchor.h"
+#include "StyleFeature.h"
 
 namespace UI {
 	struct WidgetFeature {
@@ -19,6 +19,8 @@ namespace UI {
 	struct Widget {};
 	struct WidgetInstance { TSharedPtr<SWidget> Value; };
 
+	struct Border {};
+
 	struct ConstraintCanvas {};
 
 	struct CompoundWidgetInstance : public SCompoundWidget {
@@ -26,7 +28,7 @@ namespace UI {
 		SLATE_BEGIN_ARGS(CompoundWidgetInstance) {}
 		SLATE_END_ARGS()
 
-		void Construct(const FArguments& InArgs) {}
+			void Construct(const FArguments& InArgs) {}
 
 		FCompoundWidgetOneChildSlot& Slot() { return ChildSlot; }
 	};
@@ -51,31 +53,37 @@ namespace UI {
 		return FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom));
 	}
 
-	static inline TPair<FAnchors, FVector2D> ToAnchorsAndAlignment(const flecs::entity& child)
-	{
+	static inline TPair<FAnchors, FVector2D> ToAnchorsAndAlignment(const flecs::entity& child) {
 		EVerticalAlignment vAlign = static_cast<EVerticalAlignment>(child.get<VAlign>()->Value);
 		EHorizontalAlignment hAlign = static_cast<EHorizontalAlignment>(child.get<HAlign>()->Value);
 
 		FAnchors anchors;
 		FVector2D alignment;
 
-		switch (hAlign)
-		{
-		case HAlign_Left:   anchors.Minimum.X = anchors.Maximum.X = 0.f; alignment.X = 0.f; break;
-		case HAlign_Center: anchors.Minimum.X = anchors.Maximum.X = 0.5f; alignment.X = 0.5f; break;
-		case HAlign_Right:  anchors.Minimum.X = anchors.Maximum.X = 1.f; alignment.X = 1.f; break;
-		default:            anchors.Minimum.X = anchors.Maximum.X = 0.f; alignment.X = 0.f; break;
+		switch (hAlign) {
+			case HAlign_Left:   anchors.Minimum.X = anchors.Maximum.X = 0.f; alignment.X = 0.f; break;
+			case HAlign_Center: anchors.Minimum.X = anchors.Maximum.X = 0.5f; alignment.X = 0.5f; break;
+			case HAlign_Right:  anchors.Minimum.X = anchors.Maximum.X = 1.f; alignment.X = 1.f; break;
+			default:            anchors.Minimum.X = anchors.Maximum.X = 0.f; alignment.X = 0.f; break;
 		}
 
-		switch (vAlign)
-		{
-		case VAlign_Top:    anchors.Minimum.Y = anchors.Maximum.Y = 0.f; alignment.Y = 0.f; break;
-		case VAlign_Center: anchors.Minimum.Y = anchors.Maximum.Y = 0.5f; alignment.Y = 0.5f; break;
-		case VAlign_Bottom: anchors.Minimum.Y = anchors.Maximum.Y = 1.f; alignment.Y = 1.f; break;
-		default:            anchors.Minimum.Y = anchors.Maximum.Y = 0.f; alignment.Y = 0.f; break;
+		switch (vAlign) {
+			case VAlign_Top:    anchors.Minimum.Y = anchors.Maximum.Y = 0.f; alignment.Y = 0.f; break;
+			case VAlign_Center: anchors.Minimum.Y = anchors.Maximum.Y = 0.5f; alignment.Y = 0.5f; break;
+			case VAlign_Bottom: anchors.Minimum.Y = anchors.Maximum.Y = 1.f; alignment.Y = 1.f; break;
+			default:            anchors.Minimum.Y = anchors.Maximum.Y = 0.f; alignment.Y = 0.f; break;
 		}
 
 		return { anchors, alignment };
+	}
+
+	static inline void AddBorderWidget(const flecs::entity border) {
+		FSlateBrush brush;
+		border.children([&brush](flecs::entity child) {
+			if (child.has<Brush>())
+				brush = GetBrush(child);
+		});
+		border.set(WidgetInstance{ SNew(SBorder).BorderImage(&brush) });
 	}
 
 	static inline void AddMenuWidget(const flecs::entity menu) {
@@ -93,9 +101,8 @@ namespace UI {
 	}
 
 	template<typename SlotType>
-	void AttachSlot(SlotType& slot, const flecs::entity child)
-	{
-		auto padding = child.get<Padding>();	
+	void AttachSlot(SlotType& slot, const flecs::entity child) {
+		auto padding = child.get<Padding>();
 		slot
 			.VAlign(static_cast<EVerticalAlignment>(child.get<VAlign>()->Value))
 			.HAlign(static_cast<EHorizontalAlignment>(child.get<HAlign>()->Value))
