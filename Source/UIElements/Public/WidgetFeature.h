@@ -95,7 +95,6 @@ namespace UI {
 	template<typename SlotType>
 	void AttachSlot(SlotType& slot, const flecs::entity child)
 	{
-		auto p = child.path();
 		auto padding = child.get<Padding>();	
 		slot
 			.VAlign(static_cast<EVerticalAlignment>(child.get<VAlign>()->Value))
