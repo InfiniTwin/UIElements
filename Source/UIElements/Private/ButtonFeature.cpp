@@ -70,8 +70,7 @@ namespace UI {
 					checkBox->SetIsChecked(ECheckBoxState::Unchecked);
 					checkBox->SetVisibility(EVisibility::Visible);
 					other.add(CheckBoxState::Unchecked);
-				}
-				});
+				}});
 				});
 
 		//world.observer<const UIScheme>("UpdateButtonStyles")

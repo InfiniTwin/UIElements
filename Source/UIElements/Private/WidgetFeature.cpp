@@ -90,7 +90,7 @@ namespace UI {
 			if (parent.has<ConstraintCanvas>())
 				AttachToConstraintCanvas(parentWidget, child);
 			if (parent.has<CompoundWidget>())
-				AttachToCompoundWidget(w.Value.ToSharedRef(), parentWidget);
+				AttachToCompoundWidget(parentWidget, w.Value.ToSharedRef());
 			else if (parent.has<Box>())
 				SetContent<SBox>(parentWidget, child);
 			else if (parent.has<HBox>())
