@@ -28,7 +28,7 @@ namespace UI {
 		SLATE_BEGIN_ARGS(CompoundWidgetInstance) {}
 		SLATE_END_ARGS()
 
-			void Construct(const FArguments& InArgs) {}
+		void Construct(const FArguments& InArgs) {}
 
 		FCompoundWidgetOneChildSlot& Slot() { return ChildSlot; }
 	};
@@ -41,9 +41,13 @@ namespace UI {
 	struct Box {};
 	struct HBox {};
 	struct VBox {};
+	
+	struct FillHeight { float Value; };
+	struct FillWidth { float Value; };
 
-	struct HAlign { int Value; };
 	struct VAlign { int Value; };
+	struct HAlign { int Value; };
+	
 	struct Padding { float Left, Top, Right, Bottom; };
 
 	struct Attached {};
@@ -54,36 +58,55 @@ namespace UI {
 	}
 
 	static inline TPair<FAnchors, FVector2D> ToAnchorsAndAlignment(const flecs::entity& child) {
-		EVerticalAlignment vAlign = static_cast<EVerticalAlignment>(child.get<VAlign>()->Value);
 		EHorizontalAlignment hAlign = static_cast<EHorizontalAlignment>(child.get<HAlign>()->Value);
+		EVerticalAlignment vAlign = static_cast<EVerticalAlignment>(child.get<VAlign>()->Value);
 
 		FAnchors anchors;
 		FVector2D alignment;
 
 		switch (hAlign) {
-			case HAlign_Left:   anchors.Minimum.X = anchors.Maximum.X = 0.f; alignment.X = 0.f; break;
-			case HAlign_Center: anchors.Minimum.X = anchors.Maximum.X = 0.5f; alignment.X = 0.5f; break;
-			case HAlign_Right:  anchors.Minimum.X = anchors.Maximum.X = 1.f; alignment.X = 1.f; break;
-			default:            anchors.Minimum.X = anchors.Maximum.X = 0.f; alignment.X = 0.f; break;
+		case HAlign_Left:
+			anchors.Minimum.X = anchors.Maximum.X = 0.f;
+			alignment.X = 0.f;
+			break;
+		case HAlign_Center:
+			anchors.Minimum.X = anchors.Maximum.X = 0.5f;
+			alignment.X = 0.5f;
+			break;
+		case HAlign_Right:
+			anchors.Minimum.X = anchors.Maximum.X = 1.f;
+			alignment.X = 1.f;
+			break;
+		case HAlign_Fill:
+		default:
+			anchors.Minimum.X = 0.f;
+			anchors.Maximum.X = 1.f;
+			alignment.X = 0.f;
+			break;
 		}
 
 		switch (vAlign) {
-			case VAlign_Top:    anchors.Minimum.Y = anchors.Maximum.Y = 0.f; alignment.Y = 0.f; break;
-			case VAlign_Center: anchors.Minimum.Y = anchors.Maximum.Y = 0.5f; alignment.Y = 0.5f; break;
-			case VAlign_Bottom: anchors.Minimum.Y = anchors.Maximum.Y = 1.f; alignment.Y = 1.f; break;
-			default:            anchors.Minimum.Y = anchors.Maximum.Y = 0.f; alignment.Y = 0.f; break;
+		case VAlign_Top:
+			anchors.Minimum.Y = anchors.Maximum.Y = 0.f;
+			alignment.Y = 0.f;
+			break;
+		case VAlign_Center:
+			anchors.Minimum.Y = anchors.Maximum.Y = 0.5f;
+			alignment.Y = 0.5f;
+			break;
+		case VAlign_Bottom:
+			anchors.Minimum.Y = anchors.Maximum.Y = 1.f;
+			alignment.Y = 1.f;
+			break;
+		case VAlign_Fill:
+		default:
+			anchors.Minimum.Y = 0.f;
+			anchors.Maximum.Y = 1.f;
+			alignment.Y = 0.f;
+			break;
 		}
 
 		return { anchors, alignment };
-	}
-
-	static inline void AddBorderWidget(const flecs::entity border) {
-		flecs::entity brush;
-		border.children([&brush](flecs::entity child) {
-			if (child.has<Brush>())
-				brush = child;
-		});
-		border.set(WidgetInstance{ SNew(SBorder).BorderImage(&brush.get<Brush>()->Value) });
 	}
 
 	static inline void AddMenuWidget(const flecs::entity menu) {
@@ -129,21 +152,21 @@ namespace UI {
 			.AttachWidget(child.get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
-	static inline void AttachToBox(TSharedRef<SWidget> parent, flecs::entity child) {
-		auto slot = StaticCastSharedRef<SHorizontalBox>(parent)->AddSlot();
-		slot.AutoWidth();
-		AttachSlot(slot, child);
-	}
-
 	static inline void AttachToHorizontalBox(TSharedRef<SWidget> parent, flecs::entity child) {
 		auto slot = StaticCastSharedRef<SHorizontalBox>(parent)->AddSlot();
-		slot.AutoWidth();
+		if (child.has<FillWidth>()) 
+			slot.FillWidth(child.get<FillWidth>()->Value);
+		else 
+			slot.AutoWidth();
 		AttachSlot(slot, child);
 	}
 
 	static inline void AttachToVerticalBox(TSharedRef<SWidget> parent, flecs::entity child) {
 		auto slot = StaticCastSharedRef<SVerticalBox>(parent)->AddSlot();
-		slot.AutoHeight();
+		if (child.has<FillWidth>()) 
+			slot.FillHeight(child.get<FillHeight>()->Value);
+		else 
+			slot.AutoHeight();
 		AttachSlot(slot, child);
 	}
 

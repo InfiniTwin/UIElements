@@ -29,9 +29,13 @@ namespace UI {
 		world.component<Box>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HBox>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<VBox>().add(flecs::OnInstantiate, flecs::Inherit);
+		
+		world.component<FillHeight>().member<float>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<FillWidth>().member<float>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
-		world.component<HAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<VAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<HAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		
 		world.component<Padding>()
 			.member<float>(MEMBER(Padding::Left))
 			.member<float>(MEMBER(Padding::Topp))
