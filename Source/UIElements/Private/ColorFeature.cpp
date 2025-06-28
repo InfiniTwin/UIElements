@@ -39,11 +39,11 @@ namespace UI {
 			std::string Utf8 = TCHAR_TO_UTF8(*HexStr);
 			const char* CStr = Utf8.c_str();
 			return s->value(flecs::String, &CStr);
-		})
+				})
 			.assign_string([](Argb* data, const char* value) {
 			FString Hex = UTF8_TO_TCHAR(value);
 			*data = UIUtils::ArgbFromHex(Hex);
-		});
+				});
 
 		// FLinearColor <=> Hex (as string)
 		world.component<FLinearColor>()
@@ -53,11 +53,11 @@ namespace UI {
 			std::string Utf8 = TCHAR_TO_UTF8(*HexStr);
 			const char* CStr = Utf8.c_str();
 			return s->value(flecs::String, &CStr);
-		})
+				})
 			.assign_string([](FLinearColor* data, const char* value) {
 			FString Hex = UTF8_TO_TCHAR(value);
 			*data = UIUtils::LinearColorFromHex(Hex);
-		});
+				});
 	}
 
 	void ColorFeature::RegisterComponents(flecs::world& world) {
@@ -79,7 +79,8 @@ namespace UI {
 	void ColorFeature::CreateQueries(flecs::world& world) {
 		world.component<QueryColorPrefab>();
 		world.set(QueryColorPrefab{
-			world.query_builder<Color>(COMPONENT(QueryColorPrefab)).with(flecs::Prefab)
+			world.query_builder<Color>(COMPONENT(QueryColorPrefab))
+			.with(flecs::Prefab)
 			.cached().build() });
 	};
 
@@ -149,11 +150,12 @@ namespace UI {
 			SetPrefabColor(world, "TertiaryFixed", MaterialDynamicColors::TertiaryFixed().GetLinear(ds));
 			SetPrefabColor(world, "TertiaryFixedDim", MaterialDynamicColors::TertiaryFixedDim().GetLinear(ds));
 			SetPrefabColor(world, "OnTertiaryFixed", MaterialDynamicColors::OnTertiaryFixed().GetLinear(ds));
-			SetPrefabColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds)); 
+			SetPrefabColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds));
 
 			world.get<QueryBrushPrefab>()->Value
-				.each([](flecs::entity brush, Brush) {
-				SetBrush(brush);
+				.each([&world](flecs::entity brush, Brush) {
+				if (brush.owns<Brush>())
+					brush.get_mut<Brush>()->Value = GetBrush(brush);
 					});
 
 			world.get<QueryButtonStylePrefab>()->Value
@@ -193,10 +195,10 @@ namespace UI {
 			while (it.next())
 				for (auto i : it)
 				{
-					auto p = it.entity(i);
-					if (std::strcmp(p.name(), cn.Get()) == 0)
+					auto prefab = it.entity(i);
+					if (std::strcmp(prefab.name(), cn.Get()) == 0)
 					{
-						p.set<Color>({ c });
+						prefab.set<Color>({ c });
 						return;
 					}
 				}

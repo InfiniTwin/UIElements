@@ -29,14 +29,25 @@ namespace UI {
 	};
 
 	void StyleFeature::CreateObservers(flecs::world& world) {
-		world.observer<>("SetWidgetBrush")
+		world.observer<>("SetWidgetBrushOnBrushAdded")
 			.with<Brush>()
 			.event(flecs::OnAdd)
 			.each([&world](flecs::entity brush) {
 			flecs::entity parent = brush.parent();
-			if (parent.has<Border>())
+			if (parent.has<WidgetInstance>() && parent.has<Border>())
 				StaticCastSharedRef<SBorder>(parent.get_mut<WidgetInstance>()->Value.ToSharedRef())
 				->SetBorderImage(&brush.get<Brush>()->Value);
 				});
+
+		world.observer<>("SetWidgetBrushOnWidgetInstanceAdded")
+			.with<WidgetInstance>()
+			.event(flecs::OnSet)
+			.each([&world](flecs::entity widget) {
+			widget.children([&widget](flecs::entity child) {
+				if (child.has<Brush>()) {
+					if (widget.has<Border>())
+						StaticCastSharedRef<SBorder>(widget.get_mut<WidgetInstance>()->Value.ToSharedRef())
+						->SetBorderImage(&child.get<Brush>()->Value);
+				}}); });
 	}
 }

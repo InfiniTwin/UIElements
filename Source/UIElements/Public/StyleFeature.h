@@ -42,8 +42,4 @@ namespace UI {
 		}
 		return slateBrush;
 	}
-
-	static inline void SetBrush(flecs::entity brush) {
-		brush.get_mut<Brush>()->Value = GetBrush(brush);
-	}
 }
