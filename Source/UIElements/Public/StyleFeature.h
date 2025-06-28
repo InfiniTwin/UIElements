@@ -16,9 +16,8 @@ namespace UI {
 	struct Brush { FSlateBrush Value; };
 	struct BrushType { int Value; };
 
-	struct Width { float Value; };
-	struct FixedRadius {};
 	struct Radii { float TopLeft, TopRight, BottomRight, BottomLeft; };
+	struct Width { float Value; };
 
 	struct QueryBrushPrefab { flecs::query<Brush> Value; };
 
@@ -29,7 +28,7 @@ namespace UI {
 		if (slateBrush.GetDrawType() == ESlateBrushDrawType::Type::RoundedBox) {
 			if (auto outline = ECS::FirstChild(brush)) {
 				slateBrush.OutlineSettings.Color = outline.get<Color>()->Value;
-				if (!outline.has<FixedRadius>())
+				if (!outline.has<Radii>())
 					slateBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::HalfHeightRadius;
 				else {
 					slateBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
@@ -37,7 +36,7 @@ namespace UI {
 					slateBrush.OutlineSettings.CornerRadii = FVector4(
 						radii->TopLeft, radii->TopRight, radii->BottomRight, radii->BottomLeft);
 				}
-				slateBrush.OutlineSettings.Width = outline.get<Width>()->Value;
+				slateBrush.OutlineSettings.Width = outline.has<Width>() ? outline.get<Width>()->Value : 0;
 			}
 		}
 		return slateBrush;
