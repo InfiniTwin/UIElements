@@ -92,7 +92,7 @@ namespace UI {
 
 			if (!parent.has<WidgetInstance>())
 				return;
-			TSharedRef<SWidget> parentWidget = parent.get_mut<WidgetInstance>()->Value.ToSharedRef();
+			TSharedRef<SWidget> parentWidget = parent.try_get_mut<WidgetInstance>()->Value.ToSharedRef();
 
 			if (parent.has<Border>())
 				SetContent<SBorder>(parentWidget, child);
@@ -120,7 +120,7 @@ namespace UI {
 			.event(flecs::OnSet)
 			.each([&world](flecs::entity entity) {
 			auto open = entity.has(WidgetState::Opened);
-			StaticCastSharedRef<SMenuAnchor>(entity.get<WidgetInstance>()->Value.ToSharedRef())
+			StaticCastSharedRef<SMenuAnchor>(entity.try_get<WidgetInstance>()->Value.ToSharedRef())
 				->SetIsOpen(entity.has(WidgetState::Opened));
 				});
 	}

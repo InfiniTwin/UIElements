@@ -58,8 +58,8 @@ namespace UI {
 	}
 
 	static inline TPair<FAnchors, FVector2D> ToAnchorsAndAlignment(const flecs::entity& child) {
-		EHorizontalAlignment hAlign = static_cast<EHorizontalAlignment>(child.get<HAlign>()->Value);
-		EVerticalAlignment vAlign = static_cast<EVerticalAlignment>(child.get<VAlign>()->Value);
+		EHorizontalAlignment hAlign = static_cast<EHorizontalAlignment>(child.try_get<HAlign>()->Value);
+		EVerticalAlignment vAlign = static_cast<EVerticalAlignment>(child.try_get<VAlign>()->Value);
 
 		FAnchors anchors;
 		FVector2D alignment;
@@ -111,12 +111,12 @@ namespace UI {
 
 	static inline void AddMenuWidget(const flecs::entity menu) {
 		menu.set(WidgetInstance{ SNew(SMenuAnchor)
-			.Placement(static_cast<EMenuPlacement>(menu.get<MenuPlacement>()->Value))
+			.Placement(static_cast<EMenuPlacement>(menu.try_get<MenuPlacement>()->Value))
 			.OnGetMenuContent(FOnGetContent::CreateLambda([menu]() -> TSharedRef<SWidget> {
 				TSharedPtr<SWidget> content;
 				menu.children([&content](flecs::entity child) {
 					if (child.has<MenuContent>())
-						content = child.get<WidgetInstance>()->Value;
+						content = child.try_get<WidgetInstance>()->Value;
 				});
 				return content.ToSharedRef(); }))
 			.UseApplicationMenuStack(false)
@@ -125,17 +125,17 @@ namespace UI {
 
 	template<typename SlotType>
 	void AttachSlot(SlotType& slot, const flecs::entity child) {
-		auto padding = child.get<Padding>();
+		auto padding = child.try_get<Padding>();
 		slot
-			.VAlign(static_cast<EVerticalAlignment>(child.get<VAlign>()->Value))
-			.HAlign(static_cast<EHorizontalAlignment>(child.get<HAlign>()->Value))
+			.VAlign(static_cast<EVerticalAlignment>(child.try_get<VAlign>()->Value))
+			.HAlign(static_cast<EHorizontalAlignment>(child.try_get<HAlign>()->Value))
 			.Padding(padding->Left, padding->Top, padding->Right, padding->Bottom)
-			.AttachWidget(child.get<WidgetInstance>()->Value.ToSharedRef());
+			.AttachWidget(child.try_get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
 	template<typename TWidget>
 	static inline void SetContent(TSharedRef<SWidget>& parent, flecs::entity& child) {
-		StaticCastSharedRef<TWidget>(parent)->SetContent(child.get<WidgetInstance>()->Value.ToSharedRef());
+		StaticCastSharedRef<TWidget>(parent)->SetContent(child.try_get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
 	static inline void AttachToCompoundWidget(TSharedRef<SWidget> parent, TSharedRef<SWidget> child) {
@@ -148,14 +148,14 @@ namespace UI {
 			.AutoSize(true)
 			.Anchors(anchors)
 			.Alignment(alignment)
-			.Offset(ToMargin(child.get<Padding>()))
-			.AttachWidget(child.get<WidgetInstance>()->Value.ToSharedRef());
+			.Offset(ToMargin(child.try_get<Padding>()))
+			.AttachWidget(child.try_get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
 	static inline void AttachToHorizontalBox(TSharedRef<SWidget> parent, flecs::entity child) {
 		auto slot = StaticCastSharedRef<SHorizontalBox>(parent)->AddSlot();
 		if (child.has<FillWidth>()) 
-			slot.FillWidth(child.get<FillWidth>()->Value);
+			slot.FillWidth(child.try_get<FillWidth>()->Value);
 		else 
 			slot.AutoWidth();
 		AttachSlot(slot, child);
@@ -164,7 +164,7 @@ namespace UI {
 	static inline void AttachToVerticalBox(TSharedRef<SWidget> parent, flecs::entity child) {
 		auto slot = StaticCastSharedRef<SVerticalBox>(parent)->AddSlot();
 		if (child.has<FillWidth>()) 
-			slot.FillHeight(child.get<FillHeight>()->Value);
+			slot.FillHeight(child.try_get<FillHeight>()->Value);
 		else 
 			slot.AutoHeight();
 		AttachSlot(slot, child);

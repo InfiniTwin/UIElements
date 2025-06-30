@@ -66,7 +66,7 @@ namespace UI {
 			// Uncheck others
 			entity.parent().children([&entity](flecs::entity other) {
 				if (other.has(CheckBoxState::Checked) && other.id() != entity.id()) {
-					auto checkBox = StaticCastSharedRef<SCheckBox>(other.get<WidgetInstance>()->Value.ToSharedRef());
+					auto checkBox = StaticCastSharedRef<SCheckBox>(other.try_get<WidgetInstance>()->Value.ToSharedRef());
 					checkBox->SetIsChecked(ECheckBoxState::Unchecked);
 					checkBox->SetVisibility(EVisibility::Visible);
 					other.add(CheckBoxState::Unchecked);
@@ -77,12 +77,12 @@ namespace UI {
 		//	.term_at(0).singleton()
 		//	.event(flecs::OnSet)
 		//	.each([&world](const UIScheme& scheme) {
-		//	world.get<QueryButtonStylePrefab>()->Value
+		//	world.try_get<QueryButtonStylePrefab>()->Value
 		//		.each([](flecs::entity prefab, ButtonStyle& style) {
 		//		SetButtonStyle(prefab);
 		//			});
 
-		//	world.get<QueryCheckBoxStylePrefab>()->Value
+		//	world.try_get<QueryCheckBoxStylePrefab>()->Value
 		//		.each([](flecs::entity prefab, CheckBoxStyle& style) {
 		//		SetCheckBoxStyle(prefab);
 		//			});

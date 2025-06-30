@@ -34,8 +34,8 @@ namespace UI {
 			.each([&world](flecs::entity brush) {
 			flecs::entity parent = brush.parent();
 			if (parent.has<WidgetInstance>() && parent.has<Border>())
-				StaticCastSharedRef<SBorder>(parent.get_mut<WidgetInstance>()->Value.ToSharedRef())
-				->SetBorderImage(&brush.get<Brush>()->Value);
+				StaticCastSharedRef<SBorder>(parent.try_get_mut<WidgetInstance>()->Value.ToSharedRef())
+				->SetBorderImage(&brush.try_get<Brush>()->Value);
 				});
 
 		world.observer<>("SetWidgetBrushOnWidgetInstanceAdded")
@@ -45,8 +45,8 @@ namespace UI {
 			widget.children([&widget](flecs::entity child) {
 				if (child.has<Brush>()) {
 					if (widget.has<Border>())
-						StaticCastSharedRef<SBorder>(widget.get_mut<WidgetInstance>()->Value.ToSharedRef())
-						->SetBorderImage(&child.get<Brush>()->Value);
+						StaticCastSharedRef<SBorder>(widget.try_get_mut<WidgetInstance>()->Value.ToSharedRef())
+						->SetBorderImage(&child.try_get<Brush>()->Value);
 				}}); });
 	}
 }

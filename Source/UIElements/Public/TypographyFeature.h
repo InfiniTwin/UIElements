@@ -100,7 +100,7 @@ namespace UI {
 
 	static inline void AddTextBlockWidget(flecs::entity entity) {
 		TSharedRef<STextBlock> widget = SNew(STextBlock);
-		SetTextBlockFontInfo(widget, entity.get<FontInfo>()->Value);
+		SetTextBlockFontInfo(widget, entity.try_get<FontInfo>()->Value);
 		entity.set(WidgetInstance{ widget });
 	}
 }

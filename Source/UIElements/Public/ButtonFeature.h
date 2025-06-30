@@ -27,13 +27,13 @@ namespace UI {
 
 	static inline void AddButtonWidget(flecs::world world, flecs::entity entity) {
 		entity.set(WidgetInstance{ SNew(SButton)
-			.ButtonStyle(&entity.get<ButtonStyle>()->Value)
+			.ButtonStyle(&entity.try_get<ButtonStyle>()->Value)
 			.OnClicked_Lambda(([entity]() { entity.add(Clicked); return FReply::Handled(); })) });
 	}
 
 	static inline void AddCheckBoxWidget(flecs::world world, flecs::entity entity) {
 		entity.set(WidgetInstance{ SNew(SCheckBox)
-			.Style(&entity.get<CheckBoxStyle>()->Value)
+			.Style(&entity.try_get<CheckBoxStyle>()->Value)
 			.OnCheckStateChanged_Lambda([entity](ECheckBoxState state) {
 				switch (state) {
 				case ECheckBoxState::Unchecked:
@@ -55,7 +55,7 @@ namespace UI {
 			if (brush.name().contains("Hovered"))
 				style.SetHovered(GetBrush(brush));
 			else {
-				auto margin = ToMargin(brush.get<Padding>());
+				auto margin = ToMargin(brush.try_get<Padding>());
 				if (brush.name().contains("Normal")) {
 					style.SetNormal(GetBrush(brush));
 					style.SetNormalPadding(margin);
@@ -65,14 +65,14 @@ namespace UI {
 				}
 			}
 		});
-		entity.get_mut<ButtonStyle>()->Value = style;
+		entity.try_get_mut<ButtonStyle>()->Value = style;
 	}
 
 	static inline void SetCheckBoxStyle(flecs::entity entity) {
 		auto fbs = FTextBlockStyle();
 		auto style = FCheckBoxStyle();
 		style.CheckBoxType = static_cast<ESlateCheckBoxType::Type>(entity.has<Toggle>());
-		style.SetPadding(ToMargin(entity.get<Padding>()));
+		style.SetPadding(ToMargin(entity.try_get<Padding>()));
 
 		entity.children([&style](flecs::entity brush) {
 			if (!brush.has<BrushType>()) return;
@@ -92,9 +92,9 @@ namespace UI {
 				style.SetCheckedPressedImage(GetBrush(brush));
 
 			else if (brush.name().contains("ForegroundNormal"))
-				style.SetForegroundColor(brush.get<Color>()->Value);
+				style.SetForegroundColor(brush.try_get<Color>()->Value);
 			else if (brush.name().contains("ForegroundHovered")) {
-				FLinearColor color = brush.get<Color>()->Value;
+				FLinearColor color = brush.try_get<Color>()->Value;
 				style.SetCheckedForegroundColor(color);
 				style.SetHoveredForegroundColor(color);
 				style.SetCheckedHoveredForegroundColor(color);
@@ -102,6 +102,6 @@ namespace UI {
 				style.SetCheckedPressedForegroundColor(color);
 			}
 		});
-		entity.get_mut<CheckBoxStyle>()->Value = style;
+		entity.try_get_mut<CheckBoxStyle>()->Value = style;
 	}
 }

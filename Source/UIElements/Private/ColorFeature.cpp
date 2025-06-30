@@ -152,18 +152,18 @@ namespace UI {
 			SetPrefabColor(world, "OnTertiaryFixed", MaterialDynamicColors::OnTertiaryFixed().GetLinear(ds));
 			SetPrefabColor(world, "OnTertiaryFixedVariant", MaterialDynamicColors::OnTertiaryFixedVariant().GetLinear(ds));
 
-			world.get<QueryBrushPrefab>()->Value
+			world.try_get<QueryBrushPrefab>()->Value
 				.each([&world](flecs::entity brush, Brush) {
 				if (brush.owns<Brush>())
-					brush.get_mut<Brush>()->Value = GetBrush(brush);
+					brush.try_get_mut<Brush>()->Value = GetBrush(brush);
 					});
 
-			world.get<QueryButtonStylePrefab>()->Value
+			world.try_get<QueryButtonStylePrefab>()->Value
 				.each([](flecs::entity style, ButtonStyle) {
 				SetButtonStyle(style);
 					});
 
-			world.get<QueryCheckBoxStylePrefab>()->Value
+			world.try_get<QueryCheckBoxStylePrefab>()->Value
 				.each([](flecs::entity style, CheckBoxStyle) {
 				SetCheckBoxStyle(style);
 					});
@@ -191,7 +191,7 @@ namespace UI {
 	void SetPrefabColor(flecs::world& world, const FString name, const FLinearColor c) {
 		auto colorName = TEXT("Color") + name;
 		FTCHARToUTF8 cn(*colorName);
-		world.get<QueryColorPrefab>()->Value.run([&cn, &c](flecs::iter& it) {
+		world.try_get<QueryColorPrefab>()->Value.run([&cn, &c](flecs::iter& it) {
 			while (it.next())
 				for (auto i : it)
 				{
@@ -208,7 +208,7 @@ namespace UI {
 	void SetWidgetColor(flecs::world& world, flecs::entity entity, const FLinearColor color) {
 		if (!entity.has<WidgetInstance>())
 			return;
-		TSharedPtr<SWidget> widget = entity.get_mut<WidgetInstance>()->Value;
+		TSharedPtr<SWidget> widget = entity.try_get_mut<WidgetInstance>()->Value;
 
 		if (entity.has<TextBlock>())
 			StaticCastSharedPtr<STextBlock>(widget)->SetColorAndOpacity(color);

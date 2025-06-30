@@ -50,7 +50,7 @@ namespace UI {
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const TextFont& f) {
-			world.get<QueryText>()->Value
+			world.try_get<QueryText>()->Value
 				.each([&f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
 				SetFontInfo(p, f.Value, ff.Value, fs.Value);
 			});
@@ -60,7 +60,7 @@ namespace UI {
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const IconFont& f) {
-			world.get<QueryIcon>()->Value
+			world.try_get<QueryIcon>()->Value
 				.each([&world, &f](flecs::entity p, const FontFace& ff, const FontSize& fs) {
 				SetFontInfo(p, f.Value, ff.Value, fs.Value);
 			});
@@ -75,7 +75,7 @@ namespace UI {
 			for (flecs::entity instance : instances) {
 				if (!instance.has<WidgetInstance>())
 					return;
-				TSharedPtr<SWidget> widget = instance.get_mut<WidgetInstance>()->Value;
+				TSharedPtr<SWidget> widget = instance.try_get_mut<WidgetInstance>()->Value;
 				if (instance.has<TextBlock>())
 					SetTextBlockFontInfo(widget, fi.Value);
 			}
@@ -96,7 +96,7 @@ namespace UI {
 			if (string.IsEmpty())
 				return;
 			if (entity.has<Localized>())
-				string = GetLocalizedText(world.get<Locale>()->Value, string);
+				string = GetLocalizedText(world.try_get<Locale>()->Value, string);
 			if (entity.has<TextBlock>())
 				SetTextBlockText(widget.Value, string); });
 
@@ -107,11 +107,11 @@ namespace UI {
 			TMap<FString, TMap<FString, FString>> tables;
 			for (const FString& tableName : Assets::GetFolders(Assets::GetAssetPath("", LocalizationFolder)))
 				tables.Add(tableName, LoadTable(GetTablePath(tableName, locale.Value)));
-			world.get<QueryLocalizedText>()->Value
+			world.try_get<QueryLocalizedText>()->Value
 				.each([&tables](flecs::entity e, const Text& lt, const WidgetInstance& w) {
 				if (const auto* table = tables.Find(GetTable(lt.Value)); table)
 					if (const auto* result = table->Find(GetKey(lt.Value))) {
-						TSharedPtr<SWidget> widget = e.get_mut<WidgetInstance>()->Value;
+						TSharedPtr<SWidget> widget = e.try_get_mut<WidgetInstance>()->Value;
 						if (e.has<TextBlock>())
 							SetTextBlockText(widget, *result);
 					} });

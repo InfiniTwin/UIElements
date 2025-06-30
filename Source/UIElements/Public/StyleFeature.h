@@ -23,20 +23,20 @@ namespace UI {
 
 	static inline FSlateBrush GetBrush(flecs::entity brush) {
 		FSlateBrush slateBrush;
-		slateBrush.DrawAs = static_cast<ESlateBrushDrawType::Type>(brush.get<BrushType>()->Value);
-		slateBrush.TintColor = brush.get<Color>()->Value;
+		slateBrush.DrawAs = static_cast<ESlateBrushDrawType::Type>(brush.try_get<BrushType>()->Value);
+		slateBrush.TintColor = brush.try_get<Color>()->Value;
 		if (slateBrush.GetDrawType() == ESlateBrushDrawType::Type::RoundedBox) {
 			if (auto outline = ECS::FirstChild(brush)) {
-				slateBrush.OutlineSettings.Color = outline.get<Color>()->Value;
+				slateBrush.OutlineSettings.Color = outline.try_get<Color>()->Value;
 				if (!outline.has<Radii>())
 					slateBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::HalfHeightRadius;
 				else {
 					slateBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
-					auto radii = outline.get<Radii>();
+					auto radii = outline.try_get<Radii>();
 					slateBrush.OutlineSettings.CornerRadii = FVector4(
 						radii->TopLeft, radii->TopRight, radii->BottomRight, radii->BottomLeft);
 				}
-				slateBrush.OutlineSettings.Width = outline.has<Width>() ? outline.get<Width>()->Value : 0;
+				slateBrush.OutlineSettings.Width = outline.has<Width>() ? outline.try_get<Width>()->Value : 0;
 			}
 		}
 		return slateBrush;
