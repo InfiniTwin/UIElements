@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "flecs.h"
+#include <flecs.h>
 
 namespace UI {
 	struct UIScale { float Value; };

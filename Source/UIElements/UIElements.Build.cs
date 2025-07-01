@@ -13,7 +13,6 @@ public class UIElements : ModuleRules
 			"FlecsLibrary",
 			"ECSCore",
 			"UIMCU",
-			"Json",
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
