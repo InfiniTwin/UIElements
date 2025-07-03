@@ -21,7 +21,7 @@ void FUIElementsModule::ShutdownModule() {
 
 #undef LOCTEXT_NAMESPACE
 
-IMPLEMENT_MODULE(FUIElementsModule, UI)
+IMPLEMENT_MODULE(FUIElementsModule, UIElements)
 
 namespace UI {
 	FString& Scope() {
