@@ -44,20 +44,6 @@ namespace UI {
 			FString Hex = UTF8_TO_TCHAR(value);
 			*data = UIUtils::ArgbFromHex(Hex);
 				});
-
-		// FLinearColor <=> Hex (as string)
-		world.component<FLinearColor>()
-			.opaque(flecs::String)
-			.serialize([](const flecs::serializer* s, const FLinearColor* data) {
-			FString HexStr = UIUtils::HexFromLinearColor(*data);
-			std::string Utf8 = TCHAR_TO_UTF8(*HexStr);
-			const char* CStr = Utf8.c_str();
-			return s->value(flecs::String, &CStr);
-				})
-			.assign_string([](FLinearColor* data, const char* value) {
-			FString Hex = UTF8_TO_TCHAR(value);
-			*data = UIUtils::LinearColorFromHex(Hex);
-				});
 	}
 
 	void ColorFeature::RegisterComponents(flecs::world& world) {

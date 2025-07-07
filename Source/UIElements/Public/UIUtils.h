@@ -18,24 +18,6 @@ public:
 		return 0xffffffff;
 	}
 
-	static inline FString HexFromLinearColor(const FLinearColor& Color) {
-		FColor sRGB = Color.ToFColor(true);
-		return FString::Printf(TEXT("0x%02x%02x%02x%02x"), sRGB.A, sRGB.R, sRGB.G, sRGB.B);
-	}
-
-	static inline FLinearColor LinearColorFromHex(const FString& Hex) {
-		const FString CleanHex = SanitizeHex(Hex);
-		if (CleanHex.Len() == 8) {
-			uint32 ARGB = FParse::HexNumber(*CleanHex);
-			uint8 A = (ARGB >> 24) & 0xFF;
-			uint8 R = (ARGB >> 16) & 0xFF;
-			uint8 G = (ARGB >> 8) & 0xFF;
-			uint8 B = (ARGB) & 0xFF;
-			return FLinearColor(FColor(R, G, B, A));
-		}
-		return FLinearColor::White;
-	}
-
 private:
 	static inline FString SanitizeHex(const FString& Hex) {
 		if (Hex.StartsWith(TEXT("#")))
