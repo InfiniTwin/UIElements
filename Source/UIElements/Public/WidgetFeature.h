@@ -48,14 +48,10 @@ namespace UI {
 	struct VAlign { int Value; };
 	struct HAlign { int Value; };
 	
-	struct Padding { float Left, Top, Right, Bottom; };
+	struct Padding { FMargin Value; };
 
 	struct Attached {};
 	struct Order { int Value; };
-
-	static inline FMargin ToMargin(const Padding* padding) {
-		return FMargin((padding->Left, padding->Top, padding->Right, padding->Bottom));
-	}
 
 	static inline TPair<FAnchors, FVector2D> ToAnchorsAndAlignment(const flecs::entity& child) {
 		EHorizontalAlignment hAlign = static_cast<EHorizontalAlignment>(child.try_get<HAlign>()->Value);
@@ -125,11 +121,10 @@ namespace UI {
 
 	template<typename SlotType>
 	void AttachSlot(SlotType& slot, const flecs::entity child) {
-		auto padding = child.try_get<Padding>();
 		slot
 			.VAlign(static_cast<EVerticalAlignment>(child.try_get<VAlign>()->Value))
 			.HAlign(static_cast<EHorizontalAlignment>(child.try_get<HAlign>()->Value))
-			.Padding(padding->Left, padding->Top, padding->Right, padding->Bottom)
+			.Padding(child.try_get<Padding>()->Value)
 			.AttachWidget(child.try_get<WidgetInstance>()->Value.ToSharedRef());
 	}
 
@@ -148,7 +143,7 @@ namespace UI {
 			.AutoSize(true)
 			.Anchors(anchors)
 			.Alignment(alignment)
-			.Offset(ToMargin(child.try_get<Padding>()))
+			.Offset(child.try_get<Padding>()->Value)
 			.AttachWidget(child.try_get<WidgetInstance>()->Value.ToSharedRef());
 	}
 

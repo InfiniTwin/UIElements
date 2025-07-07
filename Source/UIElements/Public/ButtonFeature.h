@@ -55,7 +55,7 @@ namespace UI {
 			if (brush.name().contains("Hovered"))
 				style.SetHovered(GetBrush(brush));
 			else {
-				auto margin = ToMargin(brush.try_get<Padding>());
+				auto margin = brush.try_get<Padding>()->Value;
 				if (brush.name().contains("Normal")) {
 					style.SetNormal(GetBrush(brush));
 					style.SetNormalPadding(margin);
@@ -72,7 +72,7 @@ namespace UI {
 		auto fbs = FTextBlockStyle();
 		auto style = FCheckBoxStyle();
 		style.CheckBoxType = static_cast<ESlateCheckBoxType::Type>(entity.has<Toggle>());
-		style.SetPadding(ToMargin(entity.try_get<Padding>()));
+		style.SetPadding(entity.try_get<Padding>()->Value);
 
 		entity.children([&style](flecs::entity brush) {
 			if (!brush.has<BrushType>()) return;

@@ -36,12 +36,7 @@ namespace UI {
 		world.component<VAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		
-		world.component<Padding>()
-			.member<float>(MEMBER(Padding::Left))
-			.member<float>(MEMBER(Padding::Topp))
-			.member<float>(MEMBER(Padding::Right))
-			.member<float>(MEMBER(Padding::Bottom))
-			.add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Padding>().member<FMargin>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Attached>().add(flecs::CanToggle);
 		world.component<Order>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
