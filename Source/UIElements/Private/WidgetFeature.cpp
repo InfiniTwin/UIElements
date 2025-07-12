@@ -7,10 +7,12 @@
 #include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
+#include "WindowFeature.h"
 
 namespace UI {
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
+		world.component<SlateApplication>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Viewport>();
 
 		world.component<Widget>().add(flecs::OnInstantiate, flecs::Inherit);
@@ -29,13 +31,13 @@ namespace UI {
 		world.component<Box>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HBox>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<VBox>().add(flecs::OnInstantiate, flecs::Inherit);
-		
+
 		world.component<FillHeight>().member<float>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FillWidth>().member<float>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<VAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		
+
 		world.component<Padding>().member<FMargin>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Attached>().add(flecs::CanToggle);
@@ -60,9 +62,9 @@ namespace UI {
 			else if (widget.has<VBox>())
 				widget.set(WidgetInstance{ SNew(SVerticalBox) });
 			else if (widget.has<Button>())
-				AddButtonWidget(world, widget);
+				AddButtonWidget(widget);
 			else if (widget.has<CheckBox>())
-				AddCheckBoxWidget(world, widget);
+				AddCheckBoxWidget(widget);
 			else if (widget.has<TextBlock>())
 				AddTextBlockWidget(widget);
 			else if (widget.has<Menu>())
@@ -80,6 +82,9 @@ namespace UI {
 			.each([](flecs::entity child, const WidgetInstance& w, Order) {
 			flecs::entity parent = child.parent();
 			child.enable<Attached>();
+
+			if (child.has<Window>()) return;
+
 			if (parent.has<Viewport>()) {
 				GEngine->GameViewport->AddViewportWidgetContent(w.Value.ToSharedRef());
 				return;
@@ -114,7 +119,6 @@ namespace UI {
 			.with<WidgetState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
 			.each([&world](flecs::entity entity) {
-			auto open = entity.has(WidgetState::Opened);
 			StaticCastSharedRef<SMenuAnchor>(entity.try_get<WidgetInstance>()->Value.ToSharedRef())
 				->SetIsOpen(entity.has(WidgetState::Opened));
 				});

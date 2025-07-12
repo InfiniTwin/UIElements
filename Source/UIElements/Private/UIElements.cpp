@@ -7,6 +7,7 @@
 #include "ColorFeature.h"
 #include "StyleFeature.h"
 #include "ButtonFeature.h"
+#include "WindowFeature.h"
 
 #define LOCTEXT_NAMESPACE "FUIElementsModule"
 
@@ -38,11 +39,13 @@ namespace UI {
 		TypographyFeature::RegisterComponents(world);
 		StyleFeature::RegisterComponents(world);
 		ButtonFeature::RegisterComponents(world);
+		WindowFeature::RegisterComponents(world);
 
 		ColorFeature::CreateQueries(world);
 		TypographyFeature::CreateQueries(world);
 		StyleFeature::CreateQueries(world);
 		ButtonFeature::CreateQueries(world);
+		WindowFeature::CreateQueries(world);
 
 		UIFeature::CreateObservers(world);
 		WidgetFeature::CreateObservers(world);
@@ -52,5 +55,6 @@ namespace UI {
 		ButtonFeature::CreateObservers(world);
 
 		WidgetFeature::CreateSystems(world);
+		WindowFeature::CreateSystems(world);
 	}
 }

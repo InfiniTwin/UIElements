@@ -25,32 +25,32 @@ namespace UI {
 	struct QueryButtonStylePrefab { flecs::query<ButtonStyle> Value; };
 	struct QueryCheckBoxStylePrefab { flecs::query<CheckBoxStyle> Value; };
 
-	static inline void AddButtonWidget(flecs::world world, flecs::entity entity) {
-		entity.set(WidgetInstance{ SNew(SButton)
-			.ButtonStyle(&entity.try_get<ButtonStyle>()->Value)
-			.OnClicked_Lambda(([entity]() { entity.add(Clicked); return FReply::Handled(); })) });
+	static inline void AddButtonWidget(flecs::entity button) {
+		button.set(WidgetInstance{ SNew(SButton)
+			.ButtonStyle(&button.try_get<ButtonStyle>()->Value)
+			.OnClicked_Lambda(([button]() { button.add(Clicked); return FReply::Handled(); })) });
 	}
 
-	static inline void AddCheckBoxWidget(flecs::world world, flecs::entity entity) {
-		entity.set(WidgetInstance{ SNew(SCheckBox)
-			.Style(&entity.try_get<CheckBoxStyle>()->Value)
-			.OnCheckStateChanged_Lambda([entity](ECheckBoxState state) {
+	static inline void AddCheckBoxWidget(flecs::entity checkBox) {
+		checkBox.set(WidgetInstance{ SNew(SCheckBox)
+			.Style(&checkBox.try_get<CheckBoxStyle>()->Value)
+			.OnCheckStateChanged_Lambda([checkBox](ECheckBoxState state) {
 				switch (state) {
 				case ECheckBoxState::Unchecked:
-					entity.add(Unchecked);
+					checkBox.add(Unchecked);
 					break;
 				case ECheckBoxState::Checked:
-					entity.add(Checked);
+					checkBox.add(Checked);
 					break;
 				case ECheckBoxState::Undetermined:
-					entity.add(Undetermined);
+					checkBox.add(Undetermined);
 					break;
 				}}) });
 	}
 
-	static inline void SetButtonStyle(flecs::entity entity) {
+	static inline void SetButtonStyle(flecs::entity button) {
 		auto style = FButtonStyle();
-		entity.children([&style](flecs::entity brush) {
+		button.children([&style](flecs::entity brush) {
 			if (!brush.has<BrushType>()) return;
 			if (brush.name().contains("Hovered"))
 				style.SetHovered(GetBrush(brush));
@@ -65,16 +65,16 @@ namespace UI {
 				}
 			}
 		});
-		entity.try_get_mut<ButtonStyle>()->Value = style;
+		button.try_get_mut<ButtonStyle>()->Value = style;
 	}
 
-	static inline void SetCheckBoxStyle(flecs::entity entity) {
+	static inline void SetCheckBoxStyle(flecs::entity checkBox) {
 		auto fbs = FTextBlockStyle();
 		auto style = FCheckBoxStyle();
-		style.CheckBoxType = static_cast<ESlateCheckBoxType::Type>(entity.has<Toggle>());
-		style.SetPadding(entity.try_get<Padding>()->Value);
+		style.CheckBoxType = static_cast<ESlateCheckBoxType::Type>(checkBox.has<Toggle>());
+		style.SetPadding(checkBox.try_get<Padding>()->Value);
 
-		entity.children([&style](flecs::entity brush) {
+		checkBox.children([&style](flecs::entity brush) {
 			if (!brush.has<BrushType>()) return;
 			if (brush.name().contains("BrushNormalOFF"))
 				style.SetUncheckedImage(GetBrush(brush));
@@ -102,6 +102,6 @@ namespace UI {
 				style.SetCheckedPressedForegroundColor(color);
 			}
 		});
-		entity.try_get_mut<CheckBoxStyle>()->Value = style;
+		checkBox.try_get_mut<CheckBoxStyle>()->Value = style;
 	}
 }

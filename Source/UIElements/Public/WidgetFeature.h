@@ -14,6 +14,7 @@ namespace UI {
 		static void CreateSystems(flecs::world& world);
 	};
 
+	struct SlateApplication {};
 	struct Viewport {};
 
 	struct Widget {};
