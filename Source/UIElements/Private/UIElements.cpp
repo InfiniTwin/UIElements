@@ -56,5 +56,7 @@ namespace UI {
 
 		WidgetFeature::CreateSystems(world);
 		WindowFeature::CreateSystems(world);
+
+		WindowFeature::Initialize(world);
 	}
 }

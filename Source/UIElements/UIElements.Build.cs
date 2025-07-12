@@ -20,6 +20,10 @@ public class UIElements : ModuleRules
 			"Engine",
 			"Slate",
 			"SlateCore",
-		});
-	}
+        });
+
+        if (Target.bBuildEditor) {
+            PrivateDependencyModuleNames.Add("UnrealEd");
+        }
+    }
 }

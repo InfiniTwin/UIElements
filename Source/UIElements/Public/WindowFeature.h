@@ -12,9 +12,13 @@ namespace UI {
 		static void RegisterComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
 		static void CreateSystems(flecs::world& world);
+		static void Initialize(flecs::world& world);
 	};
 
 	struct Window {};
+	struct WindowStyle { FWindowStyle Value; };
+
+	struct QueryWindows { flecs::query<WidgetInstance> Value; };
 
 	static inline void OpenWindow(flecs::entity window) {
 		auto widget =

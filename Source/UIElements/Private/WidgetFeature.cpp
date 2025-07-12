@@ -16,8 +16,7 @@ namespace UI {
 		world.component<Viewport>();
 
 		world.component<Widget>().add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<WidgetInstance>()
-			.on_remove([](flecs::entity e, WidgetInstance& w) {w.Value.Reset(); });
+		world.component<WidgetInstance>();
 
 		world.component<Border>().add(flecs::OnInstantiate, flecs::Inherit);
 
