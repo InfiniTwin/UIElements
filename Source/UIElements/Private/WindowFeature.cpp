@@ -4,6 +4,10 @@
 #include "WindowFeature.h"
 
 namespace UI {
+#if WITH_EDITORONLY_DATA
+	static FDelegateHandle PIEHandle;
+#endif
+
 	void WindowFeature::RegisterComponents(flecs::world& world) {
 		world.component<Window>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<WindowStyle>().add(flecs::OnInstantiate, flecs::Inherit);
@@ -39,6 +43,7 @@ namespace UI {
 
 	void WindowFeature::Initialize(flecs::world& world) {
 		auto closeWindows = [&world] {
+			if (!world) return;
 			world.try_get<QueryWindows>()->Value
 				.each([](const WidgetInstance& widget) {
 				TSharedPtr<SWindow> window = StaticCastSharedPtr<SWindow>(widget.Value);
@@ -48,7 +53,13 @@ namespace UI {
 					});
 			};
 #if WITH_EDITORONLY_DATA
-		FEditorDelegates::EndPIE.AddLambda([closeWindows](bool) { closeWindows(); });
+		PIEHandle = FEditorDelegates::EndPIE.AddLambda([closeWindows](bool) {
+			closeWindows();
+			if (PIEHandle.IsValid()) {
+				FEditorDelegates::EndPIE.Remove(PIEHandle);
+				PIEHandle.Reset();
+			}
+			});
 #endif
 		FCoreDelegates::ApplicationWillTerminateDelegate.AddLambda(closeWindows);
 	}
