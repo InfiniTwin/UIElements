@@ -10,6 +10,7 @@ namespace UI {
 
 	void WindowFeature::RegisterComponents(flecs::world& world) {
 		world.component<Window>().add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<WindowTitle>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<WindowStyle>().add(flecs::OnInstantiate, flecs::Inherit);
 	};
 
@@ -22,23 +23,14 @@ namespace UI {
 	};
 
 	void WindowFeature::CreateSystems(flecs::world& world) {
-		world.observer<>("HandleWindowSwitch")
+		world.observer<>("OpenWindow")
 			.with<Window>()
 			.with<WidgetState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity entity) {
-			auto checkBox = entity.parent();
-			auto checkBoxWidget = StaticCastSharedRef<SCheckBox>(checkBox.get<WidgetInstance>().Value.ToSharedRef());
-			if (entity.has(WidgetState::Opened)) {
-				OpenWindow(entity);
-				checkBoxWidget->SetVisibility(EVisibility::HitTestInvisible);
-			}
-			else {
-				checkBoxWidget->SetIsChecked(ECheckBoxState::Unchecked);
-				checkBoxWidget->SetVisibility(EVisibility::Visible);
-				checkBox.add(Unchecked);
-			}
-				});
+			.each([&world](flecs::entity window) {
+			if (window.has(WidgetState::Opened))
+				OpenWindow(window);
+		});
 	}
 
 	void WindowFeature::Initialize(flecs::world& world) {
@@ -50,8 +42,8 @@ namespace UI {
 				if (window.IsValid()) {
 					window->RequestDestroyWindow();
 				}
-					});
-			};
+			});
+		};
 #if WITH_EDITORONLY_DATA
 		PIEHandle = FEditorDelegates::EndPIE.AddLambda([closeWindows](bool) {
 			closeWindows();
@@ -59,7 +51,7 @@ namespace UI {
 				FEditorDelegates::EndPIE.Remove(PIEHandle);
 				PIEHandle.Reset();
 			}
-			});
+		});
 #endif
 		FCoreDelegates::ApplicationWillTerminateDelegate.AddLambda(closeWindows);
 	}

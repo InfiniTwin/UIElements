@@ -83,22 +83,22 @@ namespace UI {
 
 		world.observer<const WidgetInstance, const Icon>("SetIcon")
 			.event(flecs::OnSet)
-			.each([](flecs::entity e, const WidgetInstance& w, const Icon& code) {
+			.each([](flecs::entity entity, const WidgetInstance& widget, const Icon& code) {
 			int32 codePoint = FParse::HexNumber(*code.Value);
-			FString unicodeChar;
-			unicodeChar.AppendChar(static_cast<TCHAR>(codePoint));
-			SetTextBlockText(w.Value, unicodeChar); });
+			FString text;
+			text.AppendChar(static_cast<TCHAR>(codePoint));
+			SetText(entity, widget.Value, text); });
 
 		world.observer<const WidgetInstance, const Text>("SetText")
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity entity, const WidgetInstance& widget, const Text& text) {
-			FString string = text.Value;
-			if (string.IsEmpty())
+			.each([&world](flecs::entity entity, const WidgetInstance& widget, const Text& t) {
+			FString text = t.Value;
+			if (text.IsEmpty())
 				return;
 			if (entity.has<Localized>())
-				string = GetLocalizedText(world.try_get<Locale>()->Value, string);
-			if (entity.has<TextBlock>())
-				SetTextBlockText(widget.Value, string); });
+				text = GetLocalizedText(world.try_get<Locale>()->Value, text);
+			SetText(entity, widget.Value, text);
+		});
 
 		world.observer<const Locale>("LocalizeText")
 			.term_at(0).singleton()
@@ -108,12 +108,11 @@ namespace UI {
 			for (const FString& tableName : Assets::GetFolders(Assets::GetAssetPath("", LocalizationFolder)))
 				tables.Add(tableName, LoadTable(GetTablePath(tableName, locale.Value)));
 			world.try_get<QueryLocalizedText>()->Value
-				.each([&tables](flecs::entity e, const Text& lt, const WidgetInstance& w) {
+				.each([&tables](flecs::entity entity, const Text& lt, const WidgetInstance& w) {
 				if (const auto* table = tables.Find(GetTable(lt.Value)); table)
 					if (const auto* result = table->Find(GetKey(lt.Value))) {
-						TSharedPtr<SWidget> widget = e.try_get_mut<WidgetInstance>()->Value;
-						if (e.has<TextBlock>())
-							SetTextBlockText(widget, *result);
+						TSharedPtr<SWidget> widget = entity.try_get_mut<WidgetInstance>()->Value;
+						SetText(entity, widget, *result);
 					} });
 		});
 	};

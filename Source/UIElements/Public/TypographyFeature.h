@@ -6,6 +6,7 @@
 #include "Assets.h"
 #include "Containers/UnrealString.h"
 #include "WidgetFeature.h"
+#include "WindowFeature.h"
 
 namespace UI {
 	struct TypographyFeature {
@@ -67,12 +68,10 @@ namespace UI {
 	inline TMap<FString, FString> LoadTable(const FString& path) {
 		TMap<FString, FString> map;
 		FString fileContents;
-		if (FFileHelper::LoadFileToString(fileContents, *path))
-		{
+		if (FFileHelper::LoadFileToString(fileContents, *path)) {
 			TArray<FString> lines;
 			fileContents.ParseIntoArrayLines(lines);
-			for (const FString& line : lines)
-			{
+			for (const FString& line : lines) {
 				FString key, value;
 				if (line.Split(KeyValueDelimiter, &key, &value))
 					map.Add(key, value);
@@ -94,8 +93,11 @@ namespace UI {
 		return *LoadTable(GetTablePath(localizedText, locale)).Find(GetKey(localizedText));
 	}
 
-	static inline void SetTextBlockText(const TSharedPtr<SWidget>& widget, const FString& text) {
-		StaticCastSharedPtr<STextBlock>(widget)->SetText(FText::FromString(text));
+	static inline void SetText(flecs::entity entity, const TSharedPtr<SWidget>& widget, const FString& text) {
+		if (entity.has<TextBlock>())
+			StaticCastSharedPtr<STextBlock>(widget)->SetText(FText::FromString(text));
+		else if (entity.has<WindowTitle>())
+			SetWindowTitle(widget, text);
 	}
 
 	static inline void AddTextBlockWidget(flecs::entity entity) {
