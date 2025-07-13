@@ -16,20 +16,18 @@ namespace UI {
 		using namespace material_color_utilities;
 		world.component<Variant>()
 			.opaque(flecs::I32)
-			.serialize([](const flecs::serializer* s, const Variant* data)
-				{
-					int value = static_cast<int>(*data);
-					return s->value(flecs::I32, &value);
-				})
+			.serialize([](const flecs::serializer* s, const Variant* data) {
+			int value = static_cast<int>(*data);
+			return s->value(flecs::I32, &value);
+		})
 			.assign_int([](Variant* data, int64_t value) {
 			if (value >= static_cast<int64_t>(Variant::kMonochrome) &&
 				value <= static_cast<int64_t>(Variant::kFruitSalad)) {
 				*data = static_cast<Variant>(value);
-			}
-			else {
+			} else {
 				*data = Variant::kMonochrome;
 			}
-				});
+		});
 
 		// Argb <=> Hex (as string)
 		world.component<Argb>()
@@ -39,11 +37,11 @@ namespace UI {
 			std::string Utf8 = TCHAR_TO_UTF8(*HexStr);
 			const char* CStr = Utf8.c_str();
 			return s->value(flecs::String, &CStr);
-				})
+		})
 			.assign_string([](Argb* data, const char* value) {
 			FString Hex = UTF8_TO_TCHAR(value);
 			*data = UIUtils::ArgbFromHex(Hex);
-				});
+		});
 	}
 
 	void ColorFeature::RegisterComponents(flecs::world& world) {
@@ -142,18 +140,23 @@ namespace UI {
 				.each([&world](flecs::entity brush, Brush) {
 				if (brush.owns<Brush>())
 					brush.try_get_mut<Brush>()->Value = GetBrush(brush);
-					});
+			});
 
 			world.try_get<QueryButtonStylePrefab>()->Value
 				.each([](flecs::entity style, ButtonStyle) {
 				SetButtonStyle(style);
-					});
+			});
 
 			world.try_get<QueryCheckBoxStylePrefab>()->Value
 				.each([](flecs::entity style, CheckBoxStyle) {
 				SetCheckBoxStyle(style);
-					});
-				});
+			});
+
+			world.try_get<QueryWindowStylePrefab>()->Value
+				.each([&world](flecs::entity style, WindowStyle) {
+				SetWindowStyle(style);
+			});
+		});
 
 		world.observer<const Color>("SetInstanceWidgetColor")
 			.with(flecs::Prefab)
@@ -163,14 +166,14 @@ namespace UI {
 			ECS::GetInstances(world, prefab, instances);
 			for (flecs::entity instance : instances)
 				SetWidgetColor(world, instance, color.Value);
-				}
+		}
 			);
 
 		world.observer<const Color>("SetWidgetColor")
 			.event(flecs::OnSet)
 			.each([&world](flecs::entity entity, const Color& color) {
 			SetWidgetColor(world, entity, color.Value);
-				}
+		}
 			);
 	}
 
@@ -179,16 +182,14 @@ namespace UI {
 		FTCHARToUTF8 cn(*colorName);
 		world.try_get<QueryColorPrefab>()->Value.run([&cn, &c](flecs::iter& it) {
 			while (it.next())
-				for (auto i : it)
-				{
+				for (auto i : it) {
 					auto prefab = it.entity(i);
-					if (std::strcmp(prefab.name(), cn.Get()) == 0)
-					{
+					if (std::strcmp(prefab.name(), cn.Get()) == 0) {
 						prefab.set<Color>({ c });
 						return;
 					}
 				}
-			});
+		});
 	}
 
 	void SetWidgetColor(flecs::world& world, flecs::entity entity, const FLinearColor color) {

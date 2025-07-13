@@ -20,6 +20,14 @@ namespace UI {
 			world.query_builder<WidgetInstance>(COMPONENT(QueryWindows))
 			.with<Window>()
 			.build() });
+
+		world.component<QueryWindowStylePrefab>();
+		world.set(QueryWindowStylePrefab{
+			world.query_builder<WindowStyle>(COMPONENT(QueryWindowStylePrefab))
+			.with<Window>()
+			.without<Widget>()
+			.with(flecs::Prefab)
+			.cached().build() });
 	};
 
 	void WindowFeature::CreateSystems(flecs::world& world) {

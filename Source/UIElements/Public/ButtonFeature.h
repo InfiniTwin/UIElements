@@ -69,7 +69,6 @@ namespace UI {
 	}
 
 	static inline void SetCheckBoxStyle(flecs::entity checkBox) {
-		auto fbs = FTextBlockStyle();
 		auto style = FCheckBoxStyle();
 		style.CheckBoxType = static_cast<ESlateCheckBoxType::Type>(checkBox.has<Toggle>());
 		style.SetPadding(checkBox.try_get<Padding>()->Value);

@@ -20,11 +20,22 @@ namespace UI {
 	struct WindowStyle { FWindowStyle Value; };
 
 	struct QueryWindows { flecs::query<WidgetInstance> Value; };
+	struct QueryWindowStylePrefab { flecs::query<WindowStyle> Value; };
+
+	static inline void SetWindowStyle(flecs::entity window) {
+		auto style = FWindowStyle();
+		window.children([&style](flecs::entity brush) {
+			if (!brush.has<BrushType>()) return;
+			if (brush.name().contains("BackgroundBrush"))
+				style.SetBackgroundBrush(GetBrush(brush));
+		});
+		window.try_get_mut<WindowStyle>()->Value = style;
+	}
 
 	static inline void CloseWindow(flecs::entity window) {
 		window.add(Closed);
 		auto checkBox = window.parent();
-		auto checkBoxWidget = StaticCastSharedRef<SCheckBox>(checkBox.get<WidgetInstance>().Value.ToSharedRef());
+		auto checkBoxWidget = StaticCastSharedRef<SCheckBox>(checkBox.try_get<WidgetInstance>()->Value.ToSharedRef());
 		checkBoxWidget->SetIsChecked(ECheckBoxState::Unchecked);
 		checkBoxWidget->SetVisibility(EVisibility::Visible);
 		checkBox.add(Unchecked);
@@ -32,21 +43,19 @@ namespace UI {
 	}
 
 	static inline void OpenWindow(flecs::entity window) {
-		StaticCastSharedRef<SCheckBox>(window.parent().get<WidgetInstance>().Value.ToSharedRef())
-			->SetVisibility(EVisibility::HitTestInvisible);
+		TSharedRef<SWindow> widget = SNew(SWindow)
+			.Style(&window.try_get<WindowStyle>()->Value);
 
-		auto widget =
-			SNew(SWindow)
-			//.Content
-			//.CreateTitleBar
-			//.Style
-			;
 		widget->SetOnWindowClosed(FOnWindowClosed::CreateLambda([window](const TSharedRef<SWindow>& closedWindow) {
 			CloseWindow(window);
 		}));
+
 		window.set(WidgetInstance{ widget });
 
 		FSlateApplication::Get().AddWindow(widget);
+
+		StaticCastSharedRef<SCheckBox>(window.parent().try_get<WidgetInstance>()->Value.ToSharedRef())
+			->SetVisibility(EVisibility::HitTestInvisible);
 	}
 
 	static inline void SetWindowTitle(const TSharedPtr<SWidget>& widget, const FString& text) {
