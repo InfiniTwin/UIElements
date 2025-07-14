@@ -11,7 +11,7 @@ namespace UI {
 	struct WindowFeature {
 		static void RegisterComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
-		static void CreateSystems(flecs::world& world);
+		static void CreateObservers(flecs::world& world);
 		static void Initialize(flecs::world& world);
 	};
 

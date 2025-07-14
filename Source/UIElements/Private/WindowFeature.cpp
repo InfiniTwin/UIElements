@@ -30,8 +30,8 @@ namespace UI {
 			.cached().build() });
 	};
 
-	void WindowFeature::CreateSystems(flecs::world& world) {
 		world.observer<>("OpenWindow")
+	void WindowFeature::CreateObservers(flecs::world& world) {
 			.with<Window>()
 			.with<WidgetState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)

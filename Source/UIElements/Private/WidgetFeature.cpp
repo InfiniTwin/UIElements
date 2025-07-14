@@ -53,7 +53,7 @@ namespace UI {
 			else if (widget.has<ConstraintCanvas>())
 				widget.set(WidgetInstance{ SNew(SConstraintCanvas) });
 			else if (widget.has<CompoundWidget>())
-				widget.set(WidgetInstance{ SNew(CompoundWidgetInstance) });
+				widget.set(WidgetInstance{ SNew(CompoundWidgetElement) });
 			else if (widget.has<Box>())
 				widget.set(WidgetInstance{ SNew(SBox).Padding(0).WidthOverride(FOptionalSize()).HeightOverride(FOptionalSize()) });
 			else if (widget.has<HBox>())
