@@ -17,6 +17,7 @@ namespace UI {
 
 	struct Window {};
 	struct WindowTitle {};
+	struct Size { FVector2D Value; };
 
 	struct QueryWindows { flecs::query<WidgetInstance> Value; };
 
@@ -28,21 +29,6 @@ namespace UI {
 		checkBoxWidget->SetVisibility(EVisibility::Visible);
 		checkBox.add(Unchecked);
 		window.remove<WidgetInstance>();
-	}
-
-	static inline void OpenWindow(flecs::entity window) {
-		TSharedRef<SWindow> widget = SNew(SWindow);
-
-		widget->SetOnWindowClosed(FOnWindowClosed::CreateLambda([window](const TSharedRef<SWindow>& closedWindow) {
-			CloseWindow(window);
-		}));
-
-		window.set(WidgetInstance{ widget });
-
-		FSlateApplication::Get().AddWindow(widget);
-
-		StaticCastSharedRef<SCheckBox>(window.parent().try_get<WidgetInstance>()->Value.ToSharedRef())
-			->SetVisibility(EVisibility::HitTestInvisible);
 	}
 
 	static inline void SetWindowTitle(const TSharedPtr<SWidget>& widget, const FString& text) {

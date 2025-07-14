@@ -2,6 +2,8 @@
 
 
 #include "WindowFeature.h"
+#include "ECS.h"
+#include "Logging/LogMacros.h"
 
 namespace UI {
 #if WITH_EDITORONLY_DATA
@@ -9,8 +11,10 @@ namespace UI {
 #endif
 
 	void WindowFeature::RegisterComponents(flecs::world& world) {
+		using namespace ECS;
 		world.component<Window>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<WindowTitle>().add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Size>().member<FVector2D>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 	};
 
 	void WindowFeature::CreateQueries(flecs::world& world) {
@@ -22,13 +26,22 @@ namespace UI {
 	};
 
 	void WindowFeature::CreateObservers(flecs::world& world) {
-		world.observer<>("OpenWindow")
+		world.observer<const Size>("OpenWindow")
 			.with<Window>()
 			.with<WidgetState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity window) {
-			if (window.has(WidgetState::Opened))
-				OpenWindow(window);
+			.each([&world](flecs::entity window, const Size& size) {
+			if (!window.has(WidgetState::Opened)) return;
+			UE_LOG(LogTemp, Log, TEXT(">>> Vec: %s"), *size.Value.ToString());
+				TSharedRef<SWindow> widget = SNew(SWindow)
+				.ClientSize(size.Value);
+			widget->SetOnWindowClosed(FOnWindowClosed::CreateLambda([window](const TSharedRef<SWindow>& closedWindow) {
+				CloseWindow(window);
+				}));
+			window.set(WidgetInstance{ widget });
+			FSlateApplication::Get().AddWindow(widget);
+			StaticCastSharedRef<SCheckBox>(window.parent().try_get<WidgetInstance>()->Value.ToSharedRef())
+				->SetVisibility(EVisibility::HitTestInvisible);
 				});
 	}
 
