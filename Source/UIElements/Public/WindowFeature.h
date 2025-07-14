@@ -17,20 +17,8 @@ namespace UI {
 
 	struct Window {};
 	struct WindowTitle {};
-	struct WindowStyle { FWindowStyle Value; };
 
 	struct QueryWindows { flecs::query<WidgetInstance> Value; };
-	struct QueryWindowStylePrefab { flecs::query<WindowStyle> Value; };
-
-	static inline void SetWindowStyle(flecs::entity window) {
-		auto style = FWindowStyle();
-		window.children([&style](flecs::entity brush) {
-			if (!brush.has<BrushType>()) return;
-			if (brush.name().contains("BackgroundBrush"))
-				style.SetBackgroundBrush(GetBrush(brush));
-		});
-		window.try_get_mut<WindowStyle>()->Value = style;
-	}
 
 	static inline void CloseWindow(flecs::entity window) {
 		window.add(Closed);
@@ -43,8 +31,7 @@ namespace UI {
 	}
 
 	static inline void OpenWindow(flecs::entity window) {
-		TSharedRef<SWindow> widget = SNew(SWindow)
-			.Style(&window.try_get<WindowStyle>()->Value);
+		TSharedRef<SWindow> widget = SNew(SWindow);
 
 		widget->SetOnWindowClosed(FOnWindowClosed::CreateLambda([window](const TSharedRef<SWindow>& closedWindow) {
 			CloseWindow(window);

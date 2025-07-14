@@ -151,11 +151,6 @@ namespace UI {
 				.each([](flecs::entity style, CheckBoxStyle) {
 				SetCheckBoxStyle(style);
 			});
-
-			world.try_get<QueryWindowStylePrefab>()->Value
-				.each([&world](flecs::entity style, WindowStyle) {
-				SetWindowStyle(style);
-			});
 		});
 
 		world.observer<const Color>("SetInstanceWidgetColor")
