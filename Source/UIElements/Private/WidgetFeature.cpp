@@ -120,6 +120,8 @@ namespace UI {
 				SetContent<SCheckBox>(parentWidget, child);
 			else if (parent.has<Menu>() && !child.has<MenuContent>())
 				SetContent<SMenuAnchor>(parentWidget, child);
+			else if (parent.has<Window>())
+				SetContent<SWindow>(parentWidget, child);
 				});
 	}
 }
