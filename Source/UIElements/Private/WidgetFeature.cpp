@@ -71,6 +71,15 @@ namespace UI {
 
 			widget.add<Attached>().disable<Attached>();
 				});
+
+		world.observer<>("SwitchMenu")
+			.with<Menu>()
+			.with<WidgetState>().second(flecs::Wildcard)
+			.event(flecs::OnSet)
+			.each([&world](flecs::entity entity) {
+			StaticCastSharedRef<SMenuAnchor>(entity.try_get<WidgetInstance>()->Value.ToSharedRef())
+				->SetIsOpen(entity.has(WidgetState::Opened));
+				});
 	}
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
@@ -111,15 +120,6 @@ namespace UI {
 				SetContent<SCheckBox>(parentWidget, child);
 			else if (parent.has<Menu>() && !child.has<MenuContent>())
 				SetContent<SMenuAnchor>(parentWidget, child);
-				});
-
-		world.observer<>("SwitchMenu")
-			.with<Menu>()
-			.with<WidgetState>().second(flecs::Wildcard)
-			.event(flecs::OnSet)
-			.each([&world](flecs::entity entity) {
-			StaticCastSharedRef<SMenuAnchor>(entity.try_get<WidgetInstance>()->Value.ToSharedRef())
-				->SetIsOpen(entity.has(WidgetState::Opened));
 				});
 	}
 }
