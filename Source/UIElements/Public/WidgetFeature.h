@@ -159,7 +159,7 @@ namespace UI {
 
 	static inline void AttachToVerticalBox(TSharedRef<SWidget> parent, flecs::entity child) {
 		auto slot = StaticCastSharedRef<SVerticalBox>(parent)->AddSlot();
-		if (child.has<FillWidth>()) 
+		if (child.has<FillHeight>()) 
 			slot.FillHeight(child.try_get<FillHeight>()->Value);
 		else 
 			slot.AutoHeight();
