@@ -52,14 +52,14 @@ namespace UI {
 		auto style = FButtonStyle();
 		button.children([&style](flecs::entity brush) {
 			if (!brush.has<BrushType>()) return;
-			if (brush.name().contains("Hovered"))
+			if (brush.name().contains("BrushHovered"))
 				style.SetHovered(GetBrush(brush));
 			else {
 				auto margin = brush.try_get<Padding>()->Value;
-				if (brush.name().contains("Normal")) {
+				if (brush.name().contains("BrushNormal")) {
 					style.SetNormal(GetBrush(brush));
 					style.SetNormalPadding(margin);
-				} else if (brush.name().contains("Pressed")) {
+				} else if (brush.name().contains("BrushPressed")) {
 					style.SetPressed(GetBrush(brush));
 					style.SetPressedPadding(margin);
 				}
