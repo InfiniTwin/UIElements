@@ -65,6 +65,6 @@ namespace UI {
 			}
 			});
 #endif
-		FCoreDelegates::ApplicationWillTerminateDelegate.AddLambda(closeWindows);
+		FCoreDelegates::GetApplicationWillTerminateDelegate().AddLambda(closeWindows);
 	}
 }

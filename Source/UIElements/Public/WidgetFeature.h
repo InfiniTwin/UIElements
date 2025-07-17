@@ -166,7 +166,7 @@ namespace UI {
 		AttachSlot(slot, child);
 	}
 
-	int SortOrder(flecs::entity_t e1, const Order* o1, flecs::entity_t e2, const Order* o2) {
+	inline int SortOrder(flecs::entity_t e1, const Order* o1, flecs::entity_t e2, const Order* o2) {
 		(void)e1;
 		(void)e2;
 		return (o1->Value > o2->Value) - (o1->Value < o2->Value);
