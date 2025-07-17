@@ -19,7 +19,6 @@ namespace UI {
 	};
 
 	enum ButtonState {
-		Normal,
 		Hovered,
 		Unhovered,
 		Pressed,

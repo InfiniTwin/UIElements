@@ -28,6 +28,10 @@ namespace UI {
 	static inline void AddButtonWidget(flecs::entity button) {
 		button.set(WidgetInstance{ SNew(SButton)
 			.ButtonStyle(&button.try_get<ButtonStyle>()->Value)
+			.OnHovered_Lambda(([button]() { button.add(Hovered); }))
+			.OnUnhovered_Lambda(([button]() { button.add(Unhovered); }))
+			.OnPressed_Lambda(([button]() { button.add(Pressed); }))
+			.OnReleased_Lambda(([button]() { button.add(Released); }))
 			.OnClicked_Lambda(([button]() { button.add(Clicked); return FReply::Handled(); })) });
 	}
 

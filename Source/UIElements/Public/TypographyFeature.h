@@ -13,7 +13,6 @@ namespace UI {
 		static void RegisterComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
 		static void CreateObservers(flecs::world& world);
-		static void Initialize(flecs::world& world);
 	};
 
 	inline constexpr TCHAR LocalizationFolder[] = TEXT("Localization");
@@ -89,8 +88,8 @@ namespace UI {
 		StaticCastSharedPtr<STextBlock>(widget)->SetFont(fontInfo);
 	}
 
-	static inline FString GetLocalizedText(const FString& locale, const FString& localizedText) {
-		return *LoadTable(GetTablePath(localizedText, locale)).Find(GetKey(localizedText));
+	UIELEMENTS_API inline FString GetLocalizedText(flecs::world& world, const FString& localizedText) {
+		return *LoadTable(GetTablePath(localizedText, world.try_get<Locale>()->Value)).Find(GetKey(localizedText));
 	}
 
 	static inline void SetText(flecs::entity entity, const TSharedPtr<SWidget>& widget, const FString& text) {

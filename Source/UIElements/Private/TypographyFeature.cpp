@@ -96,7 +96,7 @@ namespace UI {
 			if (text.IsEmpty())
 				return;
 			if (entity.has<Localized>())
-				text = GetLocalizedText(world.try_get<Locale>()->Value, text);
+				text = GetLocalizedText(world, text);
 			SetText(entity, widget.Value, text);
 		});
 
