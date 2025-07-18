@@ -20,8 +20,10 @@ namespace UI {
 			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const UIScale& scale) {
+			FSlateApplication::Get().SetApplicationScale(scale.Value);
 			GetMutableDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())
-				->ApplicationScale = scale.Value; });
+				->ApplicationScale = scale.Value;
+				});
 
 		world.observer<>("TriggerWidgetAction")
 			.with<WidgetState>().second(flecs::Wildcard)
