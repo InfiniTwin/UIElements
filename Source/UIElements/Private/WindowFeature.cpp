@@ -27,14 +27,12 @@ namespace UI {
 
 	void WindowFeature::CreateObservers(flecs::world& world) {
 		world.observer<const Size>("OpenWindow")
+			.with(WidgetState::Opened)
 			.with<Window>()
 			.with<WidgetState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
 			.each([&world](flecs::entity window, const Size& size) {
-			if (!window.has(WidgetState::Opened)) return;
-			UE_LOG(LogTemp, Log, TEXT(">>> Vec: %s"), *size.Value.ToString());
-				TSharedRef<SWindow> widget = SNew(SWindow)
-				.ClientSize(size.Value);
+			TSharedRef<SWindow> widget = SNew(SWindow).ClientSize(size.Value);
 			widget->SetOnWindowClosed(FOnWindowClosed::CreateLambda([window](const TSharedRef<SWindow>& closedWindow) {
 				CloseWindow(window);
 				}));

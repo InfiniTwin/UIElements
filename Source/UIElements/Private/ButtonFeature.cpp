@@ -72,20 +72,5 @@ namespace UI {
 					other.add(CheckBoxState::Unchecked);
 				}});
 				});
-
-		//world.observer<const UIScheme>("UpdateButtonStyles")
-		//	.term_at(0).singleton()
-		//	.event(flecs::OnSet)
-		//	.each([&world](const UIScheme& scheme) {
-		//	world.try_get<QueryButtonStylePrefab>()->Value
-		//		.each([](flecs::entity prefab, ButtonStyle& style) {
-		//		SetButtonStyle(prefab);
-		//			});
-
-		//	world.try_get<QueryCheckBoxStylePrefab>()->Value
-		//		.each([](flecs::entity prefab, CheckBoxStyle& style) {
-		//		SetCheckBoxStyle(prefab);
-		//			});
-		//		});
 	}
 }
