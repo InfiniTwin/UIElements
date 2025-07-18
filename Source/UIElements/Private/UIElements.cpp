@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "UIElements.h"
-#include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "WidgetFeature.h"
 #include "ColorFeature.h"
@@ -33,7 +32,6 @@ namespace UI {
 	void Register(flecs::world& world) {
 		ColorFeature::RegisterOpaqueTypes(world);
 
-		UIFeature::RegisterComponents(world);
 		WidgetFeature::RegisterComponents(world);
 		ColorFeature::RegisterComponents(world);
 		TypographyFeature::RegisterComponents(world);
@@ -47,7 +45,6 @@ namespace UI {
 		ButtonFeature::CreateQueries(world);
 		WindowFeature::CreateQueries(world);
 
-		UIFeature::CreateObservers(world);
 		WidgetFeature::CreateObservers(world);
 		ColorFeature::CreateObservers(world);
 		StyleFeature::CreateObservers(world);

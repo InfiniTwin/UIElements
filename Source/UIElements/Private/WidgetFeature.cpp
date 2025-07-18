@@ -4,14 +4,17 @@
 #include "WidgetFeature.h"
 #include "flecs.h"
 #include "ECS.h"
-#include "UIFeature.h"
 #include "TypographyFeature.h"
 #include "ButtonFeature.h"
 #include "WindowFeature.h"
+#include "ActionFeature.h"
+#include "Engine/UserInterfaceSettings.h"
 
 namespace UI {
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
+		world.component<UIScale>().member<float>(VALUE);
+
 		world.component<SlateApplication>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Viewport>();
 
@@ -39,11 +42,23 @@ namespace UI {
 
 		world.component<Padding>().member<FMargin>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
+		world.component<WidgetState>().add(flecs::Exclusive);
+		world.component<Visibility>().add(flecs::Exclusive);
+
 		world.component<Attached>().add(flecs::CanToggle);
 		world.component<Order>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 	}
 
 	void WidgetFeature::CreateObservers(flecs::world& world) {
+		world.observer<const UIScale>("UpdateApplicationUIScale")
+			.term_at(0).singleton()
+			.event(flecs::OnSet)
+			.each([&world](const UIScale& scale) {
+			FSlateApplication::Get().SetApplicationScale(scale.Value);
+			GetMutableDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())
+				->ApplicationScale = scale.Value;
+				});
+
 		world.observer<>("AddWidgetInstance")
 			.with<Widget>()
 			.event(flecs::OnAdd)
@@ -72,13 +87,66 @@ namespace UI {
 			widget.add<Attached>().disable<Attached>();
 				});
 
+		world.observer<>("SetWidgetVisibility")
+			.with<Visibility>(flecs::Wildcard)
+			.with<WidgetInstance>()
+			.event(flecs::OnAdd)
+			.each([](flecs::entity entity) {
+			EVisibility widgetVisibility = EVisibility::Visible;
+			Visibility visibility = entity.target<Visibility>().to_constant<Visibility>();
+
+			switch (visibility) {
+			case Visible:               widgetVisibility = EVisibility::Visible; break;
+			case Collapsed:             widgetVisibility = EVisibility::Collapsed; break;
+			case Hidden:                widgetVisibility = EVisibility::Hidden; break;
+			case HitTestInvisible:      widgetVisibility = EVisibility::HitTestInvisible; break;
+			case SelfHitTestInvisible:  widgetVisibility = EVisibility::SelfHitTestInvisible; break;
+			case All:                   widgetVisibility = EVisibility::All; break;
+			}
+
+			entity.try_get_mut<WidgetInstance>()->Value.ToSharedRef()
+				->SetVisibility(widgetVisibility);
+				});
+
 		world.observer<>("SwitchMenu")
 			.with<Menu>()
 			.with<WidgetState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
 			.each([&world](flecs::entity entity) {
 			StaticCastSharedRef<SMenuAnchor>(entity.try_get<WidgetInstance>()->Value.ToSharedRef())
-				->SetIsOpen(entity.has(WidgetState::Opened));
+				->SetIsOpen(entity.has(Opened));
+				});
+
+		world.observer<>("TriggerWidgetAction")
+			.with<WidgetState>().second(flecs::Wildcard)
+			.or_()
+			.with<Visibility>().second(flecs::Wildcard)
+			.or_()
+			.with<ButtonState>().second(flecs::Wildcard)
+			.or_()
+			.with<CheckBoxState>().second(flecs::Wildcard)
+			.event(flecs::OnSet)
+			.each([&world](flecs::iter& it, size_t t) {
+			auto event = it.pair(0);
+			it.entity(t).children([&world, &event](flecs::entity action) {
+				if (action.has<ECS::Action>() && action.has(event))
+					action.enable<ECS::Action>(); });
+				});
+
+		world.observer<>("TriggerWidgetInverseAction")
+			.with<WidgetState>().second(flecs::Wildcard)
+			.or_()
+			.with<Visibility>().second(flecs::Wildcard)
+			.or_()
+			.with<ButtonState>().second(flecs::Wildcard)
+			.or_()
+			.with<CheckBoxState>().second(flecs::Wildcard)
+			.event(flecs::OnRemove)
+			.each([&world](flecs::iter& it, size_t t) {
+			auto event = it.pair(0);
+			it.entity(t).children([&world, &event](flecs::entity action) {
+				if (action.has<ECS::Invert>() && action.has(event))
+					action.enable<ECS::Invert>(); });
 				});
 	}
 

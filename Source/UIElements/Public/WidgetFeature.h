@@ -17,6 +17,8 @@ namespace UI {
 	struct SlateApplication {};
 	struct Viewport {};
 
+	struct UIScale { float Value; };
+
 	struct Widget {};
 	struct WidgetInstance { TSharedPtr<SWidget> Value; };
 
@@ -42,14 +44,29 @@ namespace UI {
 	struct Box {};
 	struct HBox {};
 	struct VBox {};
-	
+
 	struct FillHeight { float Value; };
 	struct FillWidth { float Value; };
 
 	struct VAlign { int Value; };
 	struct HAlign { int Value; };
-	
+
 	struct Padding { FMargin Value; };
+
+	enum WidgetState {
+		None,
+		Opened,
+		Closed
+	};
+
+	enum Visibility {
+		Visible,
+		Collapsed,
+		Hidden,
+		HitTestInvisible,
+		SelfHitTestInvisible,
+		All
+	};
 
 	struct Attached {};
 	struct Order { int Value; };
@@ -150,18 +167,18 @@ namespace UI {
 
 	static inline void AttachToHorizontalBox(TSharedRef<SWidget> parent, flecs::entity child) {
 		auto slot = StaticCastSharedRef<SHorizontalBox>(parent)->AddSlot();
-		if (child.has<FillWidth>()) 
+		if (child.has<FillWidth>())
 			slot.FillWidth(child.try_get<FillWidth>()->Value);
-		else 
+		else
 			slot.AutoWidth();
 		AttachSlot(slot, child);
 	}
 
 	static inline void AttachToVerticalBox(TSharedRef<SWidget> parent, flecs::entity child) {
 		auto slot = StaticCastSharedRef<SVerticalBox>(parent)->AddSlot();
-		if (child.has<FillHeight>()) 
+		if (child.has<FillHeight>())
 			slot.FillHeight(child.try_get<FillHeight>()->Value);
-		else 
+		else
 			slot.AutoHeight();
 		AttachSlot(slot, child);
 	}

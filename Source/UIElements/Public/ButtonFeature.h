@@ -3,7 +3,6 @@
 #pragma once
 
 #include "flecs.h"
-#include "UIFeature.h"
 #include "WidgetFeature.h"
 #include "StyleFeature.h"
 
@@ -21,6 +20,20 @@ namespace UI {
 
 	struct ButtonStyle { FButtonStyle Value; };
 	struct CheckBoxStyle { FCheckBoxStyle Value; };
+
+	enum ButtonState {
+		Hovered,
+		Unhovered,
+		Pressed,
+		Released,
+		Clicked
+	};
+
+	enum CheckBoxState {
+		Unchecked,
+		Checked,
+		Undetermined
+	};
 
 	struct QueryButtonStylePrefab { flecs::query<ButtonStyle> Value; };
 	struct QueryCheckBoxStylePrefab { flecs::query<CheckBoxStyle> Value; };

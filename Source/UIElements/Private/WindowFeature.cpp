@@ -27,19 +27,17 @@ namespace UI {
 
 	void WindowFeature::CreateObservers(flecs::world& world) {
 		world.observer<const Size>("OpenWindow")
-			.with(WidgetState::Opened)
+			.with(Opened)
 			.with<Window>()
 			.with<WidgetState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity window, const Size& size) {
+			.each([](flecs::entity window, const Size& size) {
 			TSharedRef<SWindow> widget = SNew(SWindow).ClientSize(size.Value);
 			widget->SetOnWindowClosed(FOnWindowClosed::CreateLambda([window](const TSharedRef<SWindow>& closedWindow) {
-				CloseWindow(window);
+				window.add(Closed);
 				}));
 			window.set(WidgetInstance{ widget });
 			FSlateApplication::Get().AddWindow(widget);
-			StaticCastSharedRef<SCheckBox>(window.parent().try_get<WidgetInstance>()->Value.ToSharedRef())
-				->SetVisibility(EVisibility::HitTestInvisible);
 				});
 	}
 

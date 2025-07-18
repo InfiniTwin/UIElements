@@ -14,6 +14,9 @@ namespace UI {
 
 		world.component<Toggle>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Radio>().add(flecs::OnInstantiate, flecs::Inherit);
+
+		world.component<ButtonState>().add(flecs::Exclusive);
+		world.component<CheckBoxState>().add(flecs::Exclusive);
 	};
 
 	void ButtonFeature::CreateQueries(flecs::world& world) {
@@ -57,20 +60,37 @@ namespace UI {
 
 		world.observer<const WidgetInstance>("ExclusiveRadioButtons")
 			.with<Radio>()
-			.with(CheckBoxState::Checked)
+			.with(Checked)
 			.event(flecs::OnSet)
 			.each([&world](flecs::entity entity, const WidgetInstance& widget) {
 			auto checkBox = StaticCastSharedRef<SCheckBox>(widget.Value.ToSharedRef());
 			checkBox->SetIsChecked(ECheckBoxState::Checked);
-			checkBox->SetVisibility(EVisibility::HitTestInvisible);
+			entity.add(HitTestInvisible);
 			// Uncheck others
 			entity.parent().children([&entity](flecs::entity other) {
-				if (other.has(CheckBoxState::Checked) && other.id() != entity.id()) {
+				if (other.has(Checked) && other.id() != entity.id()) {
+					other.add(Visible).add(Unchecked);
 					auto checkBox = StaticCastSharedRef<SCheckBox>(other.try_get<WidgetInstance>()->Value.ToSharedRef());
 					checkBox->SetIsChecked(ECheckBoxState::Unchecked);
-					checkBox->SetVisibility(EVisibility::Visible);
-					other.add(CheckBoxState::Unchecked);
 				}});
+				});
+
+		world.observer<>("SetCheckBoxWidgetState")
+			.with<CheckBoxState>(flecs::Wildcard)
+			.with<WidgetInstance>()
+			.event(flecs::OnAdd)
+			.each([](flecs::entity entity) {
+			ECheckBoxState widgetState = ECheckBoxState::Unchecked;
+			CheckBoxState state = entity.target<CheckBoxState>().to_constant<CheckBoxState>();
+
+			switch (state) {
+			case Unchecked:     widgetState = ECheckBoxState::Unchecked; break;
+			case Checked:       widgetState = ECheckBoxState::Checked; break;
+			case Undetermined:  widgetState = ECheckBoxState::Undetermined; break;
+			}
+
+			StaticCastSharedRef<SCheckBox>(entity.try_get_mut<WidgetInstance>()->Value.ToSharedRef())
+				->SetIsChecked(widgetState);
 				});
 	}
 }
