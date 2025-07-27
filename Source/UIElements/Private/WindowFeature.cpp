@@ -44,8 +44,7 @@ namespace UI {
 	void WindowFeature::Initialize(flecs::world& world) {
 		auto closeWindows = [&world] {
 			if (!world) return;
-			world.try_get<QueryWindows>()->Value
-				.each([](const WidgetInstance& widget) {
+			world.try_get<QueryWindows>()->Value.each([](const WidgetInstance& widget) {
 				TSharedPtr<SWindow> window = StaticCastSharedPtr<SWindow>(widget.Value);
 				if (window.IsValid()) {
 					window->RequestDestroyWindow();

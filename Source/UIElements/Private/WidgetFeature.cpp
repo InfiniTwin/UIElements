@@ -21,10 +21,12 @@ namespace UI {
 		world.component<Widget>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<WidgetInstance>();
 
-		world.component<Border>().add(flecs::OnInstantiate, flecs::Inherit);
-
 		world.component<ConstraintCanvas>();
 		world.component<CompoundWidget>();
+
+		world.component<List>();
+
+		world.component<Border>().add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Menu>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<MenuPlacement>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
@@ -57,7 +59,7 @@ namespace UI {
 			FSlateApplication::Get().SetApplicationScale(scale.Value);
 			GetMutableDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())
 				->ApplicationScale = scale.Value;
-				});
+		});
 
 		world.observer<>("AddWidgetInstance")
 			.with<Widget>()
@@ -83,9 +85,18 @@ namespace UI {
 				AddTextBlockWidget(widget);
 			else if (widget.has<Menu>())
 				AddMenuWidget(widget);
+			else if (widget.has<List>()) {
+				//widget.try_get_mut<List>()->Value = TArray<TSharedPtr<SWidget>>();
+				widget.set(WidgetInstance{
+					SNew(SListView<TSharedPtr<SWidget>>)
+					.ListItemsSource(&widget.get_mut<List>().Value)
+					.OnGenerateRow_Lambda([](TSharedPtr<SWidget> widget, const TSharedRef<STableViewBase>& ownerTable) {
+					return SNew(STableRow<TSharedPtr<SWidget>>, ownerTable)[widget.ToSharedRef()];
+				}) });
+			}
 
 			widget.add<Attached>().disable<Attached>();
-				});
+		});
 
 		world.observer<>("SetWidgetVisibility")
 			.with<Visibility>(flecs::Wildcard)
@@ -96,17 +107,17 @@ namespace UI {
 			Visibility visibility = entity.target<Visibility>().to_constant<Visibility>();
 
 			switch (visibility) {
-			case Visible:               widgetVisibility = EVisibility::Visible; break;
-			case Collapsed:             widgetVisibility = EVisibility::Collapsed; break;
-			case Hidden:                widgetVisibility = EVisibility::Hidden; break;
-			case HitTestInvisible:      widgetVisibility = EVisibility::HitTestInvisible; break;
-			case SelfHitTestInvisible:  widgetVisibility = EVisibility::SelfHitTestInvisible; break;
-			case All:                   widgetVisibility = EVisibility::All; break;
+				case Visible:               widgetVisibility = EVisibility::Visible; break;
+				case Collapsed:             widgetVisibility = EVisibility::Collapsed; break;
+				case Hidden:                widgetVisibility = EVisibility::Hidden; break;
+				case HitTestInvisible:      widgetVisibility = EVisibility::HitTestInvisible; break;
+				case SelfHitTestInvisible:  widgetVisibility = EVisibility::SelfHitTestInvisible; break;
+				case All:                   widgetVisibility = EVisibility::All; break;
 			}
 
 			entity.try_get_mut<WidgetInstance>()->Value.ToSharedRef()
 				->SetVisibility(widgetVisibility);
-				});
+		});
 
 		world.observer<>("SwitchMenu")
 			.with<Menu>()
@@ -115,7 +126,7 @@ namespace UI {
 			.each([&world](flecs::entity entity) {
 			StaticCastSharedRef<SMenuAnchor>(entity.try_get<WidgetInstance>()->Value.ToSharedRef())
 				->SetIsOpen(entity.has(Opened));
-				});
+		});
 
 		world.observer<>("TriggerWidgetAction")
 			.with<WidgetState>().second(flecs::Wildcard)
@@ -131,7 +142,7 @@ namespace UI {
 			it.entity(t).children([&world, &event](flecs::entity action) {
 				if (action.has<ECS::Action>() && action.has(event))
 					action.enable<ECS::Action>(); });
-				});
+		});
 
 		world.observer<>("TriggerWidgetInverseAction")
 			.with<WidgetState>().second(flecs::Wildcard)
@@ -147,7 +158,7 @@ namespace UI {
 			it.entity(t).children([&world, &event](flecs::entity action) {
 				if (action.has<ECS::Invert>() && action.has(event))
 					action.enable<ECS::Invert>(); });
-				});
+		});
 	}
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
@@ -190,6 +201,6 @@ namespace UI {
 				SetContent<SMenuAnchor>(parentWidget, child);
 			else if (parent.has<Window>())
 				SetContent<SWindow>(parentWidget, child);
-				});
+		});
 	}
 }

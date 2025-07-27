@@ -10,6 +10,7 @@ public class UIElements : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[] {
 			"Core",
+			"InputCore",
 			"FlecsLibrary",
 			"ECSCore",
 			"UIMCU",

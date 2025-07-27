@@ -5,7 +5,6 @@
 #include "flecs.h"
 #include "Widgets/Layout/SConstraintCanvas.h"
 #include "Widgets/Input/SMenuAnchor.h"
-#include "StyleFeature.h"
 
 namespace UI {
 	struct WidgetFeature {
@@ -22,8 +21,6 @@ namespace UI {
 	struct Widget {};
 	struct WidgetInstance { TSharedPtr<SWidget> Value; };
 
-	struct Border {};
-
 	struct ConstraintCanvas {};
 
 	struct CompoundWidgetElement : public SCompoundWidget {
@@ -36,6 +33,10 @@ namespace UI {
 		FCompoundWidgetOneChildSlot& Slot() { return ChildSlot; }
 	};
 	struct CompoundWidget {};
+
+	struct List{ TArray<TSharedPtr<SWidget>> Value = TArray<TSharedPtr<SWidget>>(); };
+
+	struct Border {};
 
 	struct Menu {};
 	struct MenuPlacement { int Value; };
