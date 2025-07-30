@@ -5,6 +5,7 @@
 #include "flecs.h"
 #include "Widgets/Layout/SConstraintCanvas.h"
 #include "Widgets/Input/SMenuAnchor.h"
+#include "Logging/LogMacros.h"
 
 namespace UI {
 	struct WidgetFeature {
@@ -34,7 +35,7 @@ namespace UI {
 	};
 	struct CompoundWidget {};
 
-	struct List{ TArray<TSharedPtr<SWidget>> Value = TArray<TSharedPtr<SWidget>>(); };
+	struct List { TArray<TSharedPtr<flecs::entity>> Items; };
 
 	struct Border {};
 
@@ -139,7 +140,7 @@ namespace UI {
 	}
 
 	template<typename SlotType>
-	void AttachSlot(SlotType& slot, const flecs::entity child) {
+	void AttachSlot(SlotType& slot, flecs::entity child) {
 		slot
 			.VAlign(static_cast<EVerticalAlignment>(child.try_get<VAlign>()->Value))
 			.HAlign(static_cast<EHorizontalAlignment>(child.try_get<HAlign>()->Value))
@@ -181,7 +182,22 @@ namespace UI {
 			slot.FillHeight(child.try_get<FillHeight>()->Value);
 		else
 			slot.AutoHeight();
+
 		AttachSlot(slot, child);
+	}
+	
+	static inline void AttachToList(flecs::entity parent, flecs::entity child) {
+		parent.get_ref<List>()->Items.Add(MakeShared<flecs::entity>(child));
+
+		StaticCastSharedRef<SListView<TSharedPtr<flecs::entity>>>(
+			parent.get_ref<WidgetInstance>()->Value.ToSharedRef())
+			->RequestListRefresh();
+
+		StaticCastSharedRef<SListView<TSharedPtr<flecs::entity>>>(
+			parent.get_ref<WidgetInstance>()->Value.ToSharedRef())
+			->RebuildList();
+
+		UE_LOG(LogTemp, Warning, TEXT(">>> List now contains %d items"), parent.get_ref<List>()->Items.Num());
 	}
 
 	inline int SortOrder(flecs::entity_t e1, const Order* o1, flecs::entity_t e2, const Order* o2) {

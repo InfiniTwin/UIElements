@@ -86,13 +86,14 @@ namespace UI {
 			else if (widget.has<Menu>())
 				AddMenuWidget(widget);
 			else if (widget.has<List>()) {
-				//widget.try_get_mut<List>()->Value = TArray<TSharedPtr<SWidget>>();
 				widget.set(WidgetInstance{
-					SNew(SListView<TSharedPtr<SWidget>>)
-					.ListItemsSource(&widget.get_mut<List>().Value)
-					.OnGenerateRow_Lambda([](TSharedPtr<SWidget> widget, const TSharedRef<STableViewBase>& ownerTable) {
-					return SNew(STableRow<TSharedPtr<SWidget>>, ownerTable)[widget.ToSharedRef()];
-				}) });
+					SNew(SListView<TSharedPtr<flecs::entity>>)
+					.ItemHeight(24)
+					.ListItemsSource(&widget.get_ref<List>()->Items)
+					.OnGenerateRow_Lambda([](TSharedPtr<flecs::entity> item, const TSharedRef<STableViewBase>& ownerTable) {
+						UE_LOG(LogTemp, Warning, TEXT(">>> GENERATING ROW for entity %llu"), item->id());
+					})
+					});
 			}
 
 			widget.add<Attached>().disable<Attached>();
@@ -201,6 +202,8 @@ namespace UI {
 				SetContent<SMenuAnchor>(parentWidget, child);
 			else if (parent.has<Window>())
 				SetContent<SWindow>(parentWidget, child);
-		});
+			else if (parent.has<List>())
+				AttachToList(parent, child);
+				});
 	}
 }
