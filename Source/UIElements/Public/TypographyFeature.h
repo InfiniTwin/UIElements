@@ -15,6 +15,9 @@ namespace UI {
 		static void CreateObservers(flecs::world& world);
 	};
 
+	inline constexpr TCHAR TEXT[] = TEXT("[TEXT]");
+	inline constexpr TCHAR ICON[] = TEXT("[ICON]");
+
 	inline constexpr TCHAR LocalizationFolder[] = TEXT("Localization");
 	constexpr const char* TableKeyDelimiter = "::";
 	constexpr const TCHAR KeyValueDelimiter[] = TEXT("=");
