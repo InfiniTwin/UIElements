@@ -21,10 +21,12 @@ namespace UI {
 		world.component<Widget>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<WidgetInstance>();
 
-		world.component<Border>().add(flecs::OnInstantiate, flecs::Inherit);
-
 		world.component<ConstraintCanvas>();
 		world.component<CompoundWidget>();
+
+		world.component<Collection>().add(flecs::OnInstantiate, flecs::Inherit);
+
+		world.component<Border>().add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Menu>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<MenuPlacement>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);

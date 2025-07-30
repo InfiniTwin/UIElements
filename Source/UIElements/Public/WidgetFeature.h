@@ -22,8 +22,6 @@ namespace UI {
 	struct Widget {};
 	struct WidgetInstance { TSharedPtr<SWidget> Value; };
 
-	struct Border {};
-
 	struct ConstraintCanvas {};
 
 	struct CompoundWidgetElement : public SCompoundWidget {
@@ -36,6 +34,10 @@ namespace UI {
 		FCompoundWidgetOneChildSlot& Slot() { return ChildSlot; }
 	};
 	struct CompoundWidget {};
+
+	struct Collection {};
+
+	struct Border {};
 
 	struct Menu {};
 	struct MenuPlacement { int Value; };
