@@ -13,10 +13,12 @@
 namespace UI {
 	void WidgetFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
-		world.component<UIScale>().member<float>(VALUE);
-
 		world.component<SlateApplication>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Viewport>();
+
+		world.component<UIScale>().member<float>(VALUE);
+
+		world.component<UIOf>();
 
 		world.component<Widget>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<WidgetInstance>();

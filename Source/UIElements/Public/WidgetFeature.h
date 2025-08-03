@@ -19,6 +19,8 @@ namespace UI {
 
 	struct UIScale { float Value; };
 
+	struct UIOf {};
+
 	struct Widget {};
 	struct WidgetInstance { TSharedPtr<SWidget> Value; };
 
