@@ -130,9 +130,9 @@ namespace UI {
 			.or_()
 			.with<CheckBoxState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
-			.each([&world](flecs::iter& it, size_t t) {
+			.each([](flecs::iter& it, size_t i) {
 			auto event = it.pair(0);
-			it.entity(t).children([&world, &event](flecs::entity action) {
+			it.entity(i).children([&event](flecs::entity action) {
 				if (action.has<ECS::Action>() && action.has(event))
 					action.enable<ECS::Action>(); });
 				});
