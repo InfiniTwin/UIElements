@@ -8,6 +8,7 @@
 #include "ButtonFeature.h"
 #include "WindowFeature.h"
 #include "ActionFeature.h"
+#include "ItemViewsFeature.h"
 #include "Engine/UserInterfaceSettings.h"
 
 namespace UI {
@@ -156,6 +157,7 @@ namespace UI {
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
 		world.system<const WidgetInstance, const Order>("AttachWidget")
+			.without<TreeItem>()
 			.with(flecs::ChildOf).second(flecs::Wildcard)
 			.order_by(SortOrder)
 			.with<Attached>().id_flags(flecs::TOGGLE).without<Attached>()
