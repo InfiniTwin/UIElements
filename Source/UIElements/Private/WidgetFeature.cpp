@@ -16,7 +16,7 @@ namespace UI {
 		world.component<SlateApplication>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Viewport>();
 
-		world.component<UIScale>().member<float>(VALUE);
+		world.component<UIScale>().member<float>(VALUE).add(flecs::Singleton);
 
 		world.component<UIOf>();
 
@@ -37,12 +37,15 @@ namespace UI {
 		world.component<Box>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HBox>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<VBox>().add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<ScrollBox>().add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<FillHeight>().member<float>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FillWidth>().member<float>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<VAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<HAlign>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+
+		world.component<Orientation>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Padding>().member<FMargin>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
@@ -55,7 +58,6 @@ namespace UI {
 
 	void WidgetFeature::CreateObservers(flecs::world& world) {
 		world.observer<const UIScale>("UpdateApplicationUIScale")
-			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const UIScale& scale) {
 			FSlateApplication::Get().SetApplicationScale(scale.Value);
@@ -79,6 +81,8 @@ namespace UI {
 				widget.set(WidgetInstance{ SNew(SHorizontalBox) });
 			else if (widget.has<VBox>())
 				widget.set(WidgetInstance{ SNew(SVerticalBox) });
+			else if (widget.has<ScrollBox>())
+				widget.set(WidgetInstance{ SNew(SScrollBox).Orientation(static_cast<EOrientation>(widget.try_get<Orientation>()->Value)) });
 			else if (widget.has<Button>())
 				AddButtonWidget(widget);
 			else if (widget.has<CheckBox>())
@@ -186,6 +190,8 @@ namespace UI {
 				AttachToHorizontalBox(parentWidget, child);
 			else if (parent.has<VBox>())
 				AttachToVerticalBox(parentWidget, child);
+			else if (parent.has<ScrollBox>())
+				AttachToScrollBox(parentWidget, child);
 			else if (parent.has<Button>())
 				SetContent<SButton>(parentWidget, child);
 			else if (parent.has<CheckBox>())

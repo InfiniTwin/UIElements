@@ -48,12 +48,15 @@ namespace UI {
 	struct Box {};
 	struct HBox {};
 	struct VBox {};
+	struct ScrollBox {};
 
 	struct FillHeight { float Value; };
 	struct FillWidth { float Value; };
 
 	struct VAlign { int Value; };
 	struct HAlign { int Value; };
+
+	struct Orientation { int Value; };
 
 	struct Padding { FMargin Value; };
 
@@ -184,6 +187,11 @@ namespace UI {
 			slot.FillHeight(child.try_get<FillHeight>()->Value);
 		else
 			slot.AutoHeight();
+		AttachSlot(slot, child);
+	}
+
+	static inline void AttachToScrollBox(TSharedRef<SWidget> parent, flecs::entity child) {
+		auto slot = StaticCastSharedRef<SScrollBox>(parent)->AddSlot();
 		AttachSlot(slot, child);
 	}
 

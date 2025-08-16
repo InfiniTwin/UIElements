@@ -57,7 +57,8 @@ namespace UI {
 			.member<Argb>(MEMBER(UIScheme::Tertiary))
 			.member<Argb>(MEMBER(UIScheme::Neutral))
 			.member<Argb>(MEMBER(UIScheme::NeutralVariant))
-			.member<Argb>(MEMBER(UIScheme::Error));
+			.member<Argb>(MEMBER(UIScheme::Error))
+			.add(flecs::Singleton);
 	}
 
 	void ColorFeature::CreateQueries(flecs::world& world) {
@@ -70,7 +71,6 @@ namespace UI {
 
 	void ColorFeature::CreateObservers(flecs::world& world) {
 		world.observer<const UIScheme>("SetPrefabColor")
-			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const UIScheme& scheme) {
 			using namespace material_color_utilities;

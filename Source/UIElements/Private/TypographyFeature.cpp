@@ -7,8 +7,8 @@
 namespace UI {
 	void TypographyFeature::RegisterComponents(flecs::world& world) {
 		using namespace ECS;
-		world.component<TextFont>().member<FString>(VALUE);
-		world.component<IconFont>().member<FString>(VALUE);
+		world.component<TextFont>().member<FString>(VALUE).add(flecs::Singleton);
+		world.component<IconFont>().member<FString>(VALUE).add(flecs::Singleton);
 
 		world.component<FontFace>().member<FString>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<FontSize>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
@@ -16,7 +16,7 @@ namespace UI {
 
 		world.component<TextBlock>();
 
-		world.component<Locale>().member<FString>(VALUE);
+		world.component<Locale>().member<FString>(VALUE).add(flecs::Singleton);
 		world.component<Localized>().add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Text>().member<FString>(VALUE);
@@ -47,7 +47,6 @@ namespace UI {
 
 	void TypographyFeature::CreateObservers(flecs::world& world) {
 		world.observer<const TextFont>("SetTextPrefabFontInfo")
-			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const TextFont& f) {
 			world.try_get<QueryText>()->Value
@@ -57,7 +56,6 @@ namespace UI {
 		});
 
 		world.observer<const IconFont>("SetIconPrefabFontInfo")
-			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const IconFont& f) {
 			world.try_get<QueryIcon>()->Value
@@ -101,7 +99,6 @@ namespace UI {
 		});
 
 		world.observer<const Locale>("LocalizeText")
-			.term_at(0).singleton()
 			.event(flecs::OnSet)
 			.each([&world](const Locale& locale) {
 			TMap<FString, TMap<FString, FString>> tables;
