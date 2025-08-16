@@ -26,17 +26,6 @@ namespace UI {
 
 	struct ConstraintCanvas {};
 
-	struct CompoundWidgetElement : public SCompoundWidget {
-	public:
-		SLATE_BEGIN_ARGS(CompoundWidgetElement) {}
-		SLATE_END_ARGS()
-
-		void Construct(const FArguments& InArgs) {}
-
-		FCompoundWidgetOneChildSlot& Slot() { return ChildSlot; }
-	};
-	struct CompoundWidget {};
-
 	struct Collection {};
 
 	struct Border {};
@@ -156,10 +145,6 @@ namespace UI {
 	template<typename TWidget>
 	static inline void SetContent(TSharedRef<SWidget>& parent, flecs::entity& child) {
 		StaticCastSharedRef<TWidget>(parent)->SetContent(child.try_get<WidgetInstance>()->Value.ToSharedRef());
-	}
-
-	static inline void AttachToCompoundWidget(TSharedRef<SWidget> parent, TSharedRef<SWidget> child) {
-		StaticCastSharedRef<CompoundWidgetElement>(parent)->Slot().AttachWidget(child);
 	}
 
 	static inline void AttachToConstraintCanvas(TSharedRef<SWidget> parent, flecs::entity child) {

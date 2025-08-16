@@ -21,10 +21,9 @@ namespace UI {
 		world.component<UIOf>();
 
 		world.component<Widget>().add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<WidgetInstance>();
+		world.component<WidgetInstance>().on_remove([](flecs::entity entity, WidgetInstance& widget) { widget.Value.Reset(); });
 
 		world.component<ConstraintCanvas>();
-		world.component<CompoundWidget>();
 
 		world.component<Collection>().add(flecs::OnInstantiate, flecs::Inherit);
 
@@ -59,7 +58,7 @@ namespace UI {
 	void WidgetFeature::CreateObservers(flecs::world& world) {
 		world.observer<const UIScale>("UpdateApplicationUIScale")
 			.event(flecs::OnSet)
-			.each([&world](const UIScale& scale) {
+			.each([](const UIScale& scale) {
 			FSlateApplication::Get().SetApplicationScale(scale.Value);
 			GetMutableDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())
 				->ApplicationScale = scale.Value;
@@ -68,13 +67,11 @@ namespace UI {
 		world.observer<>("AddWidgetInstance")
 			.with<Widget>()
 			.event(flecs::OnAdd)
-			.each([&world](flecs::entity widget) {
+			.each([](flecs::entity widget) {
 			if (widget.has<Border>())
 				widget.set(WidgetInstance{ SNew(SBorder) });
 			else if (widget.has<ConstraintCanvas>())
 				widget.set(WidgetInstance{ SNew(SConstraintCanvas) });
-			else if (widget.has<CompoundWidget>())
-				widget.set(WidgetInstance{ SNew(CompoundWidgetElement) });
 			else if (widget.has<Box>())
 				widget.set(WidgetInstance{ SNew(SBox).Padding(0).WidthOverride(FOptionalSize()).HeightOverride(FOptionalSize()) });
 			else if (widget.has<HBox>())
@@ -120,7 +117,7 @@ namespace UI {
 			.with<Menu>()
 			.with<WidgetState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity entity) {
+			.each([](flecs::entity entity) {
 			StaticCastSharedRef<SMenuAnchor>(entity.try_get<WidgetInstance>()->Value.ToSharedRef())
 				->SetIsOpen(entity.has(Opened));
 				});
@@ -150,11 +147,31 @@ namespace UI {
 			.or_()
 			.with<CheckBoxState>().second(flecs::Wildcard)
 			.event(flecs::OnRemove)
-			.each([&world](flecs::iter& it, size_t t) {
+			.each([](flecs::iter& it, size_t t) {
 			auto event = it.pair(0);
-			it.entity(t).children([&world, &event](flecs::entity action) {
+			it.entity(t).children([&event](flecs::entity action) {
 				if (action.has<ECS::Invert>() && action.has(event))
 					action.enable<ECS::Invert>(); });
+				});
+
+		world.observer<WidgetInstance>("DetachWidget")
+			.event(flecs::OnRemove)
+			.each([](flecs::entity entity, WidgetInstance& instance) {
+			TSharedPtr<SWidget> widget = instance.Value;
+
+			if (entity.has<HBox>() || entity.has<VBox>())
+				StaticCastSharedPtr<SBoxPanel>(widget)->ClearChildren();
+			else if (entity.has<ScrollBox>())
+				StaticCastSharedPtr<SScrollBox>(widget)->ClearChildren();
+			else if (entity.has<ConstraintCanvas>())
+				StaticCastSharedPtr<SConstraintCanvas>(widget)->ClearChildren();
+			else if (entity.has<Border>() || entity.has<Button>())
+				StaticCastSharedPtr<SBorder>(widget)->ClearContent();
+			else
+				return;
+
+			widget->Invalidate(EInvalidateWidgetReason::Layout | EInvalidateWidgetReason::Paint);
+			instance.Value.Reset();
 				});
 	}
 
@@ -163,14 +180,14 @@ namespace UI {
 			.with(flecs::ChildOf).second(flecs::Wildcard)
 			.order_by(SortOrder)
 			.with<Attached>().id_flags(flecs::TOGGLE).without<Attached>()
-			.each([](flecs::entity child, const WidgetInstance& w, Order) {
+			.each([](flecs::entity child, const WidgetInstance& widget, Order) {
 			flecs::entity parent = child.parent();
 			child.enable<Attached>();
 
 			if (child.has<Window>()) return;
 
 			if (parent.has<Viewport>()) {
-				GEngine->GameViewport->AddViewportWidgetContent(w.Value.ToSharedRef());
+				GEngine->GameViewport->AddViewportWidgetContent(widget.Value.ToSharedRef());
 				return;
 			}
 
@@ -182,8 +199,6 @@ namespace UI {
 				SetContent<SBorder>(parentWidget, child);
 			else if (parent.has<ConstraintCanvas>())
 				AttachToConstraintCanvas(parentWidget, child);
-			else if (parent.has<CompoundWidget>())
-				AttachToCompoundWidget(parentWidget, w.Value.ToSharedRef());
 			else if (parent.has<Box>())
 				SetContent<SBox>(parentWidget, child);
 			else if (parent.has<HBox>())
