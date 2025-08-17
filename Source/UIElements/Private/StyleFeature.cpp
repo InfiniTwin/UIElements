@@ -28,9 +28,9 @@ namespace UI {
 	};
 
 	void StyleFeature::CreateObservers(flecs::world& world) {
-		world.observer<>("SetWidgetBrushOnBrushAdded")
+		world.observer<>("SetWidgetBrushOnBrushSet")
 			.with<Brush>()
-			.event(flecs::OnAdd)
+			.event(flecs::OnSet)
 			.each([&world](flecs::entity brush) {
 			flecs::entity parent = brush.parent();
 			if (parent.has<WidgetInstance>() && parent.has<Border>())
