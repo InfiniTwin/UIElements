@@ -41,9 +41,9 @@ namespace UI {
 		world.observer<>("TriggerCheckBoxAction")
 			.with<CheckBoxState>(flecs::Wildcard)
 			.event(flecs::OnSet)
-			.each([&world](flecs::iter& it, size_t t) {
+			.each([&](flecs::iter& it, size_t t) {
 			auto event = it.pair(0);
-			it.entity(t).children([&world, &event](flecs::entity action) {
+			it.entity(t).children([&](flecs::entity action) {
 				if (action.has<ECS::Action>() && action.has(event))
 					action.enable<ECS::Action>(); });
 				});
@@ -51,9 +51,9 @@ namespace UI {
 		world.observer<>("TriggerCheckBoxInverseAction")
 			.with<CheckBoxState>(flecs::Wildcard)
 			.event(flecs::OnRemove)
-			.each([&world](flecs::iter& it, size_t t) {
+			.each([](flecs::iter& it, size_t t) {
 			auto event = it.pair(0);
-			it.entity(t).children([&world, &event](flecs::entity action) {
+			it.entity(t).children([&](flecs::entity action) {
 				if (action.has<ECS::Invert>() && action.has(event))
 					action.enable<ECS::Invert>(); });
 				});
@@ -62,7 +62,7 @@ namespace UI {
 			.with<Radio>()
 			.with(Checked)
 			.event(flecs::OnSet)
-			.each([&world](flecs::entity entity, const WidgetInstance& widget) {
+			.each([](flecs::entity entity, const WidgetInstance& widget) {
 			auto checkBox = StaticCastSharedRef<SCheckBox>(widget.Value.ToSharedRef());
 			checkBox->SetIsChecked(ECheckBoxState::Checked);
 			entity.add(HitTestInvisible);
