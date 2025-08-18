@@ -39,6 +39,7 @@ namespace UI {
 		ButtonFeature::RegisterComponents(world);
 		WindowFeature::RegisterComponents(world);
 
+		WidgetFeature::CreateQueries(world);
 		ColorFeature::CreateQueries(world);
 		TypographyFeature::CreateQueries(world);
 		StyleFeature::CreateQueries(world);

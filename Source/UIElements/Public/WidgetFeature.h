@@ -10,6 +10,7 @@
 namespace UI {
 	struct WidgetFeature {
 		static void RegisterComponents(flecs::world& world);
+		static void CreateQueries(flecs::world& world);
 		static void CreateObservers(flecs::world& world);
 		static void CreateSystems(flecs::world& world);
 	};
@@ -66,6 +67,8 @@ namespace UI {
 
 	struct Attached {};
 	struct Order { int Value; };
+
+	struct QueryUIOf { flecs::query<> Value; };
 
 	static inline TPair<FAnchors, FVector2D> ToAnchorsAndAlignment(const flecs::entity& child) {
 		EHorizontalAlignment hAlign = static_cast<EHorizontalAlignment>(child.try_get<HAlign>()->Value);

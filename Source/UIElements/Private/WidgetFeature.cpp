@@ -175,6 +175,13 @@ namespace UI {
 				});
 	}
 
+	void WidgetFeature::CreateQueries(flecs::world& world) {
+		world.set(QueryUIOf{
+			world.query_builder<>(COMPONENT(QueryUIOf))
+			.with<UIOf>().second("$source")
+			.cached().build() });
+	};
+
 	void WidgetFeature::CreateSystems(flecs::world& world) {
 		world.system<const WidgetInstance, const Order>("AttachWidget")
 			.with(flecs::ChildOf).second(flecs::Wildcard)
