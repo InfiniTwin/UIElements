@@ -157,16 +157,21 @@ namespace UI {
 		world.observer<WidgetInstance>("DetachWidget")
 			.event(flecs::OnRemove)
 			.each([](flecs::entity entity, WidgetInstance& instance) {
-			flecs::entity parent = entity.parent();
-			TSharedPtr<SWidget> parentWidget = parent.try_get<WidgetInstance>()->Value;
-			TSharedPtr<SWidget> widget = instance.Value;
+			TSharedRef<SWidget> widget = instance.Value.ToSharedRef();
 
-			if (parent.has<HBox>() || parent.has<VBox>())
-				StaticCastSharedPtr<SBoxPanel>(parentWidget)->RemoveSlot(widget.ToSharedRef());
-			else if (parent.has<ScrollBox>())
-				StaticCastSharedPtr<SScrollBox>(parentWidget)->RemoveSlot(widget.ToSharedRef());
-			else if (parent.has<ConstraintCanvas>())
-				StaticCastSharedPtr<SConstraintCanvas>(parentWidget)->RemoveSlot(widget.ToSharedRef());
+			flecs::entity parent = entity.parent();
+			if (parent.has<WidgetInstance>()) {
+				TSharedPtr<SWidget> parentWidget = parent.try_get<WidgetInstance>()->Value;
+				if (!parentWidget.IsValid())
+					return;
+
+				if (parent.has<HBox>() || parent.has<VBox>())
+					StaticCastSharedPtr<SBoxPanel>(parentWidget)->RemoveSlot(widget);
+				else if (parent.has<ScrollBox>())
+					StaticCastSharedPtr<SScrollBox>(parentWidget)->RemoveSlot(widget);
+				else if (parent.has<ConstraintCanvas>())
+					StaticCastSharedPtr<SConstraintCanvas>(parentWidget)->RemoveSlot(widget);
+			}
 
 			widget->Invalidate(EInvalidateWidgetReason::Layout | EInvalidateWidgetReason::Paint);
 			instance.Value.Reset();
