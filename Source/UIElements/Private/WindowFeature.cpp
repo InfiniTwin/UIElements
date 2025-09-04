@@ -10,7 +10,7 @@ namespace UI {
 	static FDelegateHandle PIEHandle;
 #endif
 
-	void WindowFeature::RegisterComponents(flecs::world& world) {
+	void WindowFeature::CreateComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<Window>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<WindowTitle>().add(flecs::OnInstantiate, flecs::Inherit);

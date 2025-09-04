@@ -5,7 +5,7 @@
 #include "ECS.h"
 
 namespace UI {
-	void TypographyFeature::RegisterComponents(flecs::world& world) {
+	void TypographyFeature::CreateComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<TextFont>().member<FString>(VALUE).add(flecs::Singleton);
 		world.component<IconFont>().member<FString>(VALUE).add(flecs::Singleton);

@@ -44,7 +44,7 @@ namespace UI {
 		});
 	}
 
-	void ColorFeature::RegisterComponents(flecs::world& world) {
+	void ColorFeature::CreateComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<Color>().member<FLinearColor>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 

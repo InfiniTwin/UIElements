@@ -5,7 +5,7 @@
 #include "ActionFeature.h"
 
 namespace UI {
-	void ButtonFeature::RegisterComponents(flecs::world& world) {
+	void ButtonFeature::CreateComponents(flecs::world& world) {
 		world.component<Button>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<ButtonStyle>().add(flecs::OnInstantiate, flecs::Inherit);
 

@@ -5,7 +5,7 @@
 #include "WidgetFeature.h"
 
 namespace UI {
-	void StyleFeature::RegisterComponents(flecs::world& world) {
+	void StyleFeature::CreateComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<Brush>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<BrushType>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);

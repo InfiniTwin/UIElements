@@ -11,7 +11,7 @@
 #include "Engine/UserInterfaceSettings.h"
 
 namespace UI {
-	void WidgetFeature::RegisterComponents(flecs::world& world) {
+	void WidgetFeature::CreateComponents(flecs::world& world) {
 		using namespace ECS;
 		world.component<SlateApplication>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Viewport>();

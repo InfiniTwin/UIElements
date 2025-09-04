@@ -9,7 +9,7 @@
 
 namespace UI {
 	struct WidgetFeature {
-		static void RegisterComponents(flecs::world& world);
+		static void CreateComponents(flecs::world& world);
 		static void CreateQueries(flecs::world& world);
 		static void CreateObservers(flecs::world& world);
 		static void CreateSystems(flecs::world& world);

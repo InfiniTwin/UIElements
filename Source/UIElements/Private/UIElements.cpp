@@ -32,12 +32,12 @@ namespace UI {
 	void Register(flecs::world& world) {
 		ColorFeature::RegisterOpaqueTypes(world);
 
-		WidgetFeature::RegisterComponents(world);
-		ColorFeature::RegisterComponents(world);
-		TypographyFeature::RegisterComponents(world);
-		StyleFeature::RegisterComponents(world);
-		ButtonFeature::RegisterComponents(world);
-		WindowFeature::RegisterComponents(world);
+		WidgetFeature::CreateComponents(world);
+		ColorFeature::CreateComponents(world);
+		TypographyFeature::CreateComponents(world);
+		StyleFeature::CreateComponents(world);
+		ButtonFeature::CreateComponents(world);
+		WindowFeature::CreateComponents(world);
 
 		WidgetFeature::CreateQueries(world);
 		ColorFeature::CreateQueries(world);
