@@ -55,6 +55,13 @@ namespace UI {
 		world.component<Order>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 	}
 
+	void WidgetFeature::CreateQueries(flecs::world& world) {
+		world.set(QueryUIOf{
+			world.query_builder<>(COMPONENT(QueryUIOf))
+			.with<UIOf>().second("$source")
+			.cached().build() });
+	};
+
 	void WidgetFeature::CreateObservers(flecs::world& world) {
 		world.observer<const UIScale>("UpdateApplicationUIScale")
 			.event(flecs::OnSet)
@@ -177,13 +184,6 @@ namespace UI {
 			instance.Value.Reset();
 				});
 	}
-
-	void WidgetFeature::CreateQueries(flecs::world& world) {
-		world.set(QueryUIOf{
-			world.query_builder<>(COMPONENT(QueryUIOf))
-			.with<UIOf>().second("$source")
-			.cached().build() });
-	};
 
 	void WidgetFeature::CreateSystems(flecs::world& world) {
 		world.system<const WidgetInstance, const Order>("AttachWidget")
