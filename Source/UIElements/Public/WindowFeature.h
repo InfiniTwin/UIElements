@@ -4,7 +4,6 @@
 
 #include "flecs.h"
 #include "WidgetFeature.h"
-#include "StyleFeature.h"
 
 namespace UI {
 	struct WindowFeature {
@@ -17,6 +16,7 @@ namespace UI {
 	struct Window {};
 	struct WindowTitle {};
 	struct Size { FVector2D Value; };
+	struct Position { FVector2D Value; };
 
 	struct QueryWindows { flecs::query<WidgetInstance> Value; };
 

@@ -3,7 +3,6 @@
 
 #include "WindowFeature.h"
 #include "ECS.h"
-#include "Logging/LogMacros.h"
 
 namespace UI {
 #if WITH_EDITORONLY_DATA
@@ -15,6 +14,7 @@ namespace UI {
 		world.component<Window>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<WindowTitle>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<Size>().member<FVector2D>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Position>().member<FVector2D>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 	};
 
 	void WindowFeature::CreateQueries(flecs::world& world) {
@@ -47,6 +47,15 @@ namespace UI {
 			.each([](flecs::entity window, WidgetInstance& instance, const Size& size) {
 			TSharedPtr<SWindow> widget = StaticCastSharedPtr<SWindow>(instance.Value);
 			widget->Resize(size.Value);
+		});
+
+		world.observer<WidgetInstance, const Position>("SetWindowPosition")
+			.with<Window>().filter()
+			.event(flecs::OnAdd)
+			.event(flecs::OnSet)
+			.each([](flecs::entity window, WidgetInstance& instance, const Position& position) {
+			TSharedPtr<SWindow> widget = StaticCastSharedPtr<SWindow>(instance.Value);
+			widget->MoveWindowTo(position.Value);
 		});
 	}
 
