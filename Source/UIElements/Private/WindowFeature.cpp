@@ -26,19 +26,28 @@ namespace UI {
 	};
 
 	void WindowFeature::CreateObservers(flecs::world& world) {
-		world.observer<const Size>("OpenWindow")
-			.with(Opened)
-			.with<Window>()
+		world.observer<>("OpenWindow")
+			.with<Window>().filter()
+			.with(Opened).filter()
 			.with<WidgetState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
-			.each([](flecs::entity window, const Size& size) {
-			TSharedRef<SWindow> widget = SNew(SWindow).ClientSize(size.Value);
+			.each([](flecs::entity window) {
+			TSharedRef<SWindow> widget = SNew(SWindow);
 			widget->SetOnWindowClosed(FOnWindowClosed::CreateLambda([window](const TSharedRef<SWindow>& closedWindow) {
 				window.add(Closed);
-				}));
+			}));
 			window.set(WidgetInstance{ widget });
 			FSlateApplication::Get().AddWindow(widget);
-				});
+		});
+
+		world.observer<WidgetInstance, const Size>("SetWindowSize")
+			.with<Window>().filter()
+			.event(flecs::OnAdd)
+			.event(flecs::OnSet)
+			.each([](flecs::entity window, WidgetInstance& instance, const Size& size) {
+			TSharedPtr<SWindow> widget = StaticCastSharedPtr<SWindow>(instance.Value);
+			widget->Resize(size.Value);
+		});
 	}
 
 	void WindowFeature::Initialize(flecs::world& world) {
@@ -50,8 +59,8 @@ namespace UI {
 				if (window.IsValid()) {
 					window->RequestDestroyWindow();
 				}
-					});
-			};
+			});
+		};
 #if WITH_EDITORONLY_DATA
 		PIEHandle = FEditorDelegates::EndPIE.AddLambda([closeWindows](bool) {
 			closeWindows();
@@ -59,7 +68,7 @@ namespace UI {
 				FEditorDelegates::EndPIE.Remove(PIEHandle);
 				PIEHandle.Reset();
 			}
-			});
+		});
 #endif
 		FCoreDelegates::GetApplicationWillTerminateDelegate().AddLambda(closeWindows);
 	}

@@ -121,7 +121,7 @@ namespace UI {
 				});
 
 		world.observer<>("SwitchMenu")
-			.with<Menu>()
+			.with<Menu>().filter()
 			.with<WidgetState>().second(flecs::Wildcard)
 			.event(flecs::OnSet)
 			.each([](flecs::entity entity) {
