@@ -49,6 +49,8 @@ namespace UI {
 	struct Orientation { int Value; };
 
 	struct Padding { FMargin Value; };
+	struct Position { FVector2D Value; };
+	struct Size { FVector2D Value; };
 
 	enum WidgetState {
 		None,

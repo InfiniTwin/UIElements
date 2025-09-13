@@ -47,6 +47,8 @@ namespace UI {
 		world.component<Orientation>().member<int>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<Padding>().member<FMargin>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Position>().member<FVector2D>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
+		world.component<Size>().member<FVector2D>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 
 		world.component<WidgetState>().add(flecs::Exclusive);
 		world.component<Visibility>().add(flecs::Exclusive);

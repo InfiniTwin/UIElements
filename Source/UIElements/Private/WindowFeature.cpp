@@ -3,6 +3,7 @@
 
 #include "WindowFeature.h"
 #include "ECS.h"
+#include "GameFramework/GameUsersettings.h"
 
 namespace UI {
 #if WITH_EDITORONLY_DATA
@@ -13,8 +14,6 @@ namespace UI {
 		using namespace ECS;
 		world.component<Window>().add(flecs::OnInstantiate, flecs::Inherit);
 		world.component<WindowTitle>().add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<Size>().member<FVector2D>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
-		world.component<Position>().member<FVector2D>(VALUE).add(flecs::OnInstantiate, flecs::Inherit);
 	};
 
 	void WindowFeature::CreateQueries(flecs::world& world) {
@@ -40,14 +39,25 @@ namespace UI {
 			FSlateApplication::Get().AddWindow(widget);
 		});
 
-		world.observer<WidgetInstance, const Size>("SetWindowSize")
-			.with<Window>().filter()
+#if !WITH_EDITOR && PLATFORM_WINDOWS
+		world.observer<const Position>("SetWindowMainPosition")
+			.with<Viewport>().filter()
 			.event(flecs::OnAdd)
 			.event(flecs::OnSet)
-			.each([](flecs::entity window, WidgetInstance& instance, const Size& size) {
-			TSharedPtr<SWindow> widget = StaticCastSharedPtr<SWindow>(instance.Value);
+			.each([](flecs::entity, const Position& position) {
+			TSharedPtr<SWindow> widget = FSlateApplication::Get().GetActiveTopLevelWindow();
+			widget->MoveWindowTo(position.Value);
+		});
+
+		world.observer<const Size>("SetWindowMainSize")
+			.with<Viewport>().filter()
+			.event(flecs::OnAdd)
+			.event(flecs::OnSet)
+			.each([&](flecs::entity, const Size& size) {
+			TSharedPtr<SWindow> widget = FSlateApplication::Get().GetActiveTopLevelWindow();
 			widget->Resize(size.Value);
 		});
+#endif
 
 		world.observer<WidgetInstance, const Position>("SetWindowPosition")
 			.with<Window>().filter()
@@ -56,6 +66,15 @@ namespace UI {
 			.each([](flecs::entity window, WidgetInstance& instance, const Position& position) {
 			TSharedPtr<SWindow> widget = StaticCastSharedPtr<SWindow>(instance.Value);
 			widget->MoveWindowTo(position.Value);
+		});
+
+		world.observer<WidgetInstance, const Size>("SetWindowSize")
+			.with<Window>().filter()
+			.event(flecs::OnAdd)
+			.event(flecs::OnSet)
+			.each([](flecs::entity window, WidgetInstance& instance, const Size& size) {
+			TSharedPtr<SWindow> widget = StaticCastSharedPtr<SWindow>(instance.Value);
+			widget->Resize(size.Value);
 		});
 	}
 
